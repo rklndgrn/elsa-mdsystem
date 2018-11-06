@@ -18,7 +18,7 @@
     <ClInclude Include="Atom\Atom.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Results\Results.h">
+	<ClInclude Include="Cell\Cell.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Material\Material.h">
@@ -27,18 +27,31 @@
     <ClInclude Include="Parameters\Parameters.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Results\Results.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Atom\Atom.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+<<<<<<< HEAD
     <ClCompile Include="Results\Results.cpp">
+=======
+    <ClCompile Include="Cell\Cell.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Material\Material.cpp">
+>>>>>>> 2ce324092f6a8763a7f4987ad1566941634a28d5
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Parameters\Parameters.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Material\Material.cpp">
+    <ClCompile Include="Results\Results.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">

@@ -1,4 +1,7 @@
 #include "./Atom/Atom.h"
+#include "./Material/Material.h"
+#include "./Parameters/Parameters.h"
+#include "Cell/Cell.h"
 #include <iostream>
 
 using namespace std;
@@ -6,22 +9,48 @@ using namespace std;
 int main()
 {
 	Atom a{1, 1, 2, 3};
-	Atom b{ 2, 87, 4, 2 };
 
-	cout << "a: ID " << a.getID() << ", position (" << a.getPosX() << ", " << a.getPosY() << ", " << a.getPosZ() << ") och hastighet (" << a.getVelocityX() << ", " << a.getVelocityY() << ", " << a.getVelocityZ() << ")!" << endl;
-	cout << "b: ID " << b.getID() << ", position (" << b.getPosX() << ", " << b.getPosY() << ", " << b.getPosZ() << ") och hastighet (" << b.getVelocityX() << ", " << b.getVelocityY() << ", " << b.getVelocityZ() << ")!" << endl;
+	cout << "Hej, vi har en atom med ID " << a.getID() << ", position (" << a.getPosX() << ", " << a.getPosY() << ", " << a.getPosZ() << ") och hastighet (" << a.getVelocityX() << ", " << a.getVelocityY() << ", " << a.getVelocityZ() << ")!" << endl;
 
 
 	a.setPosition(6, 2, 3);
 	a.setVelocity(5, 3, 2);
-	a.addToNeighbourList(b);
-
-	vector<Atom*> anl = a.getNeighbourList();
-	Atom q = *anl[0];
 
 	cout << "Fast nu har vi en atom med ID " << a.getID() << ", position (" << a.getPosX() << ", " << a.getPosY() << ", " << a.getPosZ() << ") och hastighet (" << a.getVelocityX() << ", " << a.getVelocityY() << ", " << a.getVelocityZ() << ")!" << endl;
-	cout << "I dess lista ligger också ett stycke atom med ID " << q.getID() << ", position (" << q.getPosX() << ", " << q.getPosY() << ", " << q.getPosZ() << ") och hastighet (" << q.getVelocityX() << ", " << q.getVelocityY() << ", " << q.getVelocityZ() << ")!" << endl;
 	
+
+
+	Material myMaterial;
+	Parameters myParameters;
+
+	myMaterial.setCrystalStructure("FCC");
+	myMaterial.setEpsilon(3.1415926536);
+
+	myParameters.setIsThermostatOn(true);
+	myParameters.setChosenMaterial(myMaterial);
+	myParameters.setCollisionFrequency(10.05);
+
+	cout << myParameters.getIsThermostatOn() << endl;
+	cout << myParameters.getCollisionFrequency() << endl;
+
+	cout << myParameters.getChosenMaterial().getCrystalStructure() << endl;
+	cout << myParameters.getChosenMaterial().getEpsilon() << endl;
+
+	Material anotherMaterial("BCC", 4.5, 1.2, 2.3, 4.5, 55);
+	Parameters anotherParameters(100, 10, 1000, 4.56, 1.00, true, true, anotherMaterial);
+
+	cout << anotherParameters.getIsThermostatOn() << endl;
+	cout << anotherParameters.getCollisionFrequency() << endl;
+
+	cout << anotherParameters.getChosenMaterial().getCrystalStructure() << endl;
+	cout << anotherParameters.getChosenMaterial().getEpsilon() << endl;
+
+	Cell newCell;
+	newCell.setCellID(1, 3, 4);
+
+	newCell.addAtomToCellList( a );
+	cout << newCell.getCellID()[0] << newCell.getCellID()[2] << newCell.getCellID()[1] << endl;
+
 
 	char exit;
 
