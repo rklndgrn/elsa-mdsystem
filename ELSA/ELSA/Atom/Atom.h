@@ -2,13 +2,12 @@
 #define ATOM_H
 
 #include <cstddef>
-#include <memory>
 #include <vector>
 
 class Atom
 {
 private:
-	std::size_t id{};
+	unsigned int id{};
 	int cellIndex[3] = { 0, 0, 0 };
 	double position[3] = {0, 0, 0};
 	double velocity[3] = {0, 0, 0};
@@ -18,10 +17,10 @@ private:
 	std::vector<Atom*> neighbourList;
 
 public:
-	Atom(std::size_t, double, double, double);
+	Atom(int, double, double, double);
 	~Atom() = default;
 
-	std::size_t getID() const;
+	int getID() const;
 	double getAccX() const;
 	double getAccY() const;
 	double getAccZ() const;

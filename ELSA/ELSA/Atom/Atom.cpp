@@ -3,7 +3,7 @@
 using namespace std;
 
 //Constructor
-Atom::Atom(size_t newID, double newPosX, double newPosY, double newPosZ)
+Atom::Atom(int newID, double newPosX, double newPosY, double newPosZ)
 {
 	id = newID;
 	position[0] = newPosX;
@@ -39,7 +39,7 @@ vector<Atom*> Atom::getNeighbourList() const
 	return neighbourList;
 }
 
-size_t Atom::getID() const
+int Atom::getID() const
 {
 	return id;
 }

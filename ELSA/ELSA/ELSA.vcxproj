@@ -112,10 +112,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Atom\Atom.h" />
+    <ClInclude Include="Results\Results.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Atom\Atom.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Results\Results.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
