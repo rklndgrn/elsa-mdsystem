@@ -111,11 +111,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="cell.h" />
     <ClInclude Include="material.h" />
     <ClInclude Include="parameters.h" />
-	<ClInclude Include="Atom\Atom.h" />
+    <ClInclude Include="Atom\Atom.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="cell.cpp" />
     <ClCompile Include="material.cpp" />
     <ClCompile Include="parameters.cpp" />
     <ClCompile Include="Atom\Atom.cpp" />
