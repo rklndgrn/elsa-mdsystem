@@ -51,8 +51,6 @@ int main()
 	newCell.addAtomToCellList( a );
 	cout << newCell.getCellID()[0] << newCell.getCellID()[2] << newCell.getCellID()[1] << endl;
 
-	
-
 
 	char exit;
 

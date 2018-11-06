@@ -34,7 +34,7 @@ public:
 	double** getTemperature();
 	double** getTotalEnergy();
 
-	void prettyPrint();
+	void printPositions();
 
 	void setCohesiveEnergy(double, int);
 	void setDebyeTemperature(double, int);
