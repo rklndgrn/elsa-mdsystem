@@ -28,27 +28,27 @@ Results::Results(int simulationTime, int timeStep, int numberOfParticles)
 	}
 }
 
-double** getCohesiveEnergy()
+double** Results::getCohesiveEnergy()
 {
 	return &cohesiveEnergy;
 }
 
-double** getDebyeTemperature()
+double** Results::getDebyeTemperature()
 {
 	return &debyeTemperature;
 }
 
-double** getDiffusionConstant()
+double** Results::getDiffusionConstant()
 {
 	return &diffusionConstant;
 }
 
-double** getInternalPressure()
+double** Results::getInternalPressure()
 {
 	return &internalPressure;
 }
 
-double** getMeanSquareDisplacement()
+double** Results::getMeanSquareDisplacement()
 {
 	return &meanSquareDisplacement;
 }
@@ -58,17 +58,17 @@ double**** Results::getPositions()
 	return &positions;
 }
 
-double** getSpecificHeat()
+double** Results::getSpecificHeat()
 {
 	return &specificHeat;
 }
 
-double** getTemperature()
+double** Results::getTemperature()
 {
 	return &temperature;
 }
 
-double** getTotalEnergy()
+double** Results::getTotalEnergy()
 {
 	return &totalEnergy;
 }
@@ -86,27 +86,27 @@ void Results::printPositions()
 	}
 }
 
-void setCohesiveEnergy(double value, int index)
+void Results::setCohesiveEnergy(double value, int index)
 {
 	cohesiveEnergy[index] = value;
 }
 
-void setDebyeTemperature(double value, int index)
+void Results::setDebyeTemperature(double value, int index)
 {
 	debyeTemperature[index] = value;
 }
 
-void setDiffusionConstant(double value, int index)
+void Results::setDiffusionConstant(double value, int index)
 {
 	diffusionConstant[index] = value;
 }
 
-void setInternalPressure(double value, int index)
+void Results::setInternalPressure(double value, int index)
 {
 	internalPressure[index] = value;
 }
 
-void setMeanSquareDisplacement(double value, int index)
+void Results::setMeanSquareDisplacement(double value, int index)
 {
 	meanSquareDisplacement[index] = value;
 }
@@ -118,17 +118,17 @@ void Results::setPositions(double x, double y, double z, int t, int n)
 	positions[t][n][2] = z;
 }
 
-void setSpecificHeat(double value, int index)
+void Results::setSpecificHeat(double value, int index)
 {
 	specificHeat[index] = value;
 }
 
-void setTemperature(double value, int index)
+void Results::setTemperature(double value, int index)
 {
 	temperature[index] = value;
 }
 
-void setTotalEnergy(double value, int index)
+void Results::setTotalEnergy(double value, int index)
 {
 	totalEnergy[index] = value;
 }
