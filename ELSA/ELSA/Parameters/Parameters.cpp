@@ -4,7 +4,7 @@
 	This file contains the definition of the class Parameters
 */
 
-#include "parameters.h"
+#include "Parameters.h"
 
 using namespace std;
 

@@ -5,7 +5,7 @@
 */
 
 #pragma once
-#include "material.h"
+#include "../Material/Material.h"
 #include <string>
 
 class Parameters
