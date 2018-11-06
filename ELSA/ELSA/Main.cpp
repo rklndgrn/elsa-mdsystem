@@ -1,6 +1,7 @@
 #include "./Atom/Atom.h"
 #include "./Material/Material.h"
 #include "./Parameters/Parameters.h"
+#include "Cell/Cell.h"
 #include <iostream>
 
 using namespace std;
@@ -44,6 +45,11 @@ int main()
 	cout << anotherParameters.getChosenMaterial().getCrystalStructure() << endl;
 	cout << anotherParameters.getChosenMaterial().getEpsilon() << endl;
 
+	Cell newCell;
+	newCell.setCellID(1, 3, 4);
+
+	newCell.addAtomToCellList( a );
+	cout << newCell.getCellID()[0] << newCell.getCellID()[2] << newCell.getCellID()[1] << endl;
 
 
 	char exit;
