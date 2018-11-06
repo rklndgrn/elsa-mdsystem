@@ -10,12 +10,12 @@
 class Material
 {
 private:
-	std::string crystalStructure;
-	double latticeConstant;
-	double epsilon;
-	double sigma;
-	double cutOffDistance;
-	double mass;
+	std::string _crystalStructure;
+	double _latticeConstant;
+	double _epsilon;
+	double _sigma;
+	double _cutOffDistance;
+	double _mass;
 
 public:
 	std::string getCrystalStructure();
@@ -33,5 +33,12 @@ public:
 	void setMass(double m);
 
 	Material();
+	Material(
+		std::string crystalStructure,
+		double latticeConstant,
+		double epsilon,
+		double sigma,
+		double cutOffDistance,
+		double mass);
 	~Material();
 };

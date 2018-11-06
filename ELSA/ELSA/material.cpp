@@ -10,73 +10,89 @@
 using namespace std;
 
 Material::Material() : 
-	crystalStructure{""},
-	latticeConstant{0},
-	epsilon{0},
-	sigma{0},
-	cutOffDistance{0},
-	mass{0}
+	_crystalStructure{""},
+	_latticeConstant{0},
+	_epsilon{0},
+	_sigma{0},
+	_cutOffDistance{0},
+	_mass{0}
 {}
+
+Material::Material(
+	std::string crystalStructure,
+	double latticeConstant,
+	double epsilon,
+	double sigma,
+	double cutOffDistance,
+	double mass) : 
+	_crystalStructure{ crystalStructure },
+	_latticeConstant{ latticeConstant },
+	_epsilon{ epsilon },
+	_sigma{ sigma },
+	_cutOffDistance{ cutOffDistance },
+	_mass{ mass }
+{}
+
 
 Material::~Material()
 {}
 
 string Material::getCrystalStructure()
 {
-	return crystalStructure;
+	return _crystalStructure;
 }
 
 void Material::setCrystalStructure(string str)
 {
-	crystalStructure = str;
+	_crystalStructure = str;
 }
 
 double Material::getLatticeConstant()
 {
-	return latticeConstant;
+	return _latticeConstant;
 }
 
 void Material::setLatticeConstant(double lc)
 {
-	latticeConstant = lc;
+	_latticeConstant = lc;
 }
 
 double Material::getEpsilon()
 {
-	return epsilon;
+	return _epsilon;
 }
 
 void Material::setEpsilon(double eps)
 {
-	epsilon = eps;
+	_epsilon = eps;
 }
 
 double Material::getSigma()
 {
-	return sigma;
+	return _sigma;
 }
 
 void Material::setSigma(double sig)
 {
-	sigma = sig;
+	_sigma = sig;
 }
 
 double Material::getCutOffDistance()
 {
-	return cutOffDistance;
+	return _cutOffDistance;
 }
 
 void Material::setCutOffDistance(double cod)
 {
-	cutOffDistance = cod;
+	_cutOffDistance = cod;
 }
 
 double Material::getMass()
 {
-	return mass;
+	return _mass;
 }
 
 void Material::setMass(double m)
 {
-	mass = m;
+	_mass = m;
 }
