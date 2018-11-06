@@ -1,64 +1,82 @@
+/*
+	File name: material.cpp
+	Date: 2018-11-06
+	This file contains the definition of the class Material
+*/
+
 #include "material.h"
 #include <string>
 
 using namespace std;
 
-string material::getCrystalStructure()
+Material::Material() : 
+	crystalStructure{""},
+	latticeConstant{0},
+	epsilon{0},
+	sigma{0},
+	cutOffDistance{0},
+	mass{0}
+{}
+
+Material::~Material()
+{}
+
+string Material::getCrystalStructure()
 {
 	return crystalStructure;
 }
 
-void material::setCrystalStructure(string str)
+void Material::setCrystalStructure(string str)
 {
 	crystalStructure = str;
 }
 
-double material::getLatticeConstant()
+double Material::getLatticeConstant()
 {
 	return latticeConstant;
 }
 
-void material::setLatticeConstant(double lc)
+void Material::setLatticeConstant(double lc)
 {
 	latticeConstant = lc;
 }
 
-double material::getEpsilon()
+double Material::getEpsilon()
 {
 	return epsilon;
 }
 
-void material::setEpsilon(double eps)
+void Material::setEpsilon(double eps)
 {
 	epsilon = eps;
 }
 
-double material::getSigma()
+double Material::getSigma()
 {
 	return sigma;
 }
 
-void material::setSigma(double sig)
+void Material::setSigma(double sig)
 {
 	sigma = sig;
 }
 
-double material::getCutOffDistance()
+double Material::getCutOffDistance()
 {
 	return cutOffDistance;
 }
 
-void material::setCutOffDistance(double cod)
+void Material::setCutOffDistance(double cod)
 {
 	cutOffDistance = cod;
 }
 
-double material::getMass()
+double Material::getMass()
 {
 	return mass;
 }
 
-void material::setMass(double m)
+void Material::setMass(double m)
 {
 	mass = m;
 }

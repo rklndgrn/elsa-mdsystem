@@ -1,7 +1,13 @@
+/*
+	File name: material.h
+	Date: 2018-11-06
+	This file contains the definition of the class Material
+*/
+
 #pragma once
 #include <string>
 
-class material
+class Material
 {
 private:
 	std::string crystalStructure;
@@ -25,4 +31,7 @@ public:
 	void setSigma(double sig);
 	void setCutOffDistance(double cod);
 	void setMass(double m);
+
+	Material();
+	~Material();
 };
