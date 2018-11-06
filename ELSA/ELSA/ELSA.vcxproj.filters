@@ -24,7 +24,7 @@
     <ClInclude Include="Atom\Atom.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cell.h">
+    <ClInclude Include="Cell\Cell.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -41,7 +41,7 @@
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cell.cpp">
+    <ClCompile Include="Cell\Cell.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
