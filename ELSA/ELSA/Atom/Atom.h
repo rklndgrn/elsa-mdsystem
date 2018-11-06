@@ -36,6 +36,7 @@ public:
 	double getVelocityY() const;
 	double getVelocityZ() const;
 
+	void addToNeighbourList(Atom);
 	void setAccX(double);
 	void setAccY(double);
 	void setAccZ(double);
