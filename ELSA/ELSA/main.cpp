@@ -1,6 +1,7 @@
 #include "./Atom/Atom.h"
 #include "./Material/Material.h"
 #include "./Parameters/Parameters.h"
+#include "./Results/Results.h"
 #include <iostream>
 
 using namespace std;
@@ -17,8 +18,6 @@ int main()
 
 	cout << "Fast nu har vi en atom med ID " << a.getID() << ", position (" << a.getPosX() << ", " << a.getPosY() << ", " << a.getPosZ() << ") och hastighet (" << a.getVelocityX() << ", " << a.getVelocityY() << ", " << a.getVelocityZ() << ")!" << endl;
 	
-
-
 	Material myMaterial;
 	Parameters myParameters;
 
@@ -44,7 +43,15 @@ int main()
 	cout << anotherParameters.getChosenMaterial().getCrystalStructure() << endl;
 	cout << anotherParameters.getChosenMaterial().getEpsilon() << endl;
 
+	Results myResults{4, 2, 2}; //Create a 2x2x3 array.
+	myResults.setPositions(0, 0, 0, 0, 0);
+	myResults.setPositions(5, 5, 5, 0, 1);
+	myResults.setPositions(2, 3, 2, 1, 0);
+	myResults.setPositions(1, 2, 1, 1, 1);
 
+	double**** r = myResults.getPositions();
+
+	myResults.prettyPrint();
 
 	char exit;
 
