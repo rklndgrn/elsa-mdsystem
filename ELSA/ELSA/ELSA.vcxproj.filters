@@ -18,7 +18,7 @@
     <ClInclude Include="Atom\Atom.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-	<ClInclude Include="Cell\Cell.h">
+    <ClInclude Include="Cell\Cell.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Material\Material.h">
@@ -28,6 +28,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Results\Results.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Simulation\Simulation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -48,6 +51,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Results\Results.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Simulation\Simulation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

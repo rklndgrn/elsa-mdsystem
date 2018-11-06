@@ -116,14 +116,16 @@
     <ClInclude Include="Material\Material.h" />
     <ClInclude Include="Parameters\Parameters.h" />
     <ClInclude Include="Results\Results.h" />
+    <ClInclude Include="Simulation\Simulation.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Atom\Atom.cpp" />
-	<ClCompile Include="Cell\Cell.cpp" />
+    <ClCompile Include="Cell\Cell.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Material\Material.cpp" />
     <ClCompile Include="Parameters\Parameters.cpp" />
     <ClCompile Include="Results\Results.cpp" />
+    <ClCompile Include="Simulation\Simulation.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
