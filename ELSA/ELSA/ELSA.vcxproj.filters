@@ -29,9 +29,6 @@
     <ClCompile Include="material.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="parameters.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

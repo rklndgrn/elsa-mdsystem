@@ -116,7 +116,6 @@
 	<ClInclude Include="Atom\Atom.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="material.cpp" />
     <ClCompile Include="parameters.cpp" />
     <ClCompile Include="Atom\Atom.cpp" />
