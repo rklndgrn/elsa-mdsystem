@@ -5,6 +5,7 @@
 #include "../Cell/Cell.h"
 #include "../Parameters/Parameters.h"
 #include "../Results/Results.h"
+#include "../Simulation/Simulation.h"
 
 class World
 {
@@ -13,7 +14,8 @@ private:
 	std::vector<Cell> cellList;
 	Parameters myParameters;
 	Results myResults;
-
+	Simulation mySimulation;
+	
 public:
 	World(Parameters);
 	~World() = default;
