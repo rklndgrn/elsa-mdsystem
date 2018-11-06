@@ -30,6 +30,9 @@
     <ClInclude Include="Results\Results.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="World\World.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Simulation\Simulation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -51,6 +54,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Results\Results.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="World\World.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Simulation\Simulation.cpp">

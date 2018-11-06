@@ -21,6 +21,7 @@ private:
 	double *totalEnergy;
 
 public:
+	Results() = default;
 	Results(int, int, int);
 	~Results() = default;
 

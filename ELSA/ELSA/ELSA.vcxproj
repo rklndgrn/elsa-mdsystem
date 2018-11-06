@@ -116,6 +116,7 @@
     <ClInclude Include="Material\Material.h" />
     <ClInclude Include="Parameters\Parameters.h" />
     <ClInclude Include="Results\Results.h" />
+    <ClInclude Include="World\World.h" />
     <ClInclude Include="Simulation\Simulation.h" />
   </ItemGroup>
   <ItemGroup>
@@ -125,6 +126,7 @@
     <ClCompile Include="Material\Material.cpp" />
     <ClCompile Include="Parameters\Parameters.cpp" />
     <ClCompile Include="Results\Results.cpp" />
+    <ClCompile Include="World\World.cpp" />
     <ClCompile Include="Simulation\Simulation.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
