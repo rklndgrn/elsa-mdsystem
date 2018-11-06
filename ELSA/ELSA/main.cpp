@@ -1,7 +1,8 @@
 #include "./Atom/Atom.h"
 #include "./Material/Material.h"
 #include "./Parameters/Parameters.h"
-#include "Cell/Cell.h"
+#include "./Cell/Cell.h"
+#include "./Simulation/Simulation.h"
 #include <iostream>
 
 using namespace std;
@@ -51,6 +52,8 @@ int main()
 	newCell.addAtomToCellList( a );
 	cout << newCell.getCellID()[0] << newCell.getCellID()[2] << newCell.getCellID()[1] << endl;
 
+	Simulation mySim(anotherMaterial);
+	cout << mySim.calcLJPot(1e-10) << endl;
 
 	char exit;
 
