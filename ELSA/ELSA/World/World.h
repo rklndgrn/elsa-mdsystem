@@ -23,6 +23,8 @@ public:
 	Atom getAtomInAtomList(unsigned int);
 
 	void addAtomToAtomList(Atom);
+
+	void calcPot();
 };
 
 #endif

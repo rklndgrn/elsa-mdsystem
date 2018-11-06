@@ -11,7 +11,6 @@ Atom::Atom(int newID, double newPosX, double newPosY, double newPosZ)
 	position[2] = newPosZ;
 }
 
-
 //Getters
 double Atom::getAccX() const
 {

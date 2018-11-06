@@ -19,6 +19,7 @@ private:
 
 public:
 	Atom(int, double, double, double);
+	Atom() = default;
 	~Atom() = default;
 
 	int getID() const;

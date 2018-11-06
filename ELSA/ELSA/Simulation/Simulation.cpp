@@ -27,3 +27,8 @@ double Simulation::calcForce(double dist) const
 			pow((_mat.getSigma() / dist), 7)
 			);
 }
+
+double Simulation::calcDist(double x1, double y1, double z1, double x2, double y2, double z2) const
+{
+	return sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2) + pow(z1 - z2, 2));
+}
