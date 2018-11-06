@@ -111,17 +111,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Cell\Cell.h" />
-    <ClInclude Include="material.h" />
-    <ClInclude Include="parameters.h" />
     <ClInclude Include="Atom\Atom.h" />
+    <ClInclude Include="Cell\Cell.h" />
+    <ClInclude Include="Material\Material.h" />
+    <ClInclude Include="Parameters\Parameters.h" />
+    <ClInclude Include="Results\Results.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Cell\Cell.cpp" />
-    <ClCompile Include="material.cpp" />
-    <ClCompile Include="parameters.cpp" />
     <ClCompile Include="Atom\Atom.cpp" />
+	<ClCompile Include="Cell\Cell.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Material\Material.cpp" />
+    <ClCompile Include="Parameters\Parameters.cpp" />
+    <ClCompile Include="Results\Results.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

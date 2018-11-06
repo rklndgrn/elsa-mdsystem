@@ -1,6 +1,6 @@
 #include "./Atom/Atom.h"
-#include "material.h"
-#include "parameters.h"
+#include "./Material/Material.h"
+#include "./Parameters/Parameters.h"
 #include <iostream>
 
 using namespace std;

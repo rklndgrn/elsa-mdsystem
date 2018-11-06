@@ -4,7 +4,7 @@
 	This file contains the definition of the class Material
 */
 
-#include "material.h"
+#include "Material.h"
 #include <string>
 
 using namespace std;
