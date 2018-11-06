@@ -111,10 +111,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Atom\Atom.h" />
     <ClInclude Include="Results\Results.h" />
+    <ClInclude Include="material.h" />
+    <ClInclude Include="parameters.h" />
+	<ClInclude Include="Atom\Atom.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="material.cpp" />
+    <ClCompile Include="parameters.cpp" />
     <ClCompile Include="Atom\Atom.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Results\Results.cpp" />
