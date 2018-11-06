@@ -37,7 +37,7 @@ Material::Material(
 Material::~Material()
 {}
 
-string Material::getCrystalStructure()
+string Material::getCrystalStructure() const
 {
 	return _crystalStructure;
 }
@@ -47,7 +47,7 @@ void Material::setCrystalStructure(string str)
 	_crystalStructure = str;
 }
 
-double Material::getLatticeConstant()
+double Material::getLatticeConstant() const
 {
 	return _latticeConstant;
 }
@@ -57,7 +57,7 @@ void Material::setLatticeConstant(double lc)
 	_latticeConstant = lc;
 }
 
-double Material::getEpsilon()
+double Material::getEpsilon() const
 {
 	return _epsilon;
 }
@@ -67,7 +67,7 @@ void Material::setEpsilon(double eps)
 	_epsilon = eps;
 }
 
-double Material::getSigma()
+double Material::getSigma() const
 {
 	return _sigma;
 }
@@ -77,7 +77,7 @@ void Material::setSigma(double sig)
 	_sigma = sig;
 }
 
-double Material::getCutOffDistance()
+double Material::getCutOffDistance() const
 {
 	return _cutOffDistance;
 }
@@ -87,7 +87,7 @@ void Material::setCutOffDistance(double cod)
 	_cutOffDistance = cod;
 }
 
-double Material::getMass()
+double Material::getMass() const
 {
 	return _mass;
 }

@@ -18,12 +18,12 @@ private:
 	double _mass;
 
 public:
-	std::string getCrystalStructure();
-	double getLatticeConstant();
-	double getEpsilon();
-	double getSigma();
-	double getCutOffDistance();
-	double getMass();
+	std::string getCrystalStructure() const;
+	double getLatticeConstant() const;
+	double getEpsilon() const;
+	double getSigma() const;
+	double getCutOffDistance() const;
+	double getMass() const;
 
 	void setCrystalStructure(std::string str);
 	void setLatticeConstant(double lc);
