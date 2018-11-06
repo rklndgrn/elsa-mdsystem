@@ -7,7 +7,7 @@
 class Cell
 {
 private:
-	std::array<unsigned int,3> _cellID;
+	std::array<unsigned int, 3> _cellID = { 0, 0, 0 };
 	std::vector<Atom*> _atomsInCellList;
 
 public:

@@ -3,12 +3,13 @@
 
 #include <cstddef>
 #include <vector>
+#include <array>
 
 class Atom
 {
 private:
 	unsigned int id{};
-	int cellIndex[3] = { 0, 0, 0 };
+	std::array<unsigned int, 3> cellIndex = { 0, 0, 0 };
 	double position[3] = {0, 0, 0};
 	double velocity[3] = {0, 0, 0};
 	double acceleration[3] = {0, 0, 0};
@@ -24,7 +25,7 @@ public:
 	double getAccX() const;
 	double getAccY() const;
 	double getAccZ() const;
-	int* getCellIndex() const;
+	std::array<unsigned int, 3> getCellIndex() const;
 	std::vector<Atom*> getNeighbourList() const;
 	double getPosX() const;
 	double getPosY() const;

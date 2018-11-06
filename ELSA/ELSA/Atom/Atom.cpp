@@ -28,10 +28,9 @@ double Atom::getAccZ() const
 	return acceleration[2];
 }
 
-int* Atom::getCellIndex() const
+std::array<unsigned int, 3> Atom::getCellIndex() const
 {
-	int arr[3] = { cellIndex[0], cellIndex[1], cellIndex[2]};
-	return arr;
+	return cellIndex;
 }
 
 vector<Atom*> Atom::getNeighbourList() const
