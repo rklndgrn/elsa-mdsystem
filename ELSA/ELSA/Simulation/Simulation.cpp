@@ -1,9 +1,7 @@
 #include "Simulation.h"
 #include <cmath>
 
-Simulation::Simulation() :
-	_mat{ Material() }
-{};
+using namespace std;
 
 Simulation::Simulation(Material mat) :
 	_mat{mat}
@@ -28,7 +26,16 @@ double Simulation::calcForce(double dist) const
 			);
 }
 
-double Simulation::calcDist(double x1, double y1, double z1, double x2, double y2, double z2) const
+array<double, 4> Simulation::calcDist(double x1, double y1, double z1, double x2, double y2, double z2) const
 {
-	return sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2) + pow(z1 - z2, 2));
+	double rx, ry, rz, r;
+	rx = x1 - x2;
+	ry = y1 - y2;
+	rz = z1 - z2;
+	r = sqrt(pow(rx, 2) + pow(ry, 2) + pow(rz, 2));
+	rx = rx / r;
+	ry = ry / r;
+	rz = rz / r;
+	array<double, 4> temp = { r, rx, ry, rz };
+	return temp;
 }

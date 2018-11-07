@@ -1,5 +1,7 @@
 #include "World.h"
 
+using namespace std;
+
 World::World(Parameters p)
 {
 	myParameters = p;
@@ -17,24 +19,34 @@ void World::addAtomToAtomList(Atom a)
 	atomList.push_back(a);
 }
 
-void World::calcPot()
+void World::calcPotentialAndForce()
 {
-	double pot;// , force;
+	double pot, f;
+	array<double, 3> force;
 	Atom a1, a2;
-	double r;
+	array<double, 4> r;
 	for (unsigned int i{ 0 }; i < myParameters.getNumberOfAtoms(); i++)
 	{
 		a1 = atomList.at(i);
 		for (int j{ 0 }; j < a1.getNeighbourList().size(); j++)
 		{
 			a2 = *a1.getNeighbourList().at(j);
+
 			r = mySimulation.calcDist(a1.getPosX(), a1.getPosY(), a1.getPosZ(), a2.getPosX(), a2.getPosY(), a2.getPosZ());
-			pot = mySimulation.calcLJPot(r);
-//			force = mySimulation.calcForce(r);
+			f = mySimulation.calcForce(r[0]);
+
+			force = { f*r[1], f*r[2],f*r[3] };
+			pot = mySimulation.calcLJPot(r[0]);
+
 			a1.setPotential(a1.getPotential() + pot);
 			a2.setPotential(a2.getPotential() + pot);
-//			a1.setForce(a1.getForce() + force);
-//			a2.setForce(a2.getForce() + force);
+
+			a1.setForceX(a1.getForceX() + force[0]);
+			a2.setForceX(a2.getForceX() - force[0]);
+			a1.setForceY(a1.getForceY() + force[1]);
+			a2.setForceY(a2.getForceY() - force[1]);
+			a1.setForceZ(a1.getForceZ() + force[2]);
+			a2.setForceZ(a2.getForceZ() - force[2]);
 		}
 	}
 }

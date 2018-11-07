@@ -14,7 +14,7 @@ private:
 	double velocity[3] = {0, 0, 0};
 	double acceleration[3] = {0, 0, 0};
 	double potential{};
-	double force{};
+	std::array<double, 3> force{};
 	std::vector<Atom*> neighbourList;
 
 public:
@@ -32,7 +32,9 @@ public:
 	double getPosY() const;
 	double getPosZ() const;
 	double getPotential() const;
-	double getForce() const;
+	double getForceX() const;
+	double getForceY() const;
+	double getForceZ() const;
 	double getVelocityX() const;
 	double getVelocityY() const;
 	double getVelocityZ() const;
@@ -49,7 +51,9 @@ public:
 	void setPosZ(double);
 	void setPosition(double, double, double);
 	void setPotential(double);
-	void setForce(double);
+	void setForceX(double);
+	void setForceY(double);
+	void setForceZ(double);
 	void setVelocityX(double);
 	void setVelocityY(double);
 	void setVelocityZ(double);

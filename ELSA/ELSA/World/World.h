@@ -6,6 +6,7 @@
 #include "../Parameters/Parameters.h"
 #include "../Results/Results.h"
 #include "../Simulation/Simulation.h"
+#include <vector>
 
 class World
 {
@@ -24,7 +25,7 @@ public:
 
 	void addAtomToAtomList(Atom);
 
-	void calcPot();
+	void calcPotentialAndForce();
 };
 
 #endif

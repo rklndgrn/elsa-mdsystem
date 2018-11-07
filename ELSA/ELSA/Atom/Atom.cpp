@@ -62,9 +62,19 @@ double Atom::getPotential() const
 	return potential;
 }
 
-double Atom::getForce() const
+double Atom::getForceX() const
 {
-	return force;
+	return force[0];
+}
+
+double Atom::getForceY() const
+{
+	return force[1];
+}
+
+double Atom::getForceZ() const
+{
+	return force[2];
 }
 
 double Atom::getVelocityX() const
@@ -146,9 +156,19 @@ void Atom::setPotential(double u)
 	potential = u;
 }
 
-void Atom::setForce(double F)
+void Atom::setForceX(double F)
 {
-	force = F;
+	force[0] = F;
+}
+
+void Atom::setForceY(double F)
+{
+	force[1] = F;
+}
+
+void Atom::setForceZ(double F)
+{
+	force[2] = F;
 }
 
 void Atom::setVelocityX(double newV)
