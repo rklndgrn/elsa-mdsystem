@@ -14,6 +14,9 @@ private:
 	unsigned int _numberOfAtoms;
 	unsigned int _timeStep;
 	unsigned int _simulationTime;
+	unsigned int _numberOfUnitCellsX;
+	unsigned int _numberOfUnitCellsY;
+	unsigned int _numberOfUnitCellsZ;
 	double _temperature;
 	double _collisionFrequency;
 	bool _isThermostatOn;
@@ -24,6 +27,9 @@ public:
 	unsigned int getNumberOfAtoms() const;
 	unsigned int getTimeStep() const;
 	unsigned int getSimulationTime() const;
+	unsigned int getNumberOfUnitCellsX() const;
+	unsigned int getNumberOfUnitCellsY() const;
+	unsigned int getNumberOfUnitCellsZ() const;
 	double getTemperature() const;
 	double getCollisionFrequency() const;
 	bool getIsThermostatOn() const;
@@ -33,6 +39,9 @@ public:
 	void setNumberOfAtoms(unsigned int noa);
 	void setTimeStep(unsigned int ts);
 	void setSimulationTime(unsigned int st);
+	void setNumberOfUnitCellsX(unsigned int);
+	void setNumberOfUnitCellsY(unsigned int);
+	void setNumberOfUnitCellsZ(unsigned int);
 	void setTemperature(double temp);
 	void setCollisionFrequency(double cf);
 	void setIsThermostatOn(bool isT);
@@ -44,6 +53,9 @@ public:
 		unsigned int numberOfAtoms,
 		unsigned int timeStep,
 		unsigned int simulationTime, 
+		unsigned int numberOfUnitCellsX,
+		unsigned int numberOfUnitCellsY,
+		unsigned int numberOfUnitCellsZ,
 		double temperature,
 		double collisionFrequency,
 		bool isThermostatOn,

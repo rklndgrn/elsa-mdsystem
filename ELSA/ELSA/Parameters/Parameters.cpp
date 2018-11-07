@@ -22,6 +22,9 @@ Parameters::Parameters(
 	unsigned int numberOfAtoms,
 	unsigned int timeStep,
 	unsigned int simulationTime,
+	unsigned int numberOfUnitCellsX,
+	unsigned int numberOfUnitCellsY,
+	unsigned int numberOfUnitCellsZ,
 	double temperature,
 	double collisionFrequency,
 	bool isThermostatOn,
@@ -30,6 +33,9 @@ Parameters::Parameters(
 	_numberOfAtoms{ numberOfAtoms},
 	_timeStep{ timeStep },
 	_simulationTime{ simulationTime },
+	_numberOfUnitCellsX{numberOfUnitCellsX},
+	_numberOfUnitCellsY{ numberOfUnitCellsY },
+	_numberOfUnitCellsZ{ numberOfUnitCellsZ },
 	_temperature{ temperature },
 	_collisionFrequency{ collisionFrequency },
 	_isThermostatOn{ isThermostatOn },
@@ -52,6 +58,21 @@ unsigned int Parameters::getTimeStep() const
 unsigned int Parameters::getSimulationTime() const
 {
 	return _simulationTime;
+}
+
+unsigned int Parameters::getNumberOfUnitCellsX() const
+{
+	return _numberOfUnitCellsX;
+}
+
+unsigned int Parameters::getNumberOfUnitCellsY() const
+{
+	return _numberOfUnitCellsY;
+}
+
+unsigned int Parameters::getNumberOfUnitCellsZ() const
+{
+	return _numberOfUnitCellsZ;
 }
 
 double Parameters::getTemperature() const
@@ -92,6 +113,21 @@ void Parameters::setTimeStep(unsigned int ts)
 void Parameters::setSimulationTime(unsigned int st)
 {
 	_simulationTime = st;
+}
+
+void Parameters::setNumberOfUnitCellsX(unsigned int x)
+{
+	_numberOfUnitCellsX = x;
+}
+
+void Parameters::setNumberOfUnitCellsY(unsigned int y)
+{
+	_numberOfUnitCellsY = y;
+}
+
+void Parameters::setNumberOfUnitCellsZ(unsigned int z)
+{
+	_numberOfUnitCellsZ = z;
 }
 
 void Parameters::setTemperature(double temp)

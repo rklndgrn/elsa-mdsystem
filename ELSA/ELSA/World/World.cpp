@@ -4,10 +4,77 @@ using namespace std;
 
 World::World(Parameters p)
 {
-	_mySimulation = Simulation(p.getChosenMaterial());
+	setupSystem(p);
+}
+
+void World::setupSystem(Parameters p)
+{
 	_myParameters = p;
-	Results r{(int) p.getSimulationTime(), (int) p.getTimeStep(), (int) p.getNumberOfAtoms()};
-	_myResults = r;
+	_myResults = Results{ (int)p.getSimulationTime(), (int)p.getTimeStep(), (int)p.getNumberOfAtoms() };
+	_mySimulation = Simulation(p.getChosenMaterial());
+
+	unsigned int atomId{ 0 };
+	unsigned int nOfUnitCellsX{ _myParameters.getNumberOfUnitCellsX() };
+	unsigned int nOfUnitCellsY{ _myParameters.getNumberOfUnitCellsY() };
+	unsigned int nOfUnitCellsZ{ _myParameters.getNumberOfUnitCellsZ() };
+	double latticeConstant{ _myParameters.getChosenMaterial().getLatticeConstant() };
+	string crystalStructure{ _myParameters.getChosenMaterial().getCrystalStructure() };
+	
+	
+	if (crystalStructure == "fcc")
+	{
+		for (unsigned int z = 0; z <= nOfUnitCellsZ; z++)
+		{
+			for (unsigned int y = 0; y <= nOfUnitCellsY; y++)
+			{
+				for (unsigned int x = 0; x <= _myParameters.getNumberOfUnitCellsX(); x++)
+				{
+					Atom* a0 = new Atom(atomId++, x*latticeConstant, y*latticeConstant, z*latticeConstant);
+					Atom* ax = new Atom(atomId++, x*latticeConstant, (y + 0.5)*latticeConstant, (z + 0.5)*latticeConstant);
+					Atom* ay = new Atom(atomId++, (x + 0.5)*latticeConstant, y*latticeConstant, (z + 0.5)*latticeConstant);
+					Atom* az = new Atom(atomId++, (x + 0.5)*latticeConstant, (y + 0.5)*latticeConstant, z*latticeConstant);
+
+					addAtomToAtomList(a0);
+
+					if (x != nOfUnitCellsX && y != nOfUnitCellsY && z != nOfUnitCellsZ)
+					{
+						addAtomToAtomList(ax);
+						addAtomToAtomList(ay);
+						addAtomToAtomList(az);
+					}
+					else if (x == nOfUnitCellsX && y != nOfUnitCellsY && z != nOfUnitCellsZ)
+					{
+						addAtomToAtomList(ax);
+					}
+					else if (x != nOfUnitCellsX && y == nOfUnitCellsY && z != nOfUnitCellsZ)
+					{
+						addAtomToAtomList(ay);
+					}
+					else if (x != nOfUnitCellsX && y != nOfUnitCellsY && z == nOfUnitCellsZ)
+					{
+						addAtomToAtomList(az);
+					}
+				}
+			}
+		}
+
+
+	}
+	else if (crystalStructure == "sc")
+	{
+		for (unsigned int x = 0; x <= _myParameters.getNumberOfUnitCellsX(); x++)
+		{
+			for (unsigned int y = 0; y <= _myParameters.getNumberOfUnitCellsY(); y++)
+			{
+				for (unsigned int z = 0; z <= _myParameters.getNumberOfUnitCellsZ(); z++)
+				{
+					Atom* a = new Atom(atomId++, x*latticeConstant, y*latticeConstant, z*latticeConstant);
+					addAtomToAtomList(a);
+				}
+			}
+		}
+	}
+
 }
 
 Atom* World::getAtomInAtomList(unsigned int index)

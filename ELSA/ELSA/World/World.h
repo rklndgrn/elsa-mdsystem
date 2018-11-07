@@ -17,6 +17,7 @@ private:
 	Results _myResults;
 	Simulation _mySimulation;
 	
+	void setupSystem(Parameters);
 public:
 	World(Parameters);
 	~World() = default;
