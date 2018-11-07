@@ -40,6 +40,11 @@ Parameters::Parameters(
 Parameters::~Parameters()
 {}
 
+double Parameters::getBoltzmann() const
+{
+	return _boltzmann;
+}
+
 unsigned int Parameters::getNumberOfAtoms() const
 {
 	return _numberOfAtoms;

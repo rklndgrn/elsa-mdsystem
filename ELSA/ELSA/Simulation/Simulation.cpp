@@ -6,7 +6,7 @@ Simulation::Simulation(Material mat) :
 	_mat{mat}
 {};
 
-//Function for assigning a new Gaussian velocity if an Anderson thermostat is to be used. 
+//Function for assigning a new Gaussian velocity if an Anderson thermostat is to be used. T is the variance/temperature. 
 array<double, 3> Simulation::generateGaussianVelocity(double T)
 {
 	random_device rdX;
@@ -23,29 +23,11 @@ array<double, 3> Simulation::generateGaussianVelocity(double T)
 	return v;
 }
 
-array<double, 3> Simulation::calcAcceleration(std::array<double, 4> force)
+array<double, 3> Simulation::calcAcceleration(double fx, double fy, double fz)
 {
 	double m = _mat.getMass();
-	array<double, 3> a = {m*force[1], m*force[2], m*force[3]};
+	array<double, 3> a = {m*fx, m*fy, m*fz};
 	return a;
-}
-
-double Simulation::calcLJPotential(double dist) const
-{
-	return 4 * _mat.getEpsilon() *
-		(
-			pow((_mat.getSigma() / dist),  12) - 
-			pow((_mat.getSigma() / dist), 6)
-		);
-};
-
-double Simulation::calcForce(double dist) const
-{
-	return 24 * _mat.getEpsilon() / _mat.getSigma() *
-		(
-			2 * pow((_mat.getSigma() / dist), 13) -
-			pow((_mat.getSigma() / dist), 7)
-			);
 }
 
 array<double, 4> Simulation::calcDistance(double x1, double y1, double z1, double x2, double y2, double z2) const
@@ -62,6 +44,34 @@ array<double, 4> Simulation::calcDistance(double x1, double y1, double z1, doubl
 	return temp;
 }
 
+double Simulation::calcForce(double dist) const
+{
+	return 24 * _mat.getEpsilon() / _mat.getSigma() *
+		(
+			2 * pow((_mat.getSigma() / dist), 13) -
+			pow((_mat.getSigma() / dist), 7)
+			);
+}
+
+double Simulation::calcLJPotential(double dist) const
+{
+	return 4 * _mat.getEpsilon() *
+		(
+			pow((_mat.getSigma() / dist), 12) -
+			pow((_mat.getSigma() / dist), 6)
+			);
+};
+
+double Simulation::calcKineticEnergy(array<double, 3> v)
+{
+	double vx = v[0];
+	double vy = v[1];
+	double vz = v[2];
+	double m = _mat.getMass();
+
+	return 0.5*m*(pow(vx, 2) + pow(vy, 2) + pow(vz, 2));
+}
+
 //Function to calculate the position using the Velocity Verlet Algorithm.
 array<double, 3> Simulation::calcPosition(std::array<double, 3> r, std::array<double, 3> v, std::array<double, 3> a, double timeStep)
 {
@@ -71,6 +81,11 @@ array<double, 3> Simulation::calcPosition(std::array<double, 3> r, std::array<do
 
 	array<double, 3> newR = { rX, rY, rZ };
 	return newR;
+}
+
+double Simulation::calcTemperature(double kineticEnergy, double kB, double N)
+{
+	return (2 / 3)*kineticEnergy / (kB*N);
 }
 
 //Function to calculate the velocity using the Velocity Verlet Algorithm.
