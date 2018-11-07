@@ -4,83 +4,84 @@ using namespace std;
 
 Results::Results(int simulationTime, int timeStep, int numberOfParticles)
 {
-	arrayLength = (int) floor((double) simulationTime/timeStep);
-	numberOfAtoms = numberOfParticles;
+	_arrayLength = (int) floor((double) simulationTime/timeStep);
+	_numberOfAtoms = numberOfParticles;
 
-	cohesiveEnergy = new double[arrayLength];
-	debyeTemperature = new double[arrayLength];
-	diffusionConstant = new double[arrayLength];
-	internalPressure = new double[arrayLength];
-	meanSquareDisplacement = new double[arrayLength];
-	//positions = new double[arrayLength][numberOfParticles][3];
-	specificHeat = new double[arrayLength];
-	temperature = new double[arrayLength];
-	totalEnergy = new double[arrayLength];
+	_cohesiveEnergy = new double[_arrayLength];
+	_debyeTemperature = new double[_arrayLength];
+	_diffusionConstant = new double[_arrayLength];
+	_internalPressure = new double[_arrayLength];
+	_meanSquareDisplacement = new double[_arrayLength];
+	_specificHeat = new double[_arrayLength];
+	_temperature = new double[_arrayLength];
+	_totalEnergy = new double[_arrayLength];
 
-	positions = new double**[arrayLength];
-	for (unsigned int i = 0; i < arrayLength; i++)
+	//Create a 3D array for positions for each atom over time.
+	_positions = new double**[_arrayLength];
+	for (unsigned int i = 0; i < _arrayLength; i++)
 	{
-		positions[i] = new double*[numberOfParticles];
+		_positions[i] = new double*[numberOfParticles];
 		for (int j = 0; j < numberOfParticles; j++)
 		{
-			positions[i][j] = new double[3];
+			_positions[i][j] = new double[3];
 		}
 	}
 }
 
 double** Results::getCohesiveEnergy()
 {
-	return &cohesiveEnergy;
+	return &_cohesiveEnergy;
 }
 
 double** Results::getDebyeTemperature()
 {
-	return &debyeTemperature;
+	return &_debyeTemperature;
 }
 
 double** Results::getDiffusionConstant()
 {
-	return &diffusionConstant;
+	return &_diffusionConstant;
 }
 
 double** Results::getInternalPressure()
 {
-	return &internalPressure;
+	return &_internalPressure;
 }
 
 double** Results::getMeanSquareDisplacement()
 {
-	return &meanSquareDisplacement;
+	return &_meanSquareDisplacement;
 }
 
 double**** Results::getPositions()
 {
-	return &positions;
+	return &_positions;
 }
 
 double** Results::getSpecificHeat()
 {
-	return &specificHeat;
+	return &_specificHeat;
 }
 
 double** Results::getTemperature()
 {
-	return &temperature;
+	return &_temperature;
 }
 
 double** Results::getTotalEnergy()
 {
-	return &totalEnergy;
+	return &_totalEnergy;
 }
 
+//For testing the 3D array. Delete if unnecessary.
 void Results::printPositions()
 {
-	for (unsigned int t = 0; t < arrayLength; t++)
+	for (unsigned int t = 0; t < _arrayLength; t++)
 	{
 		cout << "At time step " << t << ":" << endl;
-		for (unsigned int n = 0; n < numberOfAtoms; n++)
+		for (unsigned int n = 0; n < _numberOfAtoms; n++)
 		{
-			cout << "   Atom " << n << " has position: (" << positions[t][n][0] << ", " << positions[t][n][1] << ", " << positions[t][n][2] << ")!" << endl;
+			cout << "   Atom " << n << " has position: (" << _positions[t][n][0] << ", " << _positions[t][n][1] << ", " << _positions[t][n][2] << ")!" << endl;
 		}
 		cout << endl;
 	}
@@ -88,47 +89,47 @@ void Results::printPositions()
 
 void Results::setCohesiveEnergy(double value, int index)
 {
-	cohesiveEnergy[index] = value;
+	_cohesiveEnergy[index] = value;
 }
 
 void Results::setDebyeTemperature(double value, int index)
 {
-	debyeTemperature[index] = value;
+	_debyeTemperature[index] = value;
 }
 
 void Results::setDiffusionConstant(double value, int index)
 {
-	diffusionConstant[index] = value;
+	_diffusionConstant[index] = value;
 }
 
 void Results::setInternalPressure(double value, int index)
 {
-	internalPressure[index] = value;
+	_internalPressure[index] = value;
 }
 
 void Results::setMeanSquareDisplacement(double value, int index)
 {
-	meanSquareDisplacement[index] = value;
+	_meanSquareDisplacement[index] = value;
 }
 
 void Results::setPositions(double x, double y, double z, int t, int n)
 {
-	positions[t][n][0] = x;
-	positions[t][n][1] = y;
-	positions[t][n][2] = z;
+	_positions[t][n][0] = x;
+	_positions[t][n][1] = y;
+	_positions[t][n][2] = z;
 }
 
 void Results::setSpecificHeat(double value, int index)
 {
-	specificHeat[index] = value;
+	_specificHeat[index] = value;
 }
 
 void Results::setTemperature(double value, int index)
 {
-	temperature[index] = value;
+	_temperature[index] = value;
 }
 
 void Results::setTotalEnergy(double value, int index)
 {
-	totalEnergy[index] = value;
+	_totalEnergy[index] = value;
 }
