@@ -18,5 +18,6 @@ public:
 	void clearAtomsInCellList();
 
 	Cell();
+	Cell(unsigned int, unsigned int, unsigned int);
 	~Cell();
 };

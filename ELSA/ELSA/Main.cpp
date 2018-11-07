@@ -37,18 +37,30 @@ int main()
 	//cout << myWorld.getAtomInAtomList(1) << endl;
 	//cout << myWorld.getAtomInAtomList(0)->getNeighbourList().at(0) << endl;
 
-	Material anotherMaterial("fcc", 2, 1, 1, 1, 100);
-	Parameters myParameters(14, 1, 1, 1, 1, 1, 100, 10, false, false, anotherMaterial);
+	Material anotherMaterial("fcc", 2, 1, 1, 2.1, 2.3, 100);
+	Parameters myParameters(1, 1, 3, 3, 3, 100, 10, false, false, anotherMaterial);
 
 
 	World myWorld(myParameters);
 
 	for (unsigned int i = 0; i < myParameters.getNumberOfAtoms(); i++)
 	{
-		cout << myWorld.getAtomInAtomList(i)->getPosX() << 
-			" " << myWorld.getAtomInAtomList(i)->getPosY() << 
-			" " << myWorld.getAtomInAtomList(i)->getPosZ() << endl;
+		cout << " id: " << myWorld.getAtomInAtomList(i)->getID();
+		cout <<
+			" x: " << myWorld.getAtomInAtomList(i)->getPosX() <<
+			" y: " << myWorld.getAtomInAtomList(i)->getPosY() <<
+			" z: " << myWorld.getAtomInAtomList(i)->getPosZ();
+			
+		cout << " nid: ";
+		for (unsigned int j = 0; j < myWorld.getAtomInAtomList(i)->getNeighbourList().size(); j++)
+		{
+			cout << myWorld.getAtomInAtomList(i)->getNeighbourList()[j]->getID() << ", ";
+		}
+		cout << endl;
 	}
+
+	cout << "====================" << endl;
+	cout << "Total: " << myParameters.getNumberOfAtoms() << endl;
 
 
 	char exit;

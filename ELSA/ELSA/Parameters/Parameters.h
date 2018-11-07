@@ -50,7 +50,6 @@ public:
 
 	Parameters();
 	Parameters(
-		unsigned int numberOfAtoms,
 		unsigned int timeStep,
 		unsigned int simulationTime, 
 		unsigned int numberOfUnitCellsX,

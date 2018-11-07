@@ -5,6 +5,13 @@ using namespace std;
 Cell::Cell()
 {};
 
+Cell::Cell(unsigned int i, unsigned int j, unsigned int k)
+{
+	_cellID[0] = i;
+	_cellID[1] = j;
+	_cellID[2] = k;
+};
+
 Cell::~Cell()
 {};
 

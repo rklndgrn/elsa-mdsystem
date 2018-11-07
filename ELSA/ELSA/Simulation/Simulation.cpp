@@ -45,6 +45,20 @@ array<double, 4> Simulation::calcDistance(double x1, double y1, double z1, doubl
 	return temp;
 }
 
+array<double, 4> Simulation::calcDistance(Atom* a1, Atom* a2) const
+{
+	double rx, ry, rz, r;
+	rx = a1->getPosX() - a2->getPosX();
+	ry = a1->getPosY() - a2->getPosY();
+	rz = a1->getPosZ() - a2->getPosZ();
+	r = sqrt(pow(rx, 2) + pow(ry, 2) + pow(rz, 2));
+	rx = rx / r;
+	ry = ry / r;
+	rz = rz / r;
+	array<double, 4> temp = { r, rx, ry, rz };
+	return temp;
+}
+
 //Function to calculate the position using the Velocity Verlet Algorithm.
 array<double, 3> Simulation::calcPosition(std::array<double, 3> r, std::array<double, 3> v, std::array<double, 3> a, double timeStep)
 {

@@ -1,5 +1,6 @@
 #pragma once
 #include "../Material/Material.h"
+#include "../Atom/Atom.h"
 
 #include <array>
 #include <cmath>
@@ -13,6 +14,7 @@ public:
 	double calcForce(double) const;
 	std::array<double, 3> calcAcceleration(std::array<double, 4>);
 	std::array<double, 4> calcDistance(double, double, double, double, double, double) const;
+	std::array<double, 4> calcDistance(Atom*, Atom*) const;
 	std::array<double, 3> calcPosition(std::array<double, 3>, std::array<double, 3>, std::array<double, 3>, double);
 	std::array<double, 3> calcVelocity(std::array<double, 3>, std::array<double, 3>, double);
 

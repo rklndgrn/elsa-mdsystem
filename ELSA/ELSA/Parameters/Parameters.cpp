@@ -19,7 +19,6 @@ Parameters::Parameters() :
 {}
 
 Parameters::Parameters(
-	unsigned int numberOfAtoms,
 	unsigned int timeStep,
 	unsigned int simulationTime,
 	unsigned int numberOfUnitCellsX,
@@ -30,7 +29,6 @@ Parameters::Parameters(
 	bool isThermostatOn,
 	bool is2D,
 	Material chosenMaterial) : 
-	_numberOfAtoms{ numberOfAtoms},
 	_timeStep{ timeStep },
 	_simulationTime{ simulationTime },
 	_numberOfUnitCellsX{numberOfUnitCellsX},
@@ -41,7 +39,20 @@ Parameters::Parameters(
 	_isThermostatOn{ isThermostatOn },
 	_is2D{ is2D },
 	_chosenMaterial{ chosenMaterial }
-{}
+{
+	if (chosenMaterial.getCrystalStructure() == "fcc")
+	{
+		//It's not pretty but it's correct
+		_numberOfAtoms = (numberOfUnitCellsX + 1)*numberOfUnitCellsY*numberOfUnitCellsZ +
+			numberOfUnitCellsX*(numberOfUnitCellsY + 1)*numberOfUnitCellsZ +
+			numberOfUnitCellsX*numberOfUnitCellsY*(numberOfUnitCellsZ + 1) +
+			(numberOfUnitCellsX + 1)*(numberOfUnitCellsY + 1)*(numberOfUnitCellsZ + 1);
+	}
+	else if (chosenMaterial.getCrystalStructure() == "sc")
+	{
+		_numberOfAtoms = (numberOfUnitCellsX + 1)*(numberOfUnitCellsY + 1)*(numberOfUnitCellsZ + 1);
+	}
+}
 
 Parameters::~Parameters()
 {}

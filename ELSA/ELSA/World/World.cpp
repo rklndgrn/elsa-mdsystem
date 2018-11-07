@@ -13,73 +13,165 @@ void World::setupSystem(Parameters p)
 	_myResults = Results{ (int)p.getSimulationTime(), (int)p.getTimeStep(), (int)p.getNumberOfAtoms() };
 	_mySimulation = Simulation(p.getChosenMaterial());
 
-	unsigned int atomId{ 0 };
+
 	unsigned int nOfUnitCellsX{ _myParameters.getNumberOfUnitCellsX() };
 	unsigned int nOfUnitCellsY{ _myParameters.getNumberOfUnitCellsY() };
 	unsigned int nOfUnitCellsZ{ _myParameters.getNumberOfUnitCellsZ() };
 	double latticeConstant{ _myParameters.getChosenMaterial().getLatticeConstant() };
 	string crystalStructure{ _myParameters.getChosenMaterial().getCrystalStructure() };
 	
-	
 	if (crystalStructure == "fcc")
 	{
-		for (unsigned int z = 0; z <= nOfUnitCellsZ; z++)
-		{
-			for (unsigned int y = 0; y <= nOfUnitCellsY; y++)
-			{
-				for (unsigned int x = 0; x <= _myParameters.getNumberOfUnitCellsX(); x++)
-				{
-					Atom* a0 = new Atom(atomId++, x*latticeConstant, y*latticeConstant, z*latticeConstant);
-					Atom* ax = new Atom(atomId++, x*latticeConstant, (y + 0.5)*latticeConstant, (z + 0.5)*latticeConstant);
-					Atom* ay = new Atom(atomId++, (x + 0.5)*latticeConstant, y*latticeConstant, (z + 0.5)*latticeConstant);
-					Atom* az = new Atom(atomId++, (x + 0.5)*latticeConstant, (y + 0.5)*latticeConstant, z*latticeConstant);
-
-					addAtomToAtomList(a0);
-
-					if (x != nOfUnitCellsX && y != nOfUnitCellsY && z != nOfUnitCellsZ)
-					{
-						addAtomToAtomList(ax);
-						addAtomToAtomList(ay);
-						addAtomToAtomList(az);
-					}
-					else if (x == nOfUnitCellsX && y != nOfUnitCellsY && z != nOfUnitCellsZ)
-					{
-						addAtomToAtomList(ax);
-					}
-					else if (x != nOfUnitCellsX && y == nOfUnitCellsY && z != nOfUnitCellsZ)
-					{
-						addAtomToAtomList(ay);
-					}
-					else if (x != nOfUnitCellsX && y != nOfUnitCellsY && z == nOfUnitCellsZ)
-					{
-						addAtomToAtomList(az);
-					}
-				}
-			}
-		}
-
-
+		generateAtomsAtFccLattice(latticeConstant, nOfUnitCellsX, nOfUnitCellsY, nOfUnitCellsZ);
 	}
 	else if (crystalStructure == "sc")
 	{
-		for (unsigned int x = 0; x <= _myParameters.getNumberOfUnitCellsX(); x++)
+		generateAtomsAtScLattice(latticeConstant, nOfUnitCellsX, nOfUnitCellsY, nOfUnitCellsZ);
+	}
+
+	setupNeighbourLists();
+	distributeInitialVelocities();
+
+	generateCells();
+}
+
+void World::generateAtomsAtFccLattice(double latticeConstant, unsigned int nOfUnitCellsX, unsigned int nOfUnitCellsY, unsigned int nOfUnitCellsZ)
+{
+	unsigned int atomId{ 0 };
+	for (unsigned int z = 0; z <= nOfUnitCellsZ; z++)
+	{
+		for (unsigned int y = 0; y <= nOfUnitCellsY; y++)
 		{
-			for (unsigned int y = 0; y <= _myParameters.getNumberOfUnitCellsY(); y++)
+			for (unsigned int x = 0; x <= _myParameters.getNumberOfUnitCellsX(); x++)
 			{
-				for (unsigned int z = 0; z <= _myParameters.getNumberOfUnitCellsZ(); z++)
+				Atom* a0 = new Atom(atomId++, x*latticeConstant, y*latticeConstant, z*latticeConstant);
+				addAtomToAtomList(a0);
+
+				if (x != nOfUnitCellsX && y != nOfUnitCellsY && z != nOfUnitCellsZ)
 				{
-					Atom* a = new Atom(atomId++, x*latticeConstant, y*latticeConstant, z*latticeConstant);
-					addAtomToAtomList(a);
+					Atom* ax = new Atom(atomId++, x*latticeConstant, (y + 0.5)*latticeConstant, (z + 0.5)*latticeConstant);
+					Atom* ay = new Atom(atomId++, (x + 0.5)*latticeConstant, y*latticeConstant, (z + 0.5)*latticeConstant);
+					Atom* az = new Atom(atomId++, (x + 0.5)*latticeConstant, (y + 0.5)*latticeConstant, z*latticeConstant);
+					addAtomToAtomList(ax);
+					addAtomToAtomList(ay);
+					addAtomToAtomList(az);
+				}
+				else if (x == nOfUnitCellsX && y != nOfUnitCellsY && z != nOfUnitCellsZ)
+				{
+					Atom* ax = new Atom(atomId++, x*latticeConstant, (y + 0.5)*latticeConstant, (z + 0.5)*latticeConstant);
+					addAtomToAtomList(ax);
+				}
+				else if (x != nOfUnitCellsX && y == nOfUnitCellsY && z != nOfUnitCellsZ)
+				{
+					Atom* ay = new Atom(atomId++, (x + 0.5)*latticeConstant, y*latticeConstant, (z + 0.5)*latticeConstant);
+					addAtomToAtomList(ay);
+				}
+				else if (x != nOfUnitCellsX && y != nOfUnitCellsY && z == nOfUnitCellsZ)
+				{
+					Atom* az = new Atom(atomId++, (x + 0.5)*latticeConstant, (y + 0.5)*latticeConstant, z*latticeConstant);
+					addAtomToAtomList(az);
 				}
 			}
 		}
 	}
+}
 
+void World::generateAtomsAtScLattice(double latticeConstant, unsigned int nOfUnitCellsX, unsigned int nOfUnitCellsY, unsigned int nOfUnitCellsZ)
+{
+	unsigned int atomId{ 0 };
+	for (unsigned int x = 0; x <= _myParameters.getNumberOfUnitCellsX(); x++)
+	{
+		for (unsigned int y = 0; y <= _myParameters.getNumberOfUnitCellsY(); y++)
+		{
+			for (unsigned int z = 0; z <= _myParameters.getNumberOfUnitCellsZ(); z++)
+			{
+				Atom* a = new Atom(atomId++, x*latticeConstant, y*latticeConstant, z*latticeConstant);
+				addAtomToAtomList(a);
+			}
+		}
+	}
+}
+
+void World::setupNeighbourLists()
+{
+	double cutOffDistance{ _myParameters.getChosenMaterial().getCutOffDistance() };
+	double atomDistance{ 0 };
+	for (unsigned int atomId = 0; atomId < _myParameters.getNumberOfAtoms(); atomId++)
+	{
+		for (unsigned int higherId = atomId + 1; higherId < _myParameters.getNumberOfAtoms(); higherId++)
+		{
+			atomDistance = _mySimulation.calcDistance(getAtomInAtomList(atomId), getAtomInAtomList(higherId))[0];
+			if (atomDistance < cutOffDistance)
+			{
+				getAtomInAtomList(atomId)->addToNeighbourList(getAtomInAtomList(higherId));
+			}
+		}
+	}
+}
+
+void World::distributeInitialVelocities()
+{
+	for (unsigned int atomId = 0; atomId < _myParameters.getNumberOfAtoms(); atomId++)
+	{
+
+	}
+}
+
+void World::generateCells()
+{
+	unsigned int nOfUnitCellsX{ _myParameters.getNumberOfUnitCellsX() };
+	unsigned int nOfUnitCellsY{ _myParameters.getNumberOfUnitCellsY() };
+	unsigned int nOfUnitCellsZ{ _myParameters.getNumberOfUnitCellsZ() };
+	double latticeConstant{ _myParameters.getChosenMaterial().getLatticeConstant() };
+	double cellSize{ _myParameters.getChosenMaterial().getCellSize() };
+
+	unsigned int numberOfCellsI{ (unsigned int)ceil(nOfUnitCellsX * latticeConstant / cellSize) };
+	unsigned int numberOfCellsJ{ (unsigned int)ceil(nOfUnitCellsY * latticeConstant / cellSize) };
+	unsigned int numberOfCellsK{ (unsigned int)ceil(nOfUnitCellsZ * latticeConstant / cellSize) };
+
+	for (unsigned int k = 0; k < numberOfCellsK; k++)
+	{
+		for (unsigned int j = 0; j < numberOfCellsJ; j++)
+		{
+			for (unsigned int i = 0; i < numberOfCellsI; i++)
+			{
+				Cell* c = new Cell(i, j, k);
+				addCellToCellList(c);
+			}
+		}
+	}
+}
+
+void World::populateCells()
+{
+	unsigned int i;
+	unsigned int j;
+	unsigned int k;
+	unsigned int nOfUnitCellsX{ _myParameters.getNumberOfUnitCellsX() };
+	unsigned int nOfUnitCellsY{ _myParameters.getNumberOfUnitCellsY() };
+	unsigned int nOfUnitCellsZ{ _myParameters.getNumberOfUnitCellsZ() };
+	double latticeConstant{ _myParameters.getChosenMaterial().getLatticeConstant() };
+
+	for (unsigned int atomId = 0; atomId < _myParameters.getNumberOfAtoms(); atomId++)
+	{
+		Atom* a = getAtomInAtomList(atomId);
+
+		i = (unsigned int)ceil(a->getPosX / (latticeConstant*nOfUnitCellsX));
+		j = (unsigned int)ceil(a->getPosY / (latticeConstant*nOfUnitCellsX));
+		k = (unsigned int)ceil(a->getPosX / (latticeConstant*nOfUnitCellsX));
+
+		
+	}
 }
 
 Atom* World::getAtomInAtomList(unsigned int index)
 {
 	return _atomList.at(index);
+}
+
+Cell* World::getCellInCellList(unsigned int i, unsigned int j, unsigned int k)
+{
+	
 }
 
 Results World::getResults()
@@ -92,6 +184,11 @@ void World::addAtomToAtomList(Atom* a)
 	_atomList.push_back(a);
 }
 
+void World::addCellToCellList(Cell* c)
+{
+	_cellList.push_back(c);
+}
+
 void World::calcPotentialAndForce()
 {
 	double pot, f;
@@ -99,7 +196,7 @@ void World::calcPotentialAndForce()
 	Atom* a1;
 	Atom* a2;
 	array<double, 4> r;
-	for (unsigned int i{ 0 }; i < _myParameters.getNumberOfAtoms() - 1; i++)
+	for (unsigned int i{ 0 }; i < _myParameters.getNumberOfAtoms() - 1/*?*/; i++)
 	{
 		a1 = _atomList.at(i);
 		for (int j{ 0 }; j < a1->getNeighbourList().size(); j++)

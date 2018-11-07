@@ -24,12 +24,14 @@ Material::Material(
 	double epsilon,
 	double sigma,
 	double cutOffDistance,
+	double cellSize,
 	double mass) : 
 	_crystalStructure{ crystalStructure },
 	_latticeConstant{ latticeConstant },
 	_epsilon{ epsilon },
 	_sigma{ sigma },
 	_cutOffDistance{ cutOffDistance },
+	_cellSize{ cellSize },
 	_mass{ mass }
 {}
 
@@ -85,6 +87,16 @@ double Material::getCutOffDistance() const
 void Material::setCutOffDistance(double cod)
 {
 	_cutOffDistance = cod;
+}
+
+double Material::getCellSize() const
+{
+	return _cellSize;
+}
+
+void Material::setCellSize(double cellSize)
+{
+	_cellSize = cellSize;
 }
 
 double Material::getMass() const
