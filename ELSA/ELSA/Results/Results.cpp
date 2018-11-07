@@ -48,6 +48,7 @@ double** Results::getInternalPressure()
 	return &_internalPressure;
 }
 
+
 double** Results::getMeanSquareDisplacement()
 {
 	return &_meanSquareDisplacement;
@@ -56,6 +57,11 @@ double** Results::getMeanSquareDisplacement()
 double**** Results::getPositions()
 {
 	return &_positions;
+}
+
+double** Results::getPotentialEnergy()
+{
+	return &_potentialEnergy;
 }
 
 double** Results::getSpecificHeat()
@@ -107,6 +113,7 @@ void Results::setInternalPressure(double value, int index)
 	_internalPressure[index] = value;
 }
 
+
 void Results::setMeanSquareDisplacement(double value, int index)
 {
 	_meanSquareDisplacement[index] = value;
@@ -117,6 +124,11 @@ void Results::setPositions(double x, double y, double z, int t, int n)
 	_positions[t][n][0] = x;
 	_positions[t][n][1] = y;
 	_positions[t][n][2] = z;
+}
+
+void Results::setPotentialEnergy(double energy, int index)
+{
+	_potentialEnergy[index];
 }
 
 void Results::setSpecificHeat(double value, int index)

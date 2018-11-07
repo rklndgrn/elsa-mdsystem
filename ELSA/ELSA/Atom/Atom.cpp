@@ -95,9 +95,9 @@ double Atom::getVelocityZ() const
 
 
 //Setters
-void Atom::addToNeighbourList(Atom a)
+void Atom::addToNeighbourList(Atom* a)
 {
-	_neighbourList.push_back(&a);
+	_neighbourList.push_back(a);
 }
 
 void Atom::setAccX(double newPos)
