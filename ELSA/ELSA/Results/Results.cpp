@@ -48,6 +48,11 @@ double** Results::getInternalPressure()
 	return &internalPressure;
 }
 
+double** Results::getKineticEnergy()
+{
+	return &kineticEnergy;
+}
+
 double** Results::getMeanSquareDisplacement()
 {
 	return &meanSquareDisplacement;
@@ -109,6 +114,11 @@ void Results::setDiffusionConstant(double value, int index)
 void Results::setInternalPressure(double value, int index)
 {
 	internalPressure[index] = value;
+}
+
+void Results::setKineticEnergy(double value, int index)
+{
+	kineticEnergy[index] = value;
 }
 
 void Results::setMeanSquareDisplacement(double value, int index)
