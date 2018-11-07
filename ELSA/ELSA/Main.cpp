@@ -61,8 +61,10 @@ int main()
 	array<double, 3> acc = {0, 1, 0};
 
 	array<double, 3> newR = mySim.calcPosition(oldR, vel, acc, 0.1);
+	array<double, 3> newV = mySim.calcVelocity(vel, acc, 0.1);
 
 	cout << "New position test: (" << newR[0] << ", " << newR[1] << ", " << newR[2] << ")!" << endl;
+	cout << "New velocity test: (" << newV[0] << ", " << newV[1] << ", " << newV[2] << ")!" << endl;
 
 	char exit;
 

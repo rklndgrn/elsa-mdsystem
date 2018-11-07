@@ -1,5 +1,4 @@
 #include "Simulation.h"
-#include <cmath>
 
 using namespace std;
 
@@ -46,6 +45,7 @@ array<double, 4> Simulation::calcDistance(double x1, double y1, double z1, doubl
 	return temp;
 }
 
+//Function to calculate the position using the Velocity Verlet Algorithm.
 array<double, 3> Simulation::calcPosition(std::array<double, 3> r, std::array<double, 3> v, std::array<double, 3> a, double timeStep)
 {
 	double rX = r[0] + timeStep * v[0] + 0.5*pow(timeStep, 2)*a[0];
@@ -54,4 +54,20 @@ array<double, 3> Simulation::calcPosition(std::array<double, 3> r, std::array<do
 
 	array<double, 3> newR = { rX, rY, rZ };
 	return newR;
+}
+
+//Function to calculate the velocity using the Velocity Verlet Algorithm.
+array<double, 3> Simulation::calcVelocity(std::array<double, 3> v, std::array<double, 3> a, double timeStep)
+{
+	double halfStepVX = v[0] + 0.5*timeStep*a[0];
+	double halfStepVY = v[1] + 0.5*timeStep*a[1];
+	double halfStepVZ = v[2] + 0.5*timeStep*a[2];
+
+	double newVX = halfStepVX + 0.5*timeStep*a[0];
+	double newVY = halfStepVY + 0.5*timeStep*a[1];
+	double newVZ = halfStepVZ + 0.5*timeStep*a[2];
+
+	array<double, 3> newV = {newVX, newVY, newVZ};
+
+	return newV;
 }
