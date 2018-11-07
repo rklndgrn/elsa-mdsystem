@@ -6,7 +6,24 @@ Simulation::Simulation(Material mat) :
 	_mat{mat}
 {};
 
-std::array<double, 3> Simulation::calcAcceleration(std::array<double, 4> force)
+//Function for assigning a new Gaussian velocity if an Anderson thermostat is to be used. 
+array<double, 3> Simulation::generateGaussianVelocity(double T)
+{
+	random_device rdX;
+	random_device rdY;
+	random_device rdZ;
+	mt19937 generatorX(rdX());
+	mt19937 generatorY(rdY());
+	mt19937 generatorZ(rdZ());
+	normal_distribution<double> distributionX(0, sqrt(T));
+	normal_distribution<double> distributionY(0, sqrt(T));
+	normal_distribution<double> distributionZ(0, sqrt(T));
+
+	array<double, 3> v = {distributionX(generatorX), distributionY(generatorY), distributionZ(generatorZ)};
+	return v;
+}
+
+array<double, 3> Simulation::calcAcceleration(std::array<double, 4> force)
 {
 	double m = _mat.getMass();
 	array<double, 3> a = {m*force[1], m*force[2], m*force[3]};

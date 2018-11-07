@@ -66,6 +66,15 @@ int main()
 	cout << "New position test: (" << newR[0] << ", " << newR[1] << ", " << newR[2] << ")!" << endl;
 	cout << "New velocity test: (" << newV[0] << ", " << newV[1] << ", " << newV[2] << ")!" << endl;
 
+	
+	array<double, 3> randV;
+	
+	for (int i = 1; i < 5; i++)
+	{
+		randV = mySim.generateGaussianVelocity(9);
+		cout << "Random velocity test " << i << ": (" << randV[0] << ", " << randV[1] << ", " << randV[2] << ")!" << endl;
+	}
+
 	char exit;
 
 	cin >> exit;

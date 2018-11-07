@@ -3,6 +3,7 @@
 
 #include <array>
 #include <cmath>
+#include <random>
 
 class Simulation
 {
@@ -15,6 +16,7 @@ public:
 	std::array<double, 4> calcDistance(double, double, double, double, double, double) const;
 	std::array<double, 3> calcPosition(std::array<double, 3>, std::array<double, 3>, std::array<double, 3>, double);
 	std::array<double, 3> calcVelocity(std::array<double, 3>, std::array<double, 3>, double);
+	std::array<double, 3> generateGaussianVelocity(double);
 
 	Simulation() = default;
 	Simulation(Material mat);
