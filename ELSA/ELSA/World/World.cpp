@@ -33,6 +33,7 @@ void World::setupSystem(Parameters p)
 	distributeInitialVelocities();
 
 	generateCells();
+	populateCells();
 }
 
 void World::generateAtomsAtFccLattice(double latticeConstant, unsigned int nOfUnitCellsX, unsigned int nOfUnitCellsY, unsigned int nOfUnitCellsZ)
@@ -151,16 +152,22 @@ void World::populateCells()
 	unsigned int nOfUnitCellsY{ _myParameters.getNumberOfUnitCellsY() };
 	unsigned int nOfUnitCellsZ{ _myParameters.getNumberOfUnitCellsZ() };
 	double latticeConstant{ _myParameters.getChosenMaterial().getLatticeConstant() };
+	double cellSize{ _myParameters.getChosenMaterial().getCellSize() };
+
+	unsigned int numberOfCellsI{ (unsigned int)ceil(nOfUnitCellsX * latticeConstant / cellSize) };
+	unsigned int numberOfCellsJ{ (unsigned int)ceil(nOfUnitCellsY * latticeConstant / cellSize) };
+	unsigned int numberOfCellsK{ (unsigned int)ceil(nOfUnitCellsZ * latticeConstant / cellSize) };
+
 
 	for (unsigned int atomId = 0; atomId < _myParameters.getNumberOfAtoms(); atomId++)
 	{
 		Atom* a = getAtomInAtomList(atomId);
 
-		i = (unsigned int)ceil(a->getPosX / (latticeConstant*nOfUnitCellsX));
-		j = (unsigned int)ceil(a->getPosY / (latticeConstant*nOfUnitCellsX));
-		k = (unsigned int)ceil(a->getPosX / (latticeConstant*nOfUnitCellsX));
+		i = (unsigned int)floor(a->getPosX() / cellSize);
+		j = (unsigned int)floor(a->getPosY() / cellSize);
+		k = (unsigned int)floor(a->getPosZ() / cellSize);
 
-		
+		getCellInCellList(i + j * numberOfCellsI + k * numberOfCellsI*numberOfCellsJ)->addAtomToCellList(a);
 	}
 }
 
@@ -169,10 +176,15 @@ Atom* World::getAtomInAtomList(unsigned int index)
 	return _atomList.at(index);
 }
 
-Cell* World::getCellInCellList(unsigned int i, unsigned int j, unsigned int k)
+Cell* World::getCellInCellList(unsigned int index)
 {
-	
+	return _cellList.at(index);
 }
+
+//Cell* World::getCellInCellList(unsigned int i, unsigned int j, unsigned int k)
+//{
+//	
+//}
 
 Results World::getResults()
 {

@@ -32,9 +32,9 @@ vector<Atom*> Cell::getAtomsInCellList()
 	return _atomsInCellList ;
 }
 
-void Cell::addAtomToCellList(Atom newAtom)
+void Cell::addAtomToCellList(Atom* newAtom)
 {
-	_atomsInCellList.insert(_atomsInCellList.begin(), &newAtom);
+	_atomsInCellList.push_back(newAtom);
 }
 
 void Cell::clearAtomsInCellList()

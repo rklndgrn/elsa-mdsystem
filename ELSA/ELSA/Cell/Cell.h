@@ -14,7 +14,7 @@ public:
 	std::array<unsigned int,3> getCellID() const;
 	void setCellID(unsigned int i,unsigned int j,unsigned int k);
 	std::vector<Atom*> getAtomsInCellList() ;
-	void addAtomToCellList(Atom newAtom);
+	void addAtomToCellList(Atom* newAtom);
 	void clearAtomsInCellList();
 
 	Cell();
