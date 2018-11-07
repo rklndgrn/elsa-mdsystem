@@ -11,11 +11,11 @@
 class World
 {
 private:
-	std::vector<Atom> atomList;
-	std::vector<Cell> cellList;
-	Parameters myParameters;
-	Results myResults;
-	Simulation mySimulation;
+	std::vector<Atom> _atomList;
+	std::vector<Cell> _cellList;
+	Parameters _myParameters;
+	Results _myResults;
+	Simulation _mySimulation;
 	
 public:
 	World(Parameters);
@@ -26,6 +26,7 @@ public:
 	void addAtomToAtomList(Atom);
 
 	void calcPotentialAndForce();
+	void calcPotentialEnergy();
 };
 
 #endif

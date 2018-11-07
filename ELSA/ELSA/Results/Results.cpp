@@ -58,6 +58,11 @@ double**** Results::getPositions()
 	return &positions;
 }
 
+double** Results::getPotentialEnergy()
+{
+	return &potentialEnergy;
+}
+
 double** Results::getSpecificHeat()
 {
 	return &specificHeat;
@@ -116,6 +121,11 @@ void Results::setPositions(double x, double y, double z, int t, int n)
 	positions[t][n][0] = x;
 	positions[t][n][1] = y;
 	positions[t][n][2] = z;
+}
+
+void Results::setPotentialEnergy(double energy, int index)
+{
+	potentialEnergy[index];
 }
 
 void Results::setSpecificHeat(double value, int index)

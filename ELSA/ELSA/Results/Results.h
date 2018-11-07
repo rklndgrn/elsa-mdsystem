@@ -16,6 +16,7 @@ private:
 	double *internalPressure;
 	double *meanSquareDisplacement;
 	double ***positions;
+	double *potentialEnergy;
 	double *specificHeat;
 	double *temperature;
 	double *totalEnergy;
@@ -31,6 +32,7 @@ public:
 	double** getInternalPressure();
 	double** getMeanSquareDisplacement();
 	double**** getPositions();
+	double** getPotentialEnergy();
 	double** getSpecificHeat();
 	double** getTemperature();
 	double** getTotalEnergy();
@@ -43,6 +45,7 @@ public:
 	void setInternalPressure(double, int);
 	void setMeanSquareDisplacement(double, int);
 	void setPositions(double, double, double, int, int);
+	void setPotentialEnergy(double, int);
 	void setSpecificHeat(double, int);
 	void setTemperature(double, int);
 	void setTotalEnergy(double, int);
