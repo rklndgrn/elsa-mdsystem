@@ -10,9 +10,9 @@ class Atom
 private:
 	unsigned int id{};
 	std::array<unsigned int, 3> cellIndex = { 0, 0, 0 };
-	double position[3] = {0, 0, 0};
-	double velocity[3] = {0, 0, 0};
-	double acceleration[3] = {0, 0, 0};
+	std::array<double, 3> position = { 0, 0, 0 };
+	std::array<double, 3> velocity = { 0, 0, 0 };
+	std::array<double, 3> acceleration = { 0, 0, 0 };
 	double potential{};
 	std::array<double, 3> force{};
 	std::vector<Atom*> neighbourList;
