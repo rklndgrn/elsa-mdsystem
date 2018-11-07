@@ -3,14 +3,13 @@
 using namespace std;
 
 //Constructor
-Atom::Atom(size_t newID, double newPosX, double newPosY, double newPosZ)
+Atom::Atom(int newID, double newPosX, double newPosY, double newPosZ)
 {
 	id = newID;
 	position[0] = newPosX;
 	position[1] = newPosY;
 	position[2] = newPosZ;
 }
-
 
 //Getters
 double Atom::getAccX() const
@@ -28,10 +27,9 @@ double Atom::getAccZ() const
 	return acceleration[2];
 }
 
-int* Atom::getCellIndex() const
+std::array<unsigned int, 3> Atom::getCellIndex() const
 {
-	int arr[3] = { cellIndex[0], cellIndex[1], cellIndex[2]};
-	return arr;
+	return cellIndex;
 }
 
 vector<Atom*> Atom::getNeighbourList() const
@@ -39,7 +37,7 @@ vector<Atom*> Atom::getNeighbourList() const
 	return neighbourList;
 }
 
-size_t Atom::getID() const
+int Atom::getID() const
 {
 	return id;
 }
@@ -64,9 +62,19 @@ double Atom::getPotential() const
 	return potential;
 }
 
-double Atom::getForce() const
+double Atom::getForceX() const
 {
-	return force;
+	return force[0];
+}
+
+double Atom::getForceY() const
+{
+	return force[1];
+}
+
+double Atom::getForceZ() const
+{
+	return force[2];
 }
 
 double Atom::getVelocityX() const
@@ -148,9 +156,19 @@ void Atom::setPotential(double u)
 	potential = u;
 }
 
-void Atom::setForce(double F)
+void Atom::setForceX(double F)
 {
-	force = F;
+	force[0] = F;
+}
+
+void Atom::setForceY(double F)
+{
+	force[1] = F;
+}
+
+void Atom::setForceZ(double F)
+{
+	force[2] = F;
 }
 
 void Atom::setVelocityX(double newV)

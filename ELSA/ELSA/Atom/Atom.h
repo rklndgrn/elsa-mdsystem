@@ -2,36 +2,39 @@
 #define ATOM_H
 
 #include <cstddef>
-#include <memory>
 #include <vector>
+#include <array>
 
 class Atom
 {
 private:
-	std::size_t id{};
-	int cellIndex[3] = { 0, 0, 0 };
-	double position[3] = {0, 0, 0};
-	double velocity[3] = {0, 0, 0};
-	double acceleration[3] = {0, 0, 0};
+	unsigned int id{};
+	std::array<unsigned int, 3> cellIndex = { 0, 0, 0 };
+	std::array<double, 3> position = { 0, 0, 0 };
+	std::array<double, 3> velocity = { 0, 0, 0 };
+	std::array<double, 3> acceleration = { 0, 0, 0 };
 	double potential{};
-	double force{};
+	std::array<double, 3> force{};
 	std::vector<Atom*> neighbourList;
 
 public:
-	Atom(std::size_t, double, double, double);
+	Atom(int, double, double, double);
+	Atom() = default;
 	~Atom() = default;
 
-	std::size_t getID() const;
+	int getID() const;
 	double getAccX() const;
 	double getAccY() const;
 	double getAccZ() const;
-	int* getCellIndex() const;
+	std::array<unsigned int, 3> getCellIndex() const;
 	std::vector<Atom*> getNeighbourList() const;
 	double getPosX() const;
 	double getPosY() const;
 	double getPosZ() const;
 	double getPotential() const;
-	double getForce() const;
+	double getForceX() const;
+	double getForceY() const;
+	double getForceZ() const;
 	double getVelocityX() const;
 	double getVelocityY() const;
 	double getVelocityZ() const;
@@ -48,7 +51,9 @@ public:
 	void setPosZ(double);
 	void setPosition(double, double, double);
 	void setPotential(double);
-	void setForce(double);
+	void setForceX(double);
+	void setForceY(double);
+	void setForceZ(double);
 	void setVelocityX(double);
 	void setVelocityY(double);
 	void setVelocityZ(double);
