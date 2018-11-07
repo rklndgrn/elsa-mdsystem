@@ -45,7 +45,6 @@ public:
 	void setAccZ(double);
 	void setAcceleration(double, double, double);
 	void setCellIndex(int, int, int);
-	void setID(size_t);
 	void setPosX(double);
 	void setPosY(double);
 	void setPosZ(double);

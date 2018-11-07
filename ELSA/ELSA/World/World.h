@@ -26,11 +26,10 @@ public:
 	Atom* getAtomInAtomList(unsigned int);
 
 	void addAtomToAtomList(Atom*);
-
 	void calcPotentialAndForce();
-
 	void calcPotentialEnergy();
 	void calcKineticEnergy();
+	void solveEquationsOfMotion(double);
 };
 
 #endif

@@ -11,6 +11,7 @@ Results::Results(int simulationTime, int timeStep, int numberOfParticles)
 	_debyeTemperature = new double[_arrayLength];
 	_diffusionConstant = new double[_arrayLength];
 	_internalPressure = new double[_arrayLength];
+	_kineticEnergy = new double[_arrayLength];
 	_meanSquareDisplacement = new double[_arrayLength];
 	_specificHeat = new double[_arrayLength];
 	_temperature = new double[_arrayLength];
@@ -48,6 +49,10 @@ double** Results::getInternalPressure()
 	return &_internalPressure;
 }
 
+double** Results::getKineticEnergy()
+{
+	return &_kineticEnergy;
+}
 
 double** Results::getMeanSquareDisplacement()
 {
@@ -113,6 +118,10 @@ void Results::setInternalPressure(double value, int index)
 	_internalPressure[index] = value;
 }
 
+void Results::setKineticEnergy(double value, int index)
+{
+	_kineticEnergy[index] = value;
+}
 
 void Results::setMeanSquareDisplacement(double value, int index)
 {
@@ -126,9 +135,9 @@ void Results::setPositions(double x, double y, double z, int t, int n)
 	_positions[t][n][2] = z;
 }
 
-void Results::setPotentialEnergy(double energy, int index)
+void Results::setPotentialEnergy(double value, int index)
 {
-	_potentialEnergy[index];
+	_potentialEnergy[index] = value;
 }
 
 void Results::setSpecificHeat(double value, int index)

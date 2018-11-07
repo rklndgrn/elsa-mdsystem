@@ -54,7 +54,7 @@ double Atom::getPosY() const
 
 double Atom::getPosZ() const
 {
-	return _position[2];
+	   	return _position[2];
 }
 
 double Atom::getPotential() const

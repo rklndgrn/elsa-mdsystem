@@ -6,8 +6,7 @@ World::World(Parameters p)
 {
 	_mySimulation = Simulation(p.getChosenMaterial());
 	_myParameters = p;
-	Results r{(int) p.getSimulationTime(), (int) p.getTimeStep(), (int) p.getNumberOfAtoms()};
-	_myResults = r;
+	_myResults = Results((int)p.getSimulationTime(), (int)p.getTimeStep(), (int)p.getNumberOfAtoms());
 }
 
 Atom* World::getAtomInAtomList(unsigned int index)
@@ -58,6 +57,7 @@ void World::calcPotentialAndForce()
 	}
 }
 
+
 void World::calcPotentialEnergy()
 {
 	Atom* a1;
@@ -68,13 +68,67 @@ void World::calcPotentialEnergy()
 	}
 }
 
-/*void World::calcKineticEnergy()
+/*
+void World::calcKineticEnergy()
 {
-	Atom a1;
+	Atom* a1;
 	for (unsigned int i{ 0 }; i < _myParameters.getNumberOfAtoms() - 1; i++)
 	{
 		a1 = _atomList.at(i);
-		_myResults.setKineticEnergy(**_myResults.getKineticEnergy() )
+		_myResults.setKineticEnergy(**_myResults.getKineticEnergy())
 	}
 
-}*/
+}
+*/
+
+void World::solveEquationsOfMotion(double elapsedTime)
+{
+	Atom* thisAtom;
+	array<double, 3> oldR;
+	array<double, 3> oldV;
+	array<double, 3> oldA;
+	array<double, 3> newR;
+	array<double, 3> newV;
+
+	double K{0}; //Kinetic energy.
+	double T{0}; //Instantenous temperature
+	double timeStep = _myParameters.getTimeStep();
+	_myParameters.setTemperature(T);
+
+	random_device rd;
+	mt19937 generator(rd());
+	uniform_real_distribution<double> distribution(0, 1);
+	double randomValue;
+
+	for (int i{ 0 }; i < _atomList.size(); i++)
+	{
+		thisAtom = _atomList.at(i);
+		oldR = { thisAtom->getPosX(), thisAtom->getPosY(), thisAtom->getPosZ() };
+		oldV = { thisAtom->getVelocityX(), thisAtom->getVelocityY(), thisAtom->getVelocityZ() };
+		oldA = _mySimulation.calcAcceleration(thisAtom->getForceX(), thisAtom->getForceY(), thisAtom->getForceZ());
+
+		randomValue = distribution(generator);
+
+		newR = _mySimulation.calcPosition(oldR, oldV, oldA, timeStep);
+		_myResults.setPositions(newR[0], newR[1], newR[2], elapsedTime/timeStep, i);
+		
+		newV = _mySimulation.calcVelocity(oldV, oldA, timeStep);
+
+		K += _mySimulation.calcKineticEnergy(newV);
+	}
+
+	T = _mySimulation.calcTemperature(K, _myParameters.getBoltzmann(), _myParameters.getNumberOfAtoms());
+	K = 0;
+
+	//Anderson thermostat.
+	for (int i{ 0 }; i < _atomList.size(); i++)
+	{
+		if (randomValue < _myParameters.getCollisionFrequency()*elapsedTime)
+		{
+			newV = _mySimulation.generateGaussianVelocity(T);
+		}
+	}
+
+	_myResults.setKineticEnergy(K, elapsedTime/timeStep);
+	_myResults.setTemperature(T, elapsedTime/timeStep);
+}

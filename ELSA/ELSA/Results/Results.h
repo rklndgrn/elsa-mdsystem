@@ -14,6 +14,7 @@ private:
 	double* _debyeTemperature;
 	double* _diffusionConstant;
 	double* _internalPressure;
+	double* _kineticEnergy;
 	double* _meanSquareDisplacement;
 	double*** _positions;
 	double* _potentialEnergy;
@@ -30,6 +31,7 @@ public:
 	double** getDebyeTemperature();
 	double** getDiffusionConstant();
 	double** getInternalPressure();
+	double** getKineticEnergy();
 	double** getMeanSquareDisplacement();
 	double**** getPositions();
 	double** getPotentialEnergy();
@@ -43,6 +45,7 @@ public:
 	void setDebyeTemperature(double, int);
 	void setDiffusionConstant(double, int);
 	void setInternalPressure(double, int);
+	void setKineticEnergy(double, int);
 	void setMeanSquareDisplacement(double, int);
 	void setPositions(double, double, double, int, int);
 	void setPotentialEnergy(double, int);
