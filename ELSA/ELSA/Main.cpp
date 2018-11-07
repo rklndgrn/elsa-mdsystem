@@ -10,6 +10,7 @@ using namespace std;
 int main()
 {
 	Atom a{1, 1, 2, 3};
+	Atom b{2, 0, 0, 0};
 
 	cout << "Hej, vi har en atom med ID " << a.getID() << ", position (" << a.getPosX() << ", " << a.getPosY() << ", " << a.getPosZ() << ") och hastighet (" << a.getVelocityX() << ", " << a.getVelocityY() << ", " << a.getVelocityZ() << ")!" << endl;
 
@@ -53,7 +54,15 @@ int main()
 	cout << newCell.getCellID()[0] << newCell.getCellID()[2] << newCell.getCellID()[1] << endl;
 
 	Simulation mySim(anotherMaterial);
-	cout << mySim.calcLJPot(1e-10) << endl;
+	cout << mySim.calcLJPotential(1e-10) << endl;
+
+	array<double, 3> oldR = {0, 0, 0};
+	array<double, 3> vel = {0.5, 0, 1};
+	array<double, 3> acc = {0, 1, 0};
+
+	array<double, 3> newR = mySim.calcPosition(oldR, vel, acc, 0.1);
+
+	cout << "New position test: (" << newR[0] << ", " << newR[1] << ", " << newR[2] << ")!" << endl;
 
 	char exit;
 

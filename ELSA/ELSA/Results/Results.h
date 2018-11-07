@@ -8,17 +8,17 @@
 class Results
 {
 private:
-	unsigned int arrayLength;
-	unsigned int numberOfAtoms;
-	double *cohesiveEnergy;
-	double *debyeTemperature;
-	double *diffusionConstant;
-	double *internalPressure;
-	double *meanSquareDisplacement;
-	double ***positions;
-	double *specificHeat;
-	double *temperature;
-	double *totalEnergy;
+	unsigned int _arrayLength;
+	unsigned int _numberOfAtoms;
+	double* _cohesiveEnergy;
+	double* _debyeTemperature;
+	double* _diffusionConstant;
+	double* _internalPressure;
+	double* _meanSquareDisplacement;
+	double*** _positions;
+	double* _specificHeat;
+	double* _temperature;
+	double* _totalEnergy;
 
 public:
 	Results() = default;

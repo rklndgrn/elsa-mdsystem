@@ -8,14 +8,14 @@
 class Atom
 {
 private:
-	unsigned int id{};
-	std::array<unsigned int, 3> cellIndex = { 0, 0, 0 };
-	std::array<double, 3> position = { 0, 0, 0 };
-	std::array<double, 3> velocity = { 0, 0, 0 };
-	std::array<double, 3> acceleration = { 0, 0, 0 };
-	double potential{};
-	std::array<double, 3> force{};
-	std::vector<Atom*> neighbourList;
+	unsigned int _id{};
+	std::array<unsigned int, 3> _cellIndex = { 0, 0, 0 };
+	std::array<double, 3> _position = { 0, 0, 0 };
+	std::array<double, 3> _velocity = { 0, 0, 0 };
+	std::array<double, 3> _acceleration = { 0, 0, 0 };
+	double _potential{};
+	std::array<double, 3> _force{};
+	std::vector<Atom*> _neighbourList;
 
 public:
 	Atom(int, double, double, double);
@@ -54,6 +54,7 @@ public:
 	void setForceX(double);
 	void setForceY(double);
 	void setForceZ(double);
+	void setForce(double, double, double);
 	void setVelocityX(double);
 	void setVelocityY(double);
 	void setVelocityZ(double);

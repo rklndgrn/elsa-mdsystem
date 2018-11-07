@@ -32,11 +32,11 @@ void World::calcPotentialAndForce()
 		{
 			a2 = *a1.getNeighbourList().at(j);
 
-			r = mySimulation.calcDist(a1.getPosX(), a1.getPosY(), a1.getPosZ(), a2.getPosX(), a2.getPosY(), a2.getPosZ());
+			r = mySimulation.calcDistance(a1.getPosX(), a1.getPosY(), a1.getPosZ(), a2.getPosX(), a2.getPosY(), a2.getPosZ());
 			f = mySimulation.calcForce(r[0]);
 
 			force = { f*r[1], f*r[2],f*r[3] };
-			pot = mySimulation.calcLJPot(r[0]);
+			pot = mySimulation.calcLJPotential(r[0]);
 
 			a1.setPotential(a1.getPotential() + pot);
 			a2.setPotential(a2.getPotential() + pot);
