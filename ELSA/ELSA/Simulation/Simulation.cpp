@@ -86,18 +86,14 @@ array<double, 3> Simulation::calcPosition(std::array<double, 3> r, std::array<do
 
 double Simulation::calcTemperature(double K, double kB, double N)
 {
-	/*
-	double K = kineticEnergy / (1.602176620809*pow(10, -19));
-	double kB = 8.617330350*pow(10, -5);
-	double quota = K / kB;
-	cout << "Hello! K is " << K << " eV!" << endl;
-	cout << "Hello! kB is " << kB << " eV!" << endl;
-	cout << "Hello! N is " << N << "!" << endl;
-	cout << "Hello! K/kB is " << quota << "!" << endl;
-	quota = quota / ((double) N);
-	cout << "Hello! K/(kB*N) is " << quota << "!" << endl;
-	*/
-	return (2*K)/(3*kB*N);
+	if (N > 0)
+	{
+		return (2 * K) / (3 * kB*N);
+	}
+	else
+	{
+		return 0;
+	}
 }
 
 //Function to calculate the velocity using the Velocity Verlet Algorithm.
