@@ -38,7 +38,7 @@ int main()
 	cout << myParameters.getChosenMaterial().getCrystalStructure() << endl;
 	cout << myParameters.getChosenMaterial().getEpsilon() << endl;
 
-	Material anotherMaterial("BCC", 4.5, 1.2, 2.3, 4.5, 55);
+	Material anotherMaterial("BCC", 4.5, 1.2, 2.3, 4.5, 5.5*pow(10,-27));
 	Parameters anotherParameters(100, 10, 1000, 4.56, 1.00, true, true, anotherMaterial);
 
 	cout << anotherParameters.getIsThermostatOn() << endl;
@@ -74,6 +74,12 @@ int main()
 		randV = mySim.generateGaussianVelocity(9);
 		cout << "Random velocity test " << i << ": (" << randV[0] << ", " << randV[1] << ", " << randV[2] << ")!" << endl;
 	}
+
+	double K = mySim.calcKineticEnergy(vel);
+	double T = mySim.calcTemperature(K, anotherParameters.getBoltzmann(), 100);
+
+	cout << "Kinetic energy test: " << K << "J!" << endl;
+	cout << "Temperature test: " << T << " K!" << endl;
 
 	char exit;
 

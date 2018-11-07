@@ -101,5 +101,4 @@ void World::solveEquationsOfMotion(double elapsedTime)
 
 	_myResults.setKineticEnergy(K, elapsedTime/timeStep);
 	_myResults.setTemperature(T, elapsedTime/timeStep);
-
 }
