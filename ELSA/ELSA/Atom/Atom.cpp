@@ -37,7 +37,7 @@ vector<Atom*> Atom::getNeighbourList() const
 	return _neighbourList;
 }
 
-int Atom::getID() const
+unsigned int Atom::getID() const
 {
 	return _id;
 }

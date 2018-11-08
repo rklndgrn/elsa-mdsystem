@@ -39,8 +39,8 @@ int main()
 	//cout << myWorld.getAtomInAtomList(1) << endl;
 	//cout << myWorld.getAtomInAtomList(0)->getNeighbourList().at(0) << endl;
 
-	Material anotherMaterial("fcc", 2, 1, 1, 4, 100);
-	Parameters myParameters(1, 1, 4, 1, 1, 10000, 10, false, false, anotherMaterial);
+	Material anotherMaterial("fcc", 2, 1, 1, 2, 100);
+	Parameters myParameters(1, 1, 10, 10, 10, 10000, 10, false, false, anotherMaterial);
 
 
 	World myWorld(myParameters);
@@ -52,11 +52,11 @@ int main()
 
 	for (unsigned int i = 0; i < myParameters.getNumberOfAtoms(); i++)
 	{
-		//cout << " id: " << myWorld.getAtomInAtomList(i)->getID();
-		//cout <<
-		//	" x: " << myWorld.getAtomInAtomList(i)->getVelocityX() <<
-		//	" y: " << myWorld.getAtomInAtomList(i)->getVelocityY() <<
-		//	" z: " << myWorld.getAtomInAtomList(i)->getVelocityZ() << endl;
+	/*	cout << " id: " << myworld.getatominatomlist(i)->getid();
+		cout <<
+			" x: " << myworld.getatominatomlist(i)->getx() <<
+			" y: " << myworld.getatominatomlist(i)->getvelocityy() <<
+			" z: " << myworld.getatominatomlist(i)->getvelocityz() << endl;*/
 
 		//cout << 0.5 * myParameters.getChosenMaterial().getMass() * (pow(myWorld.getAtomInAtomList(i)->getVelocityX(), 2) + pow(myWorld.getAtomInAtomList(i)->getVelocityX(), 2) + pow(myWorld.getAtomInAtomList(i)->getVelocityX(), 2)) << endl;
 
@@ -66,12 +66,12 @@ int main()
 		myfile << myWorld.getAtomInAtomList(i)->getVelocityY() << endl;
 		myfile << myWorld.getAtomInAtomList(i)->getVelocityZ() << endl;
 
-		//cout << " nid: ";
-		//for (unsigned int j = 0; j < myWorld.getAtomInAtomList(i)->getNeighbourList().size(); j++)
-		//{
-		//	cout << myWorld.getAtomInAtomList(i)->getNeighbourList()[j]->getID() << ", ";
-		//}
-		//cout << endl;
+		cout << " nid: ";
+		for (unsigned int j = 0; j < myWorld.getAtomInAtomList(i)->getNeighbourList().size(); j++)
+		{
+			cout << myWorld.getAtomInAtomList(i)->getNeighbourList()[j]->getID() << ", ";
+		}
+		cout << endl;
 	}
 
 	myfile.close();

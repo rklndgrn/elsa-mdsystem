@@ -22,7 +22,7 @@ public:
 	Atom() = default;
 	~Atom() = default;
 
-	int getID() const;
+	unsigned int getID() const;
 	double getAccX() const;
 	double getAccY() const;
 	double getAccZ() const;
