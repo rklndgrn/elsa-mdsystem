@@ -1,4 +1,5 @@
 #include "Simulation.h"
+#include <iostream>
 
 using namespace std;
 
@@ -11,6 +12,11 @@ double Simulation::calcCohesiveEnergy(double potentialEnergy, double numberOfAto
 	return potentialEnergy/numberOfAtoms;
 }
 
+double Simulation::calcDebyeTemperature(double hBar, double T, double m, double kB, double MSD)
+{
+	return hBar * sqrt((3 * T) / (m*kB*MSD));
+}
+
 double Simulation::calcForce(double dist) const
 {
 	return 24 * _mat.getEpsilon() / _mat.getSigma() *
@@ -18,6 +24,13 @@ double Simulation::calcForce(double dist) const
 			2 * pow((_mat.getSigma() / dist), 13) -
 			pow((_mat.getSigma() / dist), 7)
 			);
+}
+
+double Simulation::calcKineticEnergy(double vx, double vy, double vz)
+{
+	double m = _mat.getMass();
+
+	return 0.5*m*(pow(vx, 2) + pow(vy, 2) + pow(vz, 2));
 }
 
 double Simulation::calcLJPotential(double dist) const
@@ -29,11 +42,57 @@ double Simulation::calcLJPotential(double dist) const
 			);
 };
 
-double Simulation::calcKineticEnergy(double vx, double vy, double vz)
+double Simulation::calcMeanSquareDisplacement(double** currentPositionArray, double** initPositionArray, unsigned int numberOfAtoms)
 {
-	double m = _mat.getMass();
+	array<double, 3> currPos;
+	array<double, 3> initPos;
 
-	return 0.5*m*(pow(vx, 2) + pow(vy, 2) + pow(vz, 2));
+	double sum{0};
+	for (unsigned int i{ 0 }; i < numberOfAtoms; i++)
+	{
+		for (int j{ 0 }; j < 3; j++)
+		{
+			currPos[j] = currentPositionArray[i][j];
+			initPos[j] = initPositionArray[i][j];
+		}
+
+		sum += pow(currPos[0] - initPos[0], 2) + pow(currPos[1] - initPos[1], 2) + pow(currPos[2] - initPos[2], 2);
+
+		cout << "currPos is " << currPos[0] << ", " << currPos[1] << ", " << currPos[2] << "!" << endl;
+		cout << "initPos is " << initPos[0] << ", " << initPos[1] << ", " << initPos[2] << "!" << endl;
+	}
+	return sum/((double) numberOfAtoms);
+}
+
+double Simulation::calcSelfDiffusionCoefficient(double*** positionsArray, int t1, int t2, unsigned int numberOfAtoms)
+{
+	double msd1 = calcMeanSquareDisplacement(positionsArray[t1], positionsArray[0], numberOfAtoms);
+	double msd2 = calcMeanSquareDisplacement(positionsArray[t2], positionsArray[0], numberOfAtoms);
+
+	return (msd2 - msd1) / ((double)6 * (t2 - t1));
+}
+
+double Simulation::calcSpecificHeat(unsigned int numberOfAtoms, double kB, double numberOfTimeSteps, double* tempArray)
+{
+	double expT{0}, expT2{0}, tmp{0};
+	for (int i{0}; i < numberOfTimeSteps; i++)
+	{
+		expT += tempArray[i];
+		expT2 += pow(tempArray[i], 2);
+	}
+	expT /= numberOfTimeSteps;
+	expT2 /= numberOfTimeSteps;
+
+	if (expT > 0)
+	{
+		tmp = expT2 - pow(expT, 2);
+		tmp *= ((2 * numberOfAtoms) / (3 * pow(expT, 2)));
+		tmp = 1 - tmp;
+		tmp = 1 / tmp;
+		tmp *= 2 / (3 * numberOfAtoms*kB);
+	}
+
+	return tmp;
 }
 
 double Simulation::calcTemperature(double K, double kB, double N)

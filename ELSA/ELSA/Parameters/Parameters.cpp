@@ -49,6 +49,22 @@ unsigned int Parameters::getNumberOfAtoms() const
 {
 	return _numberOfAtoms;
 }
+
+unsigned int Parameters::getNumberOfUnitCellsX() const
+{
+	return _numberOfUnitCellsX;
+}
+
+unsigned int Parameters::getNumberOfUnitCellsY() const
+{
+	return _numberOfUnitCellsY;
+}
+
+unsigned int Parameters::getNumberOfUnitCellsZ() const
+{
+	return _numberOfUnitCellsZ;
+}
+
 unsigned int Parameters::getTimeStep() const
 {
 	return _timeStep;
