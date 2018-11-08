@@ -262,7 +262,6 @@ void World::calcPressure(double elapsedTime)
 			pressure += r[0]*f;
 		}
 	}
-	cout << "The pork sum is " << pressure << "!" << endl;
 
 	double V = getWorldVolume();
 	double* tempArray = *_myResults.getTemperature();
@@ -270,7 +269,6 @@ void World::calcPressure(double elapsedTime)
 	pressure /= elapsedTime * 6 * V;
 	pressure += N * _myParameters.getBoltzmann() * T / V;
 
-	cout << "The pressure is set to " << pressure << "!" << endl;
 	_myResults.setInternalPressure(pressure, index);
 }
 
