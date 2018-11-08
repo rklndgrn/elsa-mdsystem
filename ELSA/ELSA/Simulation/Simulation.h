@@ -21,6 +21,7 @@ public:
 	double calcKineticEnergy(double, double, double);
 	double calcLJPotential(double dist) const;
 	double calcMeanSquareDisplacement(double**, double**, unsigned int);
+	double calcSelfDiffusionCoefficient(double ***, int, int, unsigned int);
 	double calcSpecificHeat(unsigned int, double, double, double*);
 	double calcTemperature(double, double, double);
 	double calcTotalEnergy(double, double);

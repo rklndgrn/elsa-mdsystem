@@ -19,6 +19,12 @@ Results World::getResults()
 	return _myResults;
 }
 
+double World::getWorldVolume() const
+{
+	double numberOfUnitCells = _myParameters.getNumberOfUnitCellsX()*_myParameters.getNumberOfUnitCellsY()*_myParameters.getNumberOfUnitCellsZ();
+	return numberOfUnitCells*pow(_myParameters.getChosenMaterial().getLatticeConstant(), 3);
+}
+
 void World::addAtomToAtomList(Atom* a)
 {
 	_atomList.push_back(a);
@@ -28,7 +34,6 @@ void World::calcPotentialAndForce()
 {
 	double pot{0};
 	double f{0};
-	double pressure{0};
 	array<double, 3> force;
 	Atom* a1;
 	Atom* a2;
@@ -43,10 +48,7 @@ void World::calcPotentialAndForce()
 			r = _mySimulation.calcDistance(a1->getPosX(), a1->getPosY(), a1->getPosZ(), a2->getPosX(), a2->getPosY(), a2->getPosZ());
 			f = _mySimulation.calcForce(r[0]);
 
-			force = { f*r[1], f*r[2],f*r[3] };
 			pot = _mySimulation.calcLJPotential(r[0]);
-
-			//pressure = r[0] * f;
 
 			a1->setPotential(a1->getPotential() + pot);
 			a2->setPotential(a2->getPotential() + pot);
@@ -72,18 +74,36 @@ void World::calcPotentialEnergy()
 	}
 }
 
-/*
-void World::calcKineticEnergy()
+
+void World::calcPressure(double elapsedTime)
 {
-	Atom* a1;
-	for (unsigned int i{ 0 }; i < _myParameters.getNumberOfAtoms() - 1; i++)
+	double pressure{0};
+	int N = _myParameters.getNumberOfAtoms();
+	Atom *a1, *a2;
+	double f{0};
+	array<double, 4> r;
+
+	for (int i{ 0 }; i < N; i++)
 	{
 		a1 = _atomList.at(i);
-		_myResults.setKineticEnergy(**_myResults.getKineticEnergy())
+		for (int j{ 0 }; j < a1->getNeighbourList().size(); j++)
+		{
+			a2 = a1->getNeighbourList().at(j);
+			r = _mySimulation.calcDistance(a1->getPosX(), a1->getPosY(), a1->getPosZ(), a2->getPosX(), a2->getPosY(), a2->getPosZ());
+			f = _mySimulation.calcForce(r[0]);
+
+			pressure += r[0]*f;
+		}
 	}
 
+	double V = getWorldVolume();
+	int index = (int) (elapsedTime / _myParameters.getTimeStep());
+	double T = *_myResults.getTemperature()[index];
+	pressure /= elapsedTime * 6 * V;
+	pressure += N * _myParameters.getBoltzmann() * T / V;
+
+	_myResults.setInternalPressure(pressure, index);
 }
-*/
 
 //Function to solve the equations of motion. Finds new velocities and positions of atoms and calculates their kinetic energy and temperature.
 void World::solveEquationsOfMotion(double elapsedTime)
@@ -115,7 +135,7 @@ void World::solveEquationsOfMotion(double elapsedTime)
 		oldA = _mySimulation.calcAcceleration(thisAtom->getForceX(), thisAtom->getForceY(), thisAtom->getForceZ());
 
 		newR = _mySimulation.calcPosition(oldR, oldV, oldA, timeStep);
-		_myResults.setPositions(newR[0], newR[1], newR[2], (int) elapsedTime/timeStep, i);
+		_myResults.setPositions(newR[0], newR[1], newR[2], (int) (elapsedTime/timeStep), i);
 		
 		newV = _mySimulation.calcVelocity(oldV, oldA, timeStep);
 
@@ -130,8 +150,8 @@ void World::solveEquationsOfMotion(double elapsedTime)
 	cout << "K is " << K << endl;
 
 	//Save the kinetic energy and temperature for the results presentation.
-	_myResults.setKineticEnergy(K, elapsedTime / timeStep);
-	_myResults.setTemperature(T, elapsedTime / timeStep);
+	_myResults.setKineticEnergy(K, (int) (elapsedTime / timeStep));
+	_myResults.setTemperature(T, (int) (elapsedTime / timeStep));
 
 	if (T > 0)
 	{
@@ -150,6 +170,4 @@ void World::solveEquationsOfMotion(double elapsedTime)
 			}
 		}
 	}
-
-
 }

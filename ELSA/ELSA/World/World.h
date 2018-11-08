@@ -25,10 +25,12 @@ public:
 
 	Atom* getAtomInAtomList(unsigned int);
 
+	double getWorldVolume() const;
+
 	void addAtomToAtomList(Atom*);
 	void calcPotentialAndForce();
 	void calcPotentialEnergy();
-	void calcKineticEnergy();
+	void calcPressure(double);
 	void solveEquationsOfMotion(double);
 };
 

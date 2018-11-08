@@ -64,6 +64,14 @@ double Simulation::calcMeanSquareDisplacement(double** currentPositionArray, dou
 	return sum/((double) numberOfAtoms);
 }
 
+double Simulation::calcSelfDiffusionCoefficient(double*** positionsArray, int t1, int t2, unsigned int numberOfAtoms)
+{
+	double msd1 = calcMeanSquareDisplacement(positionsArray[t1], positionsArray[0], numberOfAtoms);
+	double msd2 = calcMeanSquareDisplacement(positionsArray[t2], positionsArray[0], numberOfAtoms);
+
+	return (msd2 - msd1) / ((double)6 * (t2 - t1));
+}
+
 double Simulation::calcSpecificHeat(unsigned int numberOfAtoms, double kB, double numberOfTimeSteps, double* tempArray)
 {
 	double expT{0}, expT2{0}, tmp{0};
