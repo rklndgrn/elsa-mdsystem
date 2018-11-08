@@ -66,8 +66,8 @@ double Simulation::calcMeanSquareDisplacement(double** currentPositionArray, dou
 
 double Simulation::calcSpecificHeat(unsigned int numberOfAtoms, double kB, double numberOfTimeSteps, double* tempArray)
 {
-	double expT{ 0 }, expT2{0};
-	for (int i{ 0 }; i < numberOfTimeSteps; i++)
+	double expT{0}, expT2{0}, tmp{0};
+	for (int i{0}; i < numberOfTimeSteps; i++)
 	{
 		expT += tempArray[i];
 		expT2 += pow(tempArray[i], 2);
@@ -75,11 +75,14 @@ double Simulation::calcSpecificHeat(unsigned int numberOfAtoms, double kB, doubl
 	expT /= numberOfTimeSteps;
 	expT2 /= numberOfTimeSteps;
 
-	double tmp = expT2 - pow(expT, 2);
-	tmp *= ((2*numberOfAtoms)/(3*pow(expT, 2)));
-	tmp = 1 - tmp;
-	tmp = 1/tmp;
-	tmp *= 2 / (3 * numberOfAtoms*kB);
+	if (expT > 0)
+	{
+		tmp = expT2 - pow(expT, 2);
+		tmp *= ((2 * numberOfAtoms) / (3 * pow(expT, 2)));
+		tmp = 1 - tmp;
+		tmp = 1 / tmp;
+		tmp *= 2 / (3 * numberOfAtoms*kB);
+	}
 
 	return tmp;
 }

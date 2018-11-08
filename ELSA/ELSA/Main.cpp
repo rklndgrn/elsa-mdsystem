@@ -146,6 +146,19 @@ int main()
 
 	char exit;
 
+	double theta = mySim.calcDebyeTemperature(2, 7, 3, 0.5, 3.2);
+
+	cout << "We have a Debye Temperature that's " << theta << "!" << endl;
+
+	double* T = new double[3];
+	for (int i{ 0 }; i < 3; i++)
+	{
+		T[i] = i + 1;
+	}
+
+	double Cv = mySim.calcSpecificHeat(7, 0.5, 3, T);
+	cout << "We have a specific heat that's " << Cv << "!" << endl;
+
 	cin >> exit;
 
 	return 0;
