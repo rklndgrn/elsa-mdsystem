@@ -23,11 +23,10 @@ public:
 	~Atom() = default;
 
 	int getID() const;
+
 	double getAccX() const;
 	double getAccY() const;
 	double getAccZ() const;
-	std::array<unsigned int, 3> getCellIndex() const;
-	std::vector<Atom*> getNeighbourList() const;
 	double getPosX() const;
 	double getPosY() const;
 	double getPosZ() const;
@@ -38,6 +37,10 @@ public:
 	double getVelocityX() const;
 	double getVelocityY() const;
 	double getVelocityZ() const;
+
+
+	std::array<unsigned int, 3> getCellIndex() const;
+	std::vector<Atom*> getNeighbourList() const;
 
 	void addToNeighbourList(Atom*);
 	void setAccX(double);

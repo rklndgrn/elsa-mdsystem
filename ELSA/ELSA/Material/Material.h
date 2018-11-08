@@ -18,20 +18,6 @@ private:
 	double _mass;
 
 public:
-	std::string getCrystalStructure() const;
-	double getLatticeConstant() const;
-	double getEpsilon() const;
-	double getSigma() const;
-	double getCutOffDistance() const;
-	double getMass() const;
-
-	void setCrystalStructure(std::string str);
-	void setLatticeConstant(double lc);
-	void setEpsilon(double eps);
-	void setSigma(double sig);
-	void setCutOffDistance(double cod);
-	void setMass(double m);
-
 	Material();
 	Material(
 		std::string crystalStructure,
@@ -41,4 +27,21 @@ public:
 		double cutOffDistance,
 		double mass);
 	~Material();
+
+	double getLatticeConstant() const;
+	double getEpsilon() const;
+	double getSigma() const;
+	double getCutOffDistance() const;
+	double getMass() const;
+
+	std::string getCrystalStructure() const;
+
+	void setCrystalStructure(std::string str);
+	void setLatticeConstant(double lc);
+	void setEpsilon(double eps);
+	void setSigma(double sig);
+	void setCutOffDistance(double cod);
+	void setMass(double m);
+
+
 };

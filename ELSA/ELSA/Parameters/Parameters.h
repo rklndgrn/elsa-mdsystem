@@ -23,15 +23,30 @@ private:
 	Material _chosenMaterial;
 
 public:
-	double getBoltzmann() const;
-	Material getChosenMaterial() const;
-	double getCollisionFrequency() const;
+	Parameters();
+	Parameters(
+		unsigned int numberOfAtoms,
+		unsigned int timeStep,
+		unsigned int simulationTime,
+		double temperature,
+		double collisionFrequency,
+		bool isThermostatOn,
+		bool is2D,
+		Material chosenMaterial);
+	~Parameters();
+
 	bool getIs2D() const;
 	bool getIsThermostatOn() const;
+
+	double getCollisionFrequency() const;
+	double getBoltzmann() const;
+	double getTemperature() const;
+
+	Material getChosenMaterial() const;
+
 	unsigned int getNumberOfAtoms() const;
 	unsigned int getTimeStep() const;
 	unsigned int getSimulationTime() const;
-	double getTemperature() const;
 
 	void setNumberOfAtoms(unsigned int noa);
 	void setTimeStep(unsigned int ts);
@@ -42,15 +57,5 @@ public:
 	void setIs2D(bool is2D);
 	void setChosenMaterial(Material mat);
 
-	Parameters();
-	Parameters(
-		unsigned int numberOfAtoms,
-		unsigned int timeStep,
-		unsigned int simulationTime, 
-		double temperature,
-		double collisionFrequency,
-		bool isThermostatOn,
-		bool is2D, 
-		Material chosenMaterial);
-	~Parameters();
+
 };

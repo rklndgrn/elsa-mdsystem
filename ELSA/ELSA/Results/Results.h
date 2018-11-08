@@ -10,6 +10,7 @@ class Results
 private:
 	unsigned int _arrayLength;
 	unsigned int _numberOfAtoms;
+
 	double* _cohesiveEnergy;
 	double* _debyeTemperature;
 	double* _diffusionConstant;
