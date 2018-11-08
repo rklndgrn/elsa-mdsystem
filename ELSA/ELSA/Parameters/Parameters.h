@@ -1,21 +1,18 @@
+#pragma once
+#include "../Material/Material.h"
+#include <cmath>
+#include <string>
+
 /*
 	File name: parameters.h
 	Date: 2018-11-06
 	This file contains the definition of the class Parameters
 */
 
-#pragma once
-#include "../Material/Material.h"
-#include <cmath>
-#include <string>
-
 class Parameters
 {
 private:
 	unsigned int _numberOfAtoms;
-	unsigned int _numberOfUnitCellsX{ 1 };
-	unsigned int _numberOfUnitCellsY{ 1 };
-	unsigned int _numberOfUnitCellsZ{ 1 };
 	unsigned int _timeStep;
 	unsigned int _simulationTime;
 
@@ -36,7 +33,7 @@ private:
 
 public:
 	Parameters();
-	~Parameters();
+	~Parameters() = default;
 	Parameters(
 		unsigned int timeStep,
 		unsigned int simulationTime,
@@ -54,9 +51,6 @@ public:
 	bool getIsThermostatOn() const;
 
 	double getCollisionFrequency() const;
-	unsigned int getNumberOfUnitCellsX() const;
-	unsigned int getNumberOfUnitCellsY() const;
-	unsigned int getNumberOfUnitCellsZ() const;
 	double getBoltzmann() const;
 	double getTemperature() const;
 

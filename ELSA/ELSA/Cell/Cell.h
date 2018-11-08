@@ -1,7 +1,7 @@
+#pragma once
+
 #include "../Atom/Atom.h"
 #include <array>
-
-#pragma once
 
 
 class Cell
@@ -18,8 +18,8 @@ public:
 	void addAtomToCellList(Atom* newAtom);
 	void clearAtomsInCellList();
 
-	Cell();
+	Cell() = default;
 	Cell(unsigned int, unsigned int, unsigned int);
-	~Cell();
+	~Cell() = default;
 
 };

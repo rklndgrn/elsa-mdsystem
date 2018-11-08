@@ -2,8 +2,6 @@
 #include <random>
 #include <cmath>
 
-#define k_boltzmann 1.38064852E-23
-
 using namespace std;
 
 World::World(Parameters p)
@@ -99,7 +97,7 @@ void World::setupNeighbourLists()
 
 void World::distributeInitialVelocities()
 {
-	double sigma = sqrt(k_boltzmann * _myParameters.getTemperature() / _myParameters.getChosenMaterial().getMass());
+	double sigma = sqrt(_myParameters.getBoltzmann() * _myParameters.getTemperature() / _myParameters.getChosenMaterial().getMass());
 	
 	random_device rand;
 	mt19937 generator(rand());

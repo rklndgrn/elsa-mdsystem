@@ -25,6 +25,7 @@ private:
 	void generateCells();
 	void populateCells();
 public:
+	World() = default;
 	World(Parameters);
 	~World() = default;
 
