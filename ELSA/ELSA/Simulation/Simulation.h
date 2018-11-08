@@ -1,5 +1,6 @@
 #pragma once
 #include "../Material/Material.h"
+#include "../Atom/Atom.h"
 
 #include <array>
 #include <cmath>
@@ -10,6 +11,7 @@ class Simulation
 private:
 	Material _mat;
 public:
+
 	Simulation() = default;
 	Simulation(Material mat);
 
@@ -24,6 +26,7 @@ public:
 
 	std::array<double, 3> calcAcceleration(double, double, double);
 	std::array<double, 4> calcDistance(double, double, double, double, double, double) const;
+	std::array<double, 4> calcDistance(Atom*, Atom*) const;
 	std::array<double, 3> calcPosition(std::array<double, 3>, std::array<double, 3>, std::array<double, 3>, double);
 	std::array<double, 3> calcVelocity(std::array<double, 3>, std::array<double, 3>, double);
 	std::array<double, 3> generateGaussianVelocity(double);

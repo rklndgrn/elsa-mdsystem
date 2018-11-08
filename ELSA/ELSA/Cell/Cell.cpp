@@ -5,6 +5,13 @@ using namespace std;
 Cell::Cell()
 {};
 
+Cell::Cell(unsigned int i, unsigned int j, unsigned int k)
+{
+	_cellID[0] = i;
+	_cellID[1] = j;
+	_cellID[2] = k;
+};
+
 Cell::~Cell()
 {};
 
@@ -25,9 +32,9 @@ vector<Atom*> Cell::getAtomsInCellList()
 	return _atomsInCellList ;
 }
 
-void Cell::addAtomToCellList(Atom newAtom)
+void Cell::addAtomToCellList(Atom* newAtom)
 {
-	_atomsInCellList.insert(_atomsInCellList.begin(), &newAtom);
+	_atomsInCellList.push_back(newAtom);
 }
 
 void Cell::clearAtomsInCellList()
