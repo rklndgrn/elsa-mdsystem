@@ -38,7 +38,7 @@ int main()
 	//cout << myWorld.getAtomInAtomList(0)->getNeighbourList().at(0) << endl;
 
 	Material anotherMaterial("sc", 2, 1, 1, 2.1, 3, 100);
-	Parameters myParameters(1, 1, 4, 1, 1, 100, 10, false, false, anotherMaterial);
+	Parameters myParameters(1, 1, 4, 1, 1, 10000, 10, false, false, anotherMaterial);
 
 
 	World myWorld(myParameters);
@@ -47,9 +47,9 @@ int main()
 	{
 		cout << " id: " << myWorld.getAtomInAtomList(i)->getID();
 		cout <<
-			" x: " << myWorld.getAtomInAtomList(i)->getPosX() <<
-			" y: " << myWorld.getAtomInAtomList(i)->getPosY() <<
-			" z: " << myWorld.getAtomInAtomList(i)->getPosZ();
+			" x: " << myWorld.getAtomInAtomList(i)->getVelocityX() <<
+			" y: " << myWorld.getAtomInAtomList(i)->getVelocityY() <<
+			" z: " << myWorld.getAtomInAtomList(i)->getVelocityZ();
 			
 		cout << " nid: ";
 		for (unsigned int j = 0; j < myWorld.getAtomInAtomList(i)->getNeighbourList().size(); j++)
