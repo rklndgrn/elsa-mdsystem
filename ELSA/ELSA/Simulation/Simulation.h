@@ -15,10 +15,12 @@ public:
 
 	~Simulation() = default;
 
+	double calcCohesiveEnergy(double, double);
 	double calcForce(double) const;
 	double calcLJPotential(double dist) const;
 	double calcKineticEnergy(double, double, double);
 	double calcTemperature(double, double, double);
+	double calcTotalEnergy(double, double);
 
 	std::array<double, 3> calcAcceleration(double, double, double);
 	std::array<double, 4> calcDistance(double, double, double, double, double, double) const;

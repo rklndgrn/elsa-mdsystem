@@ -26,12 +26,14 @@ void World::addAtomToAtomList(Atom* a)
 
 void World::calcPotentialAndForce()
 {
-	double pot, f;
+	double pot{0};
+	double f{0};
+	double pressure{0};
 	array<double, 3> force;
 	Atom* a1;
 	Atom* a2;
 	array<double, 4> r;
-	for (unsigned int i{ 0 }; i < _myParameters.getNumberOfAtoms() - 1; i++)
+	for (unsigned int i{0}; i < _myParameters.getNumberOfAtoms() - 1; i++)
 	{
 		a1 = _atomList.at(i);
 		for (int j{ 0 }; j < a1->getNeighbourList().size(); j++)
