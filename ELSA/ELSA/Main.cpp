@@ -5,11 +5,14 @@
 #include "./Simulation/Simulation.h"
 #include "./World/World.h"
 #include <iostream>
+#include <fstream>
+#include <cmath>
 
 using namespace std;
 
 int main()
 {
+
 	char exit;
 
 	cin >> exit;

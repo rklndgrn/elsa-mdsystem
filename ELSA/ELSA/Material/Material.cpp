@@ -31,7 +31,9 @@ Material::Material(
 	_sigma{ sigma },
 	_cutOffDistance{ cutOffDistance },
 	_mass{ mass }
-{}
+{
+	_cellSize = ceil(cutOffDistance / latticeConstant)*latticeConstant;
+}
 
 
 Material::~Material()
@@ -85,6 +87,16 @@ double Material::getCutOffDistance() const
 void Material::setCutOffDistance(double cod)
 {
 	_cutOffDistance = cod;
+}
+
+double Material::getCellSize() const
+{
+	return _cellSize;
+}
+
+void Material::setCellSize(double cellSize)
+{
+	_cellSize = cellSize;
 }
 
 double Material::getMass() const
