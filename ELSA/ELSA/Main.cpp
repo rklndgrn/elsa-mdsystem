@@ -5,6 +5,8 @@
 #include "./Simulation/Simulation.h"
 #include "./World/World.h"
 #include <iostream>
+#include <fstream>
+#include <cmath>
 
 using namespace std;
 
@@ -37,27 +39,50 @@ int main()
 	//cout << myWorld.getAtomInAtomList(1) << endl;
 	//cout << myWorld.getAtomInAtomList(0)->getNeighbourList().at(0) << endl;
 
-	Material anotherMaterial("sc", 2, 1, 1, 2.1, 3, 100);
-	Parameters myParameters(1, 1, 4, 1, 1, 10000, 10, false, false, anotherMaterial);
+	Material anotherMaterial("fcc", 2, 1, 1, 2.1, 3, 100);
+	Parameters myParameters(1, 1, 3, 3, 3, 10000, 10, false, false, anotherMaterial);
 
 
 	World myWorld(myParameters);
 
+	double Ken1{ 0 }, Ken2;
+
+	ofstream myfile;
+	myfile.open("erik.txt");
+
 	for (unsigned int i = 0; i < myParameters.getNumberOfAtoms(); i++)
 	{
-		cout << " id: " << myWorld.getAtomInAtomList(i)->getID();
-		cout <<
-			" x: " << myWorld.getAtomInAtomList(i)->getVelocityX() <<
-			" y: " << myWorld.getAtomInAtomList(i)->getVelocityY() <<
-			" z: " << myWorld.getAtomInAtomList(i)->getVelocityZ();
-			
-		cout << " nid: ";
-		for (unsigned int j = 0; j < myWorld.getAtomInAtomList(i)->getNeighbourList().size(); j++)
-		{
-			cout << myWorld.getAtomInAtomList(i)->getNeighbourList()[j]->getID() << ", ";
-		}
-		cout << endl;
+		//cout << " id: " << myWorld.getAtomInAtomList(i)->getID();
+		//cout <<
+		//	" x: " << myWorld.getAtomInAtomList(i)->getVelocityX() <<
+		//	" y: " << myWorld.getAtomInAtomList(i)->getVelocityY() <<
+		//	" z: " << myWorld.getAtomInAtomList(i)->getVelocityZ() << endl;
+
+		//cout << 0.5 * myParameters.getChosenMaterial().getMass() * (pow(myWorld.getAtomInAtomList(i)->getVelocityX(), 2) + pow(myWorld.getAtomInAtomList(i)->getVelocityX(), 2) + pow(myWorld.getAtomInAtomList(i)->getVelocityX(), 2)) << endl;
+
+		Ken1 +=  0.5 * myParameters.getChosenMaterial().getMass() * (pow(myWorld.getAtomInAtomList(i)->getVelocityX(), 2) +pow(myWorld.getAtomInAtomList(i)->getVelocityY(), 2) +pow(myWorld.getAtomInAtomList(i)->getVelocityZ(), 2));
+		
+		myfile << myWorld.getAtomInAtomList(i)->getVelocityX() << endl;
+		myfile << myWorld.getAtomInAtomList(i)->getVelocityY() << endl;
+		myfile << myWorld.getAtomInAtomList(i)->getVelocityZ() << endl;
+
+		//cout << " nid: ";
+		//for (unsigned int j = 0; j < myWorld.getAtomInAtomList(i)->getNeighbourList().size(); j++)
+		//{
+		//	cout << myWorld.getAtomInAtomList(i)->getNeighbourList()[j]->getID() << ", ";
+		//}
+		//cout << endl;
 	}
+
+	myfile.close();
+
+	Ken1 = Ken1 / myParameters.getNumberOfAtoms();
+	Ken2 = 1.5 * 1.38064852E-23 * myParameters.getTemperature();
+
+	cout << "==========================" << endl;
+	cout << "Ken1: " << Ken1 << " Ken2: " << Ken2 << endl;
+	cout << "Ken2/Ken1 " << Ken2 / Ken1 << endl;
+
 
 	cout << "====================" << endl;
 	cout << "Total: " << myParameters.getNumberOfAtoms() << endl;

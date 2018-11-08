@@ -47,7 +47,7 @@ void World::generateAtomsAtFccLattice(double latticeConstant, unsigned int nOfUn
 	{
 		for (unsigned int y = 0; y <= nOfUnitCellsY; y++)
 		{
-			for (unsigned int x = 0; x <= _myParameters.getNumberOfUnitCellsX(); x++)
+			for (unsigned int x = 0; x <= nOfUnitCellsX; x++)
 			{
 				Atom* a0 = new Atom(atomId++, x*latticeConstant, y*latticeConstant, z*latticeConstant);
 				addAtomToAtomList(a0);
@@ -116,14 +116,18 @@ void World::setupNeighbourLists()
 
 void World::distributeInitialVelocities()
 {
-	default_random_engine generator;
-	normal_distribution<double> distribution(0, 1);
+	double sigma = sqrt(k_boltzmann * _myParameters.getTemperature() / _myParameters.getChosenMaterial().getMass());
+	
+	random_device rand;
+	mt19937 generator(rand());
+	normal_distribution<double> distribution(0, sigma);
 
 	for (unsigned int atomId = 0; atomId < _myParameters.getNumberOfAtoms(); atomId++)
 	{
-		_atomList.at(atomId)->setVelocityX(sqrt(k_boltzmann * _myParameters.getTemperature() / _myParameters.getChosenMaterial().getMass()) * distribution(generator));
-		_atomList.at(atomId)->setVelocityY(sqrt(k_boltzmann * _myParameters.getTemperature() / _myParameters.getChosenMaterial().getMass()) * distribution(generator));
-		_atomList.at(atomId)->setVelocityZ(sqrt(k_boltzmann * _myParameters.getTemperature() / _myParameters.getChosenMaterial().getMass()) * distribution(generator));
+
+		_atomList.at(atomId)->setVelocityX( distribution(generator));
+		_atomList.at(atomId)->setVelocityY( distribution(generator));
+		_atomList.at(atomId)->setVelocityZ( distribution(generator));
 	}
 }
 
@@ -176,6 +180,11 @@ void World::populateCells()
 		j = (unsigned int)floor(a->getPosY() / cellSize);
 		k = (unsigned int)floor(a->getPosZ() / cellSize);
 
+		if (i + j * numberOfCellsI + k * numberOfCellsI*numberOfCellsJ == 512)
+		{
+			i;
+		}
+
 		getCellInCellList(i + j * numberOfCellsI + k * numberOfCellsI*numberOfCellsJ)->addAtomToCellList(a);
 	}
 }
@@ -219,7 +228,7 @@ void World::calcPotentialAndForce()
 	Atom* a1;
 	Atom* a2;
 	array<double, 4> r;
-	for (unsigned int i{ 0 }; i < _myParameters.getNumberOfAtoms() - 1/*?*/; i++)
+	for (unsigned int i{ 0 }; i < _myParameters.getNumberOfAtoms() - 1; i++)
 	{
 		a1 = _atomList.at(i);
 		// For all atoms close to a1
