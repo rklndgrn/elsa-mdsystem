@@ -24,16 +24,16 @@ Material::Material(
 	double epsilon,
 	double sigma,
 	double cutOffDistance,
-	double cellSize,
 	double mass) : 
 	_crystalStructure{ crystalStructure },
 	_latticeConstant{ latticeConstant },
 	_epsilon{ epsilon },
 	_sigma{ sigma },
 	_cutOffDistance{ cutOffDistance },
-	_cellSize{ cellSize },
 	_mass{ mass }
-{}
+{
+	_cellSize = ceil(cutOffDistance / latticeConstant)*latticeConstant;
+}
 
 
 Material::~Material()

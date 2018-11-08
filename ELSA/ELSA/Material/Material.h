@@ -42,7 +42,6 @@ public:
 		double epsilon,
 		double sigma,
 		double cutOffDistance,
-		double cellSize,
 		double mass);
 	~Material();
 };

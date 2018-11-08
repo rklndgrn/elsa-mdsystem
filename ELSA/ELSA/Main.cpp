@@ -39,8 +39,8 @@ int main()
 	//cout << myWorld.getAtomInAtomList(1) << endl;
 	//cout << myWorld.getAtomInAtomList(0)->getNeighbourList().at(0) << endl;
 
-	Material anotherMaterial("fcc", 2, 1, 1, 2.1, 3, 100);
-	Parameters myParameters(1, 1, 3, 3, 3, 10000, 10, false, false, anotherMaterial);
+	Material anotherMaterial("fcc", 2, 1, 1, 4, 100);
+	Parameters myParameters(1, 1, 4, 1, 1, 10000, 10, false, false, anotherMaterial);
 
 
 	World myWorld(myParameters);
