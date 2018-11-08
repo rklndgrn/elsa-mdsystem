@@ -13,9 +13,9 @@ class Parameters
 {
 private:
 	unsigned int _numberOfAtoms;
-	unsigned int _numberOfUnitCellsX;
-	unsigned int _numberOfUnitCellsY;
-	unsigned int _numberOfUnitCellsZ;
+	unsigned int _numberOfUnitCellsX{ 1 };
+	unsigned int _numberOfUnitCellsY{ 1 };
+	unsigned int _numberOfUnitCellsZ{ 1 };
 	unsigned int _timeStep;
 	unsigned int _simulationTime;
 	double _boltzmann{ 1.3806485279E-23 };

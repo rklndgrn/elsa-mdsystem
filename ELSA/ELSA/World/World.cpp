@@ -79,6 +79,7 @@ void World::calcPressure(double elapsedTime)
 {
 	double pressure{0};
 	int N = _myParameters.getNumberOfAtoms();
+	int index = (int)(elapsedTime / _myParameters.getTimeStep());
 	Atom *a1, *a2;
 	double f{0};
 	array<double, 4> r;
@@ -95,13 +96,15 @@ void World::calcPressure(double elapsedTime)
 			pressure += r[0]*f;
 		}
 	}
+	cout << "The pork sum is " << pressure << "!" << endl;
 
 	double V = getWorldVolume();
-	int index = (int) (elapsedTime / _myParameters.getTimeStep());
-	double T = *_myResults.getTemperature()[index];
+	double* tempArray = *_myResults.getTemperature();
+	double T = tempArray[index];
 	pressure /= elapsedTime * 6 * V;
 	pressure += N * _myParameters.getBoltzmann() * T / V;
 
+	cout << "The pressure is set to " << pressure << "!" << endl;
 	_myResults.setInternalPressure(pressure, index);
 }
 
