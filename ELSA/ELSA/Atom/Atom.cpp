@@ -115,11 +115,11 @@ void Atom::setAccZ(double newPos)
 	_acceleration[2] = newPos;
 }
 
-void Atom::setAcceleration(double x, double y, double z)
+void Atom::setAcceleration(array<double, 3> a)
 {
-	setAccX(x);
-	setAccY(y);
-	setAccZ(z);
+	setAccX(a[0]);
+	setAccY(a[1]);
+	setAccZ(a[2]);
 }
 
 void Atom::setCellIndex(int i, int j, int k)
@@ -144,11 +144,11 @@ void Atom::setPosZ(double newPos)
 	_position[2] = newPos;
 }
 
-void Atom::setPosition(double x, double y, double z)
+void Atom::setPosition(array<double, 3> r)
 {
-	setPosX(x);
-	setPosY(y);
-	setPosZ(z);
+	setPosX(r[0]);
+	setPosY(r[1]);
+	setPosZ(r[2]);
 }
 
 void Atom::setPotential(double u)
@@ -171,11 +171,11 @@ void Atom::setForceZ(double F)
 	_force[2] = F;
 }
 
-void Atom::setForce(double fx, double fy, double fz)
+void Atom::setForce(array<double, 3> F)
 {
-	setForceX(fx);
-	setForceY(fy);
-	setForceZ(fz);
+	setForceX(F[0]);
+	setForceY(F[1]);
+	setForceZ(F[2]);
 }
 
 void Atom::setVelocityX(double newV)
@@ -193,9 +193,9 @@ void Atom::setVelocityZ(double newV)
 	_velocity[2] = newV;
 }
 
-void Atom::setVelocity(double vx, double vy, double vz)
+void Atom::setVelocity(array<double, 3> v)
 {
-	setVelocityX(vx);
-	setVelocityY(vy);
-	setVelocityZ(vz);
+	setVelocityX(v[0]);
+	setVelocityY(v[1]);
+	setVelocityZ(v[2]);
 }

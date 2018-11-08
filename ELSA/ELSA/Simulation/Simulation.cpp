@@ -1,5 +1,4 @@
 #include "Simulation.h"
-#include <iostream>
 
 using namespace std;
 
@@ -63,11 +62,8 @@ double Simulation::calcLJPotential(double dist) const
 			);
 };
 
-double Simulation::calcKineticEnergy(array<double, 3> v)
+double Simulation::calcKineticEnergy(double vx, double vy, double vz)
 {
-	double vx = v[0];
-	double vy = v[1];
-	double vz = v[2];
 	double m = _mat.getMass();
 
 	return 0.5*m*(pow(vx, 2) + pow(vy, 2) + pow(vz, 2));

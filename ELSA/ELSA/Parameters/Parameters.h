@@ -15,7 +15,7 @@ private:
 	unsigned int _numberOfAtoms;
 	unsigned int _timeStep;
 	unsigned int _simulationTime;
-	double _boltzmann = 1.3806485279 * pow(10, -23);
+	double _boltzmann{ 1.3806485279E-23 };
 	double _temperature;
 	double _collisionFrequency;
 	bool _isThermostatOn;

@@ -17,7 +17,7 @@ int main()
 	Atom* b1;
 	b1 = &b;
 	Material anotherMaterial("BCC", 1, 1, 2, 4.5, 55);
-	Parameters myParameters(2, 1, 1, 100, 1, true, false, anotherMaterial);
+	Parameters myParameters(2, 1, 20, 100, 0.01, true, false, anotherMaterial);
 
 
 	World myWorld(myParameters);
@@ -27,11 +27,11 @@ int main()
 	myWorld.addAtomToAtomList(&b);
 	a.addToNeighbourList(&b);
 
-	myWorld.calcPotentialAndForce();
+	//myWorld.calcPotentialAndForce();
 
-	cout << myWorld.getAtomInAtomList(1)->getPotential() << endl;
-	cout << myWorld.getAtomInAtomList(0)->getPotential() << endl;
-	cout << myWorld.getAtomInAtomList(0)->getNeighbourList().at(0)->getPotential() << endl;
+	//cout << myWorld.getAtomInAtomList(1)->getPotential() << endl;
+	//cout << myWorld.getAtomInAtomList(0)->getPotential() << endl;
+	//cout << myWorld.getAtomInAtomList(0)->getNeighbourList().at(0)->getPotential() << endl;
 	Material myMaterial;
 
 	myMaterial.setCrystalStructure("FCC");
@@ -39,37 +39,41 @@ int main()
 
 	myParameters.setIsThermostatOn(true);
 	myParameters.setChosenMaterial(myMaterial);
-	myParameters.setCollisionFrequency(10.05);
+	myParameters.setCollisionFrequency(0.01); 
 
+	/*/
 	cout << myParameters.getIsThermostatOn() << endl;
 	cout << myParameters.getCollisionFrequency() << endl;
 
 	cout << myParameters.getChosenMaterial().getCrystalStructure() << endl;
 	cout << myParameters.getChosenMaterial().getEpsilon() << endl;
+	*/
 
 	Parameters anotherParameters(100, 10, 1000, 4.56, 1.00, true, true, anotherMaterial);
 
+	/*
 	cout << anotherParameters.getIsThermostatOn() << endl;
 	cout << anotherParameters.getCollisionFrequency() << endl;
 
 	cout << anotherParameters.getChosenMaterial().getCrystalStructure() << endl;
 	cout << anotherParameters.getChosenMaterial().getEpsilon() << endl;
+	*/
 
 	Cell newCell;
 	newCell.setCellID(1, 3, 4);
 
 	newCell.addAtomToCellList( a );
-	cout << newCell.getCellID()[0] << newCell.getCellID()[2] << newCell.getCellID()[1] << endl;
+	//cout << newCell.getCellID()[0] << newCell.getCellID()[2] << newCell.getCellID()[1] << endl;
 
 	Simulation mySim(anotherMaterial);
-	cout << mySim.calcLJPotential(1e-10) << endl;
+	//cout << mySim.calcLJPotential(1e-10) << endl;
 
 
-	cout << myWorld.getAtomInAtomList(1) << endl;
-	cout << myWorld.getAtomInAtomList(0)->getNeighbourList().at(0) << endl;
+	//cout << myWorld.getAtomInAtomList(1) << endl;
+	//cout << myWorld.getAtomInAtomList(0)->getNeighbourList().at(0) << endl;
 
 
-	
+	/*
 	array<double, 3> randV;
 	
 	for (int i = 1; i < 5; i++)
@@ -77,13 +81,36 @@ int main()
 		randV = mySim.generateGaussianVelocity(9);
 		cout << "Random velocity test " << i << ": (" << randV[0] << ", " << randV[1] << ", " << randV[2] << ")!" << endl;
 	}
+	*/
 
-	array<double, 3> vel = {2, 0, 1 };
-	double K = mySim.calcKineticEnergy(vel);
-	double T = mySim.calcTemperature(K, anotherParameters.getBoltzmann(), 100);
+	cout << "STARTING SIMULATIONS FOR E.O.M..." << endl;
+	cout << "   Starting positions are" << endl;
+	cout << "      Atom 0 (x, y, z):" << " (" << myWorld.getAtomInAtomList(0)->getPosX() << ", " << myWorld.getAtomInAtomList(0)->getPosY() << ", " << myWorld.getAtomInAtomList(0)->getPosZ() << ")" << endl;
+	cout << "      Atom 1 (x, y, z):" << " (" << myWorld.getAtomInAtomList(1)->getPosX() << ", " << myWorld.getAtomInAtomList(0)->getPosY() << ", " << myWorld.getAtomInAtomList(0)->getPosZ() << ")" << endl;
 
-	cout << "Kinetic energy test: " << K << "J!" << endl;
-	cout << "Temperature test: " << T << " K!" << endl;
+	cout << "   Starting velocities are" << endl;
+	cout << "      Atom 0 (x, y, z):" << " (" << myWorld.getAtomInAtomList(0)->getVelocityX() << ", " << myWorld.getAtomInAtomList(0)->getVelocityY() << ", " << myWorld.getAtomInAtomList(0)->getVelocityZ() << ")" << endl;
+	cout << "      Atom 1 (x, y, z):" << " (" << myWorld.getAtomInAtomList(1)->getVelocityX() << ", " << myWorld.getAtomInAtomList(0)->getVelocityY() << ", " << myWorld.getAtomInAtomList(0)->getVelocityZ() << ")" << endl;
+
+	for (int i = 1; i < 10; i++)
+	{
+		if (i == 2)
+		{
+			a.setVelocityX(0.25e-10);
+			a.setVelocityZ(0.5e-10);
+		}
+
+		myWorld.solveEquationsOfMotion(i);
+
+		cout << "ELAPSED TIME: " << i << endl;
+		cout << "   POSITIONS" << endl;
+		cout << "      Atom 0 (x, y, z):" << " (" << myWorld.getAtomInAtomList(0)->getPosX() << ", " << myWorld.getAtomInAtomList(0)->getPosY() << ", " << myWorld.getAtomInAtomList(0)->getPosZ() << ")" << endl;
+		cout << "      Atom 1 (x, y, z):" << " (" << myWorld.getAtomInAtomList(1)->getPosX() << ", " << myWorld.getAtomInAtomList(0)->getPosY() << ", " << myWorld.getAtomInAtomList(0)->getPosZ() << ")" << endl;
+
+		cout << "   VELOCITIES" << endl;
+		cout << "      Atom 0 (x, y, z):" << " (" << myWorld.getAtomInAtomList(0)->getVelocityX() << ", " << myWorld.getAtomInAtomList(0)->getVelocityY() << ", " << myWorld.getAtomInAtomList(0)->getVelocityZ() << ")" << endl;
+		cout << "      Atom 1 (x, y, z):" << " (" << myWorld.getAtomInAtomList(1)->getVelocityX() << ", " << myWorld.getAtomInAtomList(0)->getVelocityY() << ", " << myWorld.getAtomInAtomList(0)->getVelocityZ() << ")" << endl;
+	}
 
 	char exit;
 

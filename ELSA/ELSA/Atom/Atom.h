@@ -43,21 +43,21 @@ public:
 	void setAccX(double);
 	void setAccY(double);
 	void setAccZ(double);
-	void setAcceleration(double, double, double);
+	void setAcceleration(std::array<double, 3>);
 	void setCellIndex(int, int, int);
 	void setPosX(double);
 	void setPosY(double);
 	void setPosZ(double);
-	void setPosition(double, double, double);
+	void setPosition(std::array<double, 3>);
 	void setPotential(double);
 	void setForceX(double);
 	void setForceY(double);
 	void setForceZ(double);
-	void setForce(double, double, double);
+	void setForce(std::array<double, 3>);
 	void setVelocityX(double);
 	void setVelocityY(double);
 	void setVelocityZ(double);
-	void setVelocity(double, double, double);
+	void setVelocity(std::array<double, 3>);
 };
 
 #endif
