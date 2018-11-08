@@ -17,6 +17,9 @@ private:
 	unsigned int _numberOfUnitCellsX;
 	unsigned int _numberOfUnitCellsY;
 	unsigned int _numberOfUnitCellsZ;
+	unsigned int _numberOfCellsI;
+	unsigned int _numberOfCellsJ;
+	unsigned int _numberOfCellsK;
 	double _temperature;
 	double _collisionFrequency;
 	bool _isThermostatOn;
@@ -30,6 +33,9 @@ public:
 	unsigned int getNumberOfUnitCellsX() const;
 	unsigned int getNumberOfUnitCellsY() const;
 	unsigned int getNumberOfUnitCellsZ() const;
+	unsigned int getNumberOfCellsI() const;
+	unsigned int getNumberOfCellsJ() const;
+	unsigned int getNumberOfCellsK() const;
 	double getTemperature() const;
 	double getCollisionFrequency() const;
 	bool getIsThermostatOn() const;
@@ -42,6 +48,9 @@ public:
 	void setNumberOfUnitCellsX(unsigned int);
 	void setNumberOfUnitCellsY(unsigned int);
 	void setNumberOfUnitCellsZ(unsigned int);
+	void setNumberOfCellsI(unsigned int);
+	void setNumberOfCellsJ(unsigned int);
+	void setNumberOfCellsK(unsigned int);
 	void setTemperature(double temp);
 	void setCollisionFrequency(double cf);
 	void setIsThermostatOn(bool isT);

@@ -31,7 +31,6 @@ public:
 	Results getResults();
 
 	Atom* getAtomInAtomList(unsigned int);
-	Cell* getCellInCellList(unsigned int);
 	Cell* getCellInCellList(unsigned int, unsigned int, unsigned int);
 
 	void addAtomToAtomList(Atom*);
