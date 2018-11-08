@@ -83,6 +83,8 @@ int main()
 	}
 	*/
 
+	/*
+
 	cout << "STARTING SIMULATIONS FOR E.O.M..." << endl;
 	cout << "   Starting positions are" << endl;
 	cout << "      Atom 0 (x, y, z):" << " (" << myWorld.getAtomInAtomList(0)->getPosX() << ", " << myWorld.getAtomInAtomList(0)->getPosY() << ", " << myWorld.getAtomInAtomList(0)->getPosZ() << ")" << endl;
@@ -111,6 +113,36 @@ int main()
 		cout << "      Atom 0 (x, y, z):" << " (" << myWorld.getAtomInAtomList(0)->getVelocityX() << ", " << myWorld.getAtomInAtomList(0)->getVelocityY() << ", " << myWorld.getAtomInAtomList(0)->getVelocityZ() << ")" << endl;
 		cout << "      Atom 1 (x, y, z):" << " (" << myWorld.getAtomInAtomList(1)->getVelocityX() << ", " << myWorld.getAtomInAtomList(0)->getVelocityY() << ", " << myWorld.getAtomInAtomList(0)->getVelocityZ() << ")" << endl;
 	}
+	*/
+
+	array<double, 3> rc1 = { 0, 0, 0 };
+	array<double, 3> rc2 = { 1, 1, 1 };
+	array<double, 3> ri1 = { 0, 0, -1 };
+	array<double, 3> ri2 = { 1, 0, 1 };
+
+	double** cP;
+	double** iP;
+
+	cP = new double*[2];
+	iP = new double*[2];
+
+	for (int i{ 0 }; i < 2; i++)
+	{
+		cP[i] = new double[3];
+		iP[i] = new double[3];
+	}
+
+	for (int i{ 0 }; i < 3; i++)
+	{
+		cP[0][i] = rc1[i];
+		cP[1][i] = rc2[i];
+		iP[0][i] = ri1[i];
+		iP[1][i] = ri2[i];
+	}
+
+	double MSD = mySim.calcMeanSquareDisplacement(cP, iP, 2);
+
+	cout << "MSD is " << MSD << "!" << endl;
 
 	char exit;
 

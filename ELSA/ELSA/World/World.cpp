@@ -46,6 +46,8 @@ void World::calcPotentialAndForce()
 			force = { f*r[1], f*r[2],f*r[3] };
 			pot = _mySimulation.calcLJPotential(r[0]);
 
+			//pressure = r[0] * f;
+
 			a1->setPotential(a1->getPotential() + pot);
 			a2->setPotential(a2->getPotential() + pot);
 
