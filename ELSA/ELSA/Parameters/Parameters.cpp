@@ -19,8 +19,8 @@ Parameters::Parameters() :
 {}
 
 Parameters::Parameters(
-	unsigned int timeStep,
-	unsigned int simulationTime,
+	double timeStep,
+	double simulationTime,
 	unsigned int numberOfUnitCellsX,
 	unsigned int numberOfUnitCellsY,
 	unsigned int numberOfUnitCellsZ,
@@ -97,17 +97,6 @@ unsigned int Parameters::getNumberOfUnitCellsZ() const
 	return _numberOfUnitCellsZ;
 }
 
-unsigned int Parameters::getSimulationTime() const
-{
-	return _simulationTime;
-}
-
-unsigned int Parameters::getTimeStep() const
-{
-	return _timeStep;
-}
-
-
 double Parameters::getBoltzmann() const
 {
 	return _boltzmann;
@@ -133,9 +122,19 @@ double Parameters::getLengthZ() const
 	return _lengthZ;
 }
 
+double Parameters::getSimulationTime() const
+{
+	return _simulationTime;
+}
+
 double Parameters::getTemperature() const
 {
 	return _temperature;
+}
+
+double Parameters::getTimeStep() const
+{
+	return _timeStep;
 }
 
 bool Parameters::getIs2D() const
@@ -181,7 +180,7 @@ void Parameters::setNumberOfAtoms(unsigned int noa)
 	_numberOfAtoms = noa;
 }
 
-void Parameters::setSimulationTime(unsigned int st)
+void Parameters::setSimulationTime(double st)
 {
 	_simulationTime = st;
 }
@@ -192,7 +191,7 @@ void Parameters::setTemperature(double temp)
 	_temperature = temp;
 }
 
-void Parameters::setTimeStep(unsigned int ts)
+void Parameters::setTimeStep(double ts)
 {
 	_timeStep = ts;
 }
