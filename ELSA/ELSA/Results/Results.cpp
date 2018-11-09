@@ -2,7 +2,7 @@
 
 using namespace std;
 
-Results::Results(int simulationTime, int timeStep, int numberOfParticles)
+Results::Results(double simulationTime, double timeStep, unsigned int numberOfParticles)
 {
 	_arrayLength = (int) round(simulationTime/timeStep);
 	_numberOfAtoms = numberOfParticles;
@@ -22,7 +22,7 @@ Results::Results(int simulationTime, int timeStep, int numberOfParticles)
 	for (unsigned int i = 0; i < _arrayLength; i++)
 	{
 		_positions[i] = new double*[numberOfParticles];
-		for (int j = 0; j < numberOfParticles; j++)
+		for (unsigned int j = 0; j < numberOfParticles; j++)
 		{
 			_positions[i][j] = new double[3];
 		}

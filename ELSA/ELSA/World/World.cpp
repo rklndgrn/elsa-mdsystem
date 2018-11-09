@@ -37,6 +37,38 @@ int World::incrementM(int m, unsigned int maxK, unsigned int lowerK, unsigned in
 	}
 }
 
+//Correct positions according to periodic boundary conditions
+void World::correctPositions(array<double, 3>& r)
+{
+	if (r[0] < 0)
+	{
+		r[0] += _myParameters.getLengthX();
+	}
+	else if (r[0] > _myParameters.getLengthX())
+	{
+		r[0] -= _myParameters.getLengthX();
+	}
+	if (r[1] < 0)
+	{
+		r[1] += _myParameters.getLengthY();
+	}
+	else if (r[1] > _myParameters.getLengthY())
+	{
+		r[1] -= _myParameters.getLengthY();
+	}
+	if (!_myParameters.getIs2D())
+	{
+		if (r[2] < 0)
+		{
+			r[2] += _myParameters.getLengthZ();
+		}
+		else if (r[2] > _myParameters.getLengthZ())
+		{
+			r[2] -= _myParameters.getLengthZ();
+		}
+	}
+}
+
 /* PUBLIC */
 //Constructor.
 World::World(Parameters p)
@@ -48,7 +80,7 @@ World::World(Parameters p)
 void World::setupSystem(Parameters p)
 {
 	_myParameters = p;
-	_myResults = Results{ (int)p.getSimulationTime(), (int)p.getTimeStep(), (int)p.getNumberOfAtoms() };
+	_myResults = Results{ p.getSimulationTime(), p.getTimeStep(), p.getNumberOfAtoms() };
 	_mySimulation = Simulation(p.getChosenMaterial());
 
 	unsigned int nOfUnitCellsX{ _myParameters.getNumberOfUnitCellsX() };
@@ -400,13 +432,13 @@ void World::calcPotentialAndForce()
 }
 
 // Calculate the potential energy as the sum of the potential of all the atoms.
-void World::calcPotentialEnergy()
+void World::calcPotentialEnergy(double elapsedTime)
 {
 	Atom* a1;
 	for (unsigned int i{ 0 }; i < _myParameters.getNumberOfAtoms() - 1; i++)
 	{
 		a1 = _atomList.at(i);
-		_myResults.setPotentialEnergy(**_myResults.getPotentialEnergy() + a1->getPotential(),_myParameters.getTimeStep());
+		_myResults.setPotentialEnergy(**_myResults.getPotentialEnergy() + a1->getPotential(),(int)round(elapsedTime/_myParameters.getTimeStep()));
 	}
 }
 
@@ -453,6 +485,7 @@ void World::solveEquationsOfMotion(double elapsedTime)
 		oldA = _mySimulation.calcAcceleration(thisAtom->getForceX(), thisAtom->getForceY(), thisAtom->getForceZ());
 
 		newR = _mySimulation.calcPosition(oldR, oldV, oldA, timeStep);
+		correctPositions(newR);
 		_myResults.setPositions(newR[0], newR[1], newR[2], (int)round(elapsedTime/timeStep), i);
 		
 		newV = _mySimulation.calcVelocity(oldV, oldA, timeStep);

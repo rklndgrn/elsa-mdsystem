@@ -174,6 +174,8 @@ array<double, 3> Simulation::calcPosition(std::array<double, 3> r, std::array<do
 	double rY = r[1] + timeStep * v[1] + 0.5*pow(timeStep, 2)*a[1];
 	double rZ = r[2] + timeStep * v[2] + 0.5*pow(timeStep, 2)*a[2];
 
+	
+
 	array<double, 3> newR = { rX, rY, rZ };
 	return newR;
 }

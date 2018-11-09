@@ -12,6 +12,16 @@ using namespace std;
 
 int main()
 {
+	Material anotherMaterial("sc", 2, 1, 1, 2.1, 100);
+	Parameters myParameters(1, 1, 5, 5, 5, 10000, 10, false, true, anotherMaterial);
+	World myWorld(myParameters);
+
+	Atom* a = myWorld.getAtomInAtomList(0);
+
+	a->setPosition({ -1.0, -1.0, -1.0 });
+	cout << a->getPositionX() << " " << a->getPositionY() << " " << a->getPositionZ() << endl;
+	myWorld.solveEquationsOfMotion(0);
+	cout << a->getPositionX() << " " << a->getPositionY() << " " << a->getPositionZ() << endl;
 
 	char exit;
 

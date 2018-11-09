@@ -27,6 +27,7 @@ private:
 
 	//Member functions
 	int incrementM(int, unsigned int, unsigned int, unsigned int);
+	void correctPositions(std::array<double, 3>&);
 
 	void distributeInitialVelocities();
 	void generateAtomsAtFccLattice(double, unsigned int, unsigned int, unsigned int);
@@ -52,7 +53,7 @@ public:
 	void addAtomToAtomList(Atom*);
 	void addCellToCellList(Cell*);
 	void calcPotentialAndForce();
-	void calcPotentialEnergy();
+	void calcPotentialEnergy(double);
 	void calcPressure(double);
 	void solveEquationsOfMotion(double);
 
