@@ -25,7 +25,7 @@ private:
 
 public:
 	Results() = default;
-	Results(int, int, int);
+	Results(double, double, unsigned int);
 	~Results() = default;
 
 	void printPositions();

@@ -40,6 +40,15 @@ Parameters::Parameters(
 	_is2D{ is2D },
 	_chosenMaterial{ chosenMaterial }
 {
+	if (chosenMaterial.getCrystalStructure() == "fcc")
+	{
+		_numberOfAtoms = 4 * numberOfUnitCellsX*numberOfUnitCellsY*numberOfUnitCellsZ;
+	}
+	else if (chosenMaterial.getCrystalStructure() == "sc")
+	{
+		_numberOfAtoms = numberOfUnitCellsX * numberOfUnitCellsY*numberOfUnitCellsZ;
+	}
+
 	//Length of simulation box
 	_lengthX = getNumberOfUnitCellsX()*getChosenMaterial().getLatticeConstant();
 	_lengthY = getNumberOfUnitCellsY()*getChosenMaterial().getLatticeConstant();
