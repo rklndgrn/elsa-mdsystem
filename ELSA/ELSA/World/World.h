@@ -23,6 +23,8 @@ private:
 	Results _myResults;
 	Simulation _mySimulation;
 
+	double _pressureRFSum{ 0 };
+
 	//Member functions
 	int incrementM(int, unsigned int, unsigned int, unsigned int);
 

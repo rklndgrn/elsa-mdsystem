@@ -4,7 +4,7 @@ using namespace std;
 
 Results::Results(int simulationTime, int timeStep, int numberOfParticles)
 {
-	_arrayLength = (int) floor((double) simulationTime/timeStep);
+	_arrayLength = (int) round(simulationTime/timeStep);
 	_numberOfAtoms = numberOfParticles;
 
 	_cohesiveEnergy = new double[_arrayLength];

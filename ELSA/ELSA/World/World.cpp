@@ -392,6 +392,9 @@ void World::calcPotentialAndForce()
 			a2->setForceY(a2->getForceY() - force*r[2]);
 			a1->setForceZ(a1->getForceZ() + force*r[3]);
 			a2->setForceZ(a2->getForceZ() - force*r[3]);
+
+			//Accumulate for internal pressure calculation
+			_pressureRFSum += r[0] * force;
 		}
 	}
 }
@@ -410,33 +413,14 @@ void World::calcPotentialEnergy()
 //Calculate the internal pressure at a certain time
 void World::calcPressure(double elapsedTime)
 {
-	double pressure{0};
+	int timeSteps = (int)round(elapsedTime / _myParameters.getTimeStep());
 	int N = _myParameters.getNumberOfAtoms();
-	int index = (int)(elapsedTime / _myParameters.getTimeStep());
-	Atom *a1, *a2;
-	double f{0};
-	array<double, 4> r;
-
-	for (int i{ 0 }; i < N; i++)
-	{
-		a1 = _atomList.at(i);
-		for (int j{ 0 }; j < a1->getNeighbourList().size(); j++)
-		{
-			a2 = a1->getNeighbourList().at(j);
-			r = _mySimulation.calcDistance(a1, a2, _myParameters.getLengthX(), _myParameters.getLengthY(), _myParameters.getLengthZ(), _myParameters.getIs2D());
-			f = _mySimulation.calcForce(r[0]);
-
-			pressure += r[0]*f;
-		}
-	}
-
 	double V = getWorldVolume();
-	double* tempArray = *_myResults.getTemperature();
-	double T = tempArray[index];
-	pressure /= elapsedTime * 6 * V;
-	pressure += N * _myParameters.getBoltzmann() * T / V;
+	double T = (*_myResults.getTemperature())[timeSteps];
+	double meanRF = _pressureRFSum / (timeSteps);
+	double pressure = (N*_myParameters.getBoltzmann()*T / V) + meanRF / (6 * V);
 
-	_myResults.setInternalPressure(pressure, index);
+	_myResults.setInternalPressure(pressure, timeSteps);
 }
 
 //Function to solve the equations of motion. Finds new velocities and positions of atoms and calculates their kinetic energy and temperature.
@@ -469,7 +453,7 @@ void World::solveEquationsOfMotion(double elapsedTime)
 		oldA = _mySimulation.calcAcceleration(thisAtom->getForceX(), thisAtom->getForceY(), thisAtom->getForceZ());
 
 		newR = _mySimulation.calcPosition(oldR, oldV, oldA, timeStep);
-		_myResults.setPositions(newR[0], newR[1], newR[2], (int) (elapsedTime/timeStep), i);
+		_myResults.setPositions(newR[0], newR[1], newR[2], (int)round(elapsedTime/timeStep), i);
 		
 		newV = _mySimulation.calcVelocity(oldV, oldA, timeStep);
 
@@ -483,8 +467,8 @@ void World::solveEquationsOfMotion(double elapsedTime)
 
 
 	//Save the kinetic energy and temperature for the results presentation.
-	_myResults.setKineticEnergy(K, (int) (elapsedTime / timeStep));
-	_myResults.setTemperature(T, (int) (elapsedTime / timeStep));
+	_myResults.setKineticEnergy(K, (int) round(elapsedTime / timeStep));
+	_myResults.setTemperature(T, (int) round(elapsedTime / timeStep));
 
 	if (T > 0 && _myParameters.getIsThermostatOn())
 	{
