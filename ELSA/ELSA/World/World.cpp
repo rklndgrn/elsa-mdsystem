@@ -1,15 +1,41 @@
 #include "World.h"
-#include <random>
-#include <cmath>
-#include <iostream>
-
-#define k_boltzmann 1.38064852E-23
 
 using namespace std;
 
 World::World(Parameters p)
 {
 	setupSystem(p);
+}
+
+int World::incrementM(int m, unsigned int maxK, unsigned int lowerK, unsigned int upperK)
+{
+	double m_check = m;
+	if (upperK <= maxK && lowerK <= maxK)
+	{
+		return m + 1;
+	}
+	else if (upperK > maxK)
+	{
+		if ((m - 1) / 3 == (m_check - 1) / 3)
+		{
+			return m + 2;
+		}
+		else
+		{
+			return m + 1;
+		}
+	}
+	else
+	{
+		if ((m + 1) / 3 == (m_check + 1) / 3)
+		{
+			return m + 2;
+		}
+		else
+		{
+			return m + 1;
+		}
+	}
 }
 
 void World::setupSystem(Parameters p)
@@ -36,7 +62,7 @@ void World::setupSystem(Parameters p)
 	generateCells();
 	populateCells();
 
-	setupNeighbourLists();
+	setupNeighbourLists(_myParameters.getIs2D());
 	distributeInitialVelocities();
 
 }
@@ -67,11 +93,11 @@ void World::generateAtomsAtFccLattice(double latticeConstant, unsigned int nOfUn
 void World::generateAtomsAtScLattice(double latticeConstant, unsigned int nOfUnitCellsX, unsigned int nOfUnitCellsY, unsigned int nOfUnitCellsZ)
 {
 	unsigned int atomId{ 0 };
-	for (unsigned int x = 0; x < nOfUnitCellsZ; x++)
+	for (unsigned int z = 0; z < nOfUnitCellsZ; z++)
 	{
 		for (unsigned int y = 0; y < nOfUnitCellsY; y++)
 		{
-			for (unsigned int z = 0; z < nOfUnitCellsX; z++)
+			for (unsigned int x = 0; x < nOfUnitCellsX; x++)
 			{
 				Atom* a = new Atom(atomId++, x*latticeConstant, y*latticeConstant, z*latticeConstant);
 				addAtomToAtomList(a);
@@ -80,7 +106,7 @@ void World::generateAtomsAtScLattice(double latticeConstant, unsigned int nOfUni
 	}
 }
 
-void World::setupNeighbourLists()
+void World::setupNeighbourLists(bool is2D)
 {
 	double cutOffDistance{ _myParameters.getChosenMaterial().getCutOffDistance() };
 	double atomDistance{ 0 };
@@ -92,851 +118,106 @@ void World::setupNeighbourLists()
 	unsigned int lengthY = _myParameters.getNumberOfUnitCellsY()*_myParameters.getChosenMaterial().getLatticeConstant();
 	unsigned int lengthZ = _myParameters.getNumberOfUnitCellsZ()*_myParameters.getChosenMaterial().getLatticeConstant();
 
+
+	unsigned int i, j, k, lowerNeighbourI, upperNeighbourI, lowerNeighbourJ, upperNeighbourJ, lowerNeighbourK, upperNeighbourK;
+	array<array<unsigned int, 3>, 27> index;
+
 	for (unsigned int atomId = 0; atomId < _myParameters.getNumberOfAtoms(); atomId++)
 	{
-		array<array<unsigned int,3>, 27> index; 
-		unsigned int i = getAtomInAtomList(atomId)->getCellIndex()[0];
-		unsigned int j = getAtomInAtomList(atomId)->getCellIndex()[1];
-		unsigned int k = getAtomInAtomList(atomId)->getCellIndex()[2];
-
-		if (i > 0 && i < maxI && j > 0 && j < maxJ && k > 0 && k < maxK)
-		{
-			index.at(0) = { i - 1, j - 1, k - 1 };
-			index.at(1) = { i - 1, j - 1, k };
-			index.at(2) = { i - 1, j - 1, k + 1 };
-			index.at(3) = { i - 1, j, k - 1 };
-			index.at(4) = { i - 1, j, k };
-			index.at(5) = { i - 1, j, k + 1 };
-			index.at(6) = { i - 1, j + 1, k - 1 };
-			index.at(7) = { i - 1, j + 1, k };
-			index.at(8) = { i - 1, j + 1, k + 1 };
-			index.at(9) = { i, j - 1, k - 1 };
-			index.at(10) = { i, j - 1, k };
-			index.at(11) = { i, j - 1, k + 1 };
-			index.at(12) = { i, j, k - 1 };
-			index.at(13) = { i, j, k };
-			index.at(14) = { i, j, k + 1 };
-			index.at(15) = { i, j + 1, k - 1 };
-			index.at(16) = { i, j + 1, k };
-			index.at(17) = { i, j + 1, k + 1 };
-			index.at(18) = { i + 1, j - 1, k - 1 };
-			index.at(19) = { i + 1, j - 1, k };
-			index.at(20) = { i + 1, j - 1, k + 1 };
-			index.at(21) = { i + 1, j, k - 1 };
-			index.at(22) = { i + 1, j, k };
-			index.at(23) = { i + 1, j, k + 1 };
-			index.at(24) = { i + 1, j + 1, k - 1 };
-			index.at(25) = { i + 1, j + 1, k };
-			index.at(26) = { i + 1, j + 1, k + 1 };
-		}
-		else if ((i == 0 || i == maxI) && j != 0 && j != maxJ && k != 0 && k != maxK)
-		{
-			if (i == 0)
-			{
-				index.at(0) = { maxI - i, j - 1, k - 1 };
-				index.at(1) = { maxI - i, j - 1, k };
-				index.at(2) = { maxI - i, j - 1, k + 1 };
-				index.at(3) = { maxI - i, j, k - 1 };
-				index.at(4) = { maxI - i, j, k };
-				index.at(5) = { maxI - i, j, k + 1 };
-				index.at(6) = { maxI - i, j + 1, k - 1 };
-				index.at(7) = { maxI - i, j + 1, k };
-				index.at(8) = { maxI - i, j + 1, k + 1 };
-
-				index.at(18) = { i + 1, j - 1, k - 1 };
-				index.at(19) = { i + 1, j - 1, k };
-				index.at(20) = { i + 1, j - 1, k + 1 };
-				index.at(21) = { i + 1, j, k - 1 };
-				index.at(22) = { i + 1, j, k };
-				index.at(23) = { i + 1, j, k + 1 };
-				index.at(24) = { i + 1, j + 1, k - 1 };
-				index.at(25) = { i + 1, j + 1, k };
-				index.at(26) = { i + 1, j + 1, k + 1 };
-			}
-			else
-			{
-				index.at(0) = { i - 1, j - 1, k - 1 };
-				index.at(1) = { i - 1, j - 1, k };
-				index.at(2) = { i - 1, j - 1, k + 1 };
-				index.at(3) = { i - 1, j, k - 1 };
-				index.at(4) = { i - 1, j, k };
-				index.at(5) = { i - 1, j, k + 1 };
-				index.at(6) = { i - 1, j + 1, k - 1 };
-				index.at(7) = { i - 1, j + 1, k };
-				index.at(8) = { i - 1, j + 1, k + 1 };
-
-				index.at(18) = { maxI - i, j - 1, k - 1 };
-				index.at(19) = { maxI - i, j - 1, k };
-				index.at(20) = { maxI - i, j - 1, k + 1 };
-				index.at(21) = { maxI - i, j, k - 1 };
-				index.at(22) = { maxI - i, j, k };
-				index.at(23) = { maxI - i, j, k + 1 };
-				index.at(24) = { maxI - i, j + 1, k - 1 };
-				index.at(25) = { maxI - i, j + 1, k };
-				index.at(26) = { maxI - i, j + 1, k + 1 };
-			}
-
-			index.at(9) = { i, j - 1, k - 1 };
-			index.at(10) = { i, j - 1, k };
-			index.at(11) = { i, j - 1, k + 1 };
-			index.at(12) = { i, j, k - 1 };
-			index.at(13) = { i, j, k };
-			index.at(14) = { i, j, k + 1 };
-			index.at(15) = { i, j + 1, k - 1 };
-			index.at(16) = { i, j + 1, k };
-			index.at(17) = { i, j + 1, k + 1 };
-
-
-		}
-		else if ((j == 0 || j == maxJ) && i != 0 && i != maxI && k != 0 && k != maxK)
-		{
-			if (j == 0)
-			{
-				index.at(0) = { i - 1, maxJ - j, k - 1 };
-				index.at(1) = { i - 1, maxJ - j, k };
-				index.at(2) = { i - 1, maxJ - j, k + 1 };
-				index.at(9) = { i, maxJ - j, k - 1 };
-				index.at(10) = { i, maxJ - j, k };
-				index.at(11) = { i, maxJ - j, k + 1 };
-				index.at(18) = { i + 1, maxJ - j, k - 1 };
-				index.at(19) = { i + 1, maxJ - j, k };
-				index.at(20) = { i + 1, maxJ - j, k + 1 };
-
-				index.at(6) = { i - 1, j + 1, k - 1 };
-				index.at(7) = { i - 1, j + 1, k };
-				index.at(8) = { i - 1, j + 1, k + 1 };
-				index.at(15) = { i, j + 1, k - 1 };
-				index.at(16) = { i, j + 1, k };
-				index.at(17) = { i, j + 1, k + 1 };
-				index.at(24) = { i + 1, j + 1, k - 1 };
-				index.at(25) = { i + 1, j + 1, k };
-				index.at(26) = { i + 1, j + 1, k + 1 };
-			}
-			else
-			{
-				index.at(0) = { i - 1, j - 1, k - 1 };
-				index.at(1) = { i - 1, j - 1, k };
-				index.at(2) = { i - 1, j - 1, k + 1 };
-				index.at(9) = { i, j - 1, k - 1 };
-				index.at(10) = { i, j - 1, k };
-				index.at(11) = { i, j - 1, k + 1 };
-				index.at(18) = { i + 1, j - 1, k - 1 };
-				index.at(19) = { i + 1, j - 1, k };
-				index.at(20) = { i + 1, j - 1, k + 1 };
-
-				index.at(6) = { i - 1, maxJ - j, k - 1 };
-				index.at(7) = { i - 1, maxJ - j, k };
-				index.at(8) = { i - 1, maxJ - j, k + 1 };
-				index.at(15) = { i, maxJ - j, k - 1 };
-				index.at(16) = { i, maxJ - j, k };
-				index.at(17) = { i, maxJ - j, k + 1 };
-				index.at(24) = { i + 1, maxJ - j, k - 1 };
-				index.at(25) = { i + 1, maxJ - j, k };
-				index.at(26) = { i + 1, maxJ - j, k + 1 };
-			}
-
-
-			index.at(3) = { i - 1, j, k - 1 };
-			index.at(4) = { i - 1, j, k };
-			index.at(5) = { i - 1, j, k + 1 };
-
-			index.at(12) = { i, j, k - 1 };
-			index.at(13) = { i, j, k };
-			index.at(14) = { i, j, k + 1 };
-
-			index.at(21) = { i + 1, j, k - 1 };
-			index.at(22) = { i + 1, j, k };
-			index.at(23) = { i + 1, j, k + 1 };
-
-		}
-		else if ((k == 0 || k == maxK) && j != 0 && j != maxJ && i != 0 && i != maxI)
-		{
-			if (k == 0)
-			{
-				index.at(0) = { i - 1, j - 1, maxK - k };
-				index.at(3) = { i - 1, j, maxK - k };
-				index.at(6) = { i - 1, j + 1, maxK - k };
-				index.at(9) = { i, j - 1, maxK - k };
-				index.at(12) = { i, j, maxK - k };
-				index.at(15) = { i, j + 1, maxK - k };
-				index.at(18) = { i + 1, j - 1, maxK - k };
-				index.at(21) = { i + 1, j, maxK - k };
-				index.at(24) = { i + 1, j + 1, maxK - k };
-
-				index.at(2) = { i - 1, j - 1, k + 1 };
-				index.at(5) = { i - 1, j, k + 1 };
-				index.at(8) = { i - 1, j + 1, k + 1 };
-				index.at(11) = { i, j - 1, k + 1 };
-				index.at(14) = { i, j, k + 1 };
-				index.at(17) = { i, j + 1, k + 1 };
-				index.at(20) = { i + 1, j - 1, k + 1 };
-				index.at(23) = { i + 1, j, k + 1 };
-				index.at(26) = { i + 1, j + 1, k + 1 };
-
-			}
-			else
-			{
-				index.at(0) = { i - 1, j - 1, k - 1 };
-				index.at(3) = { i - 1, j, k - 1 };
-				index.at(6) = { i - 1, j + 1, k - 1 };
-				index.at(9) = { i, j - 1, k - 1 };
-				index.at(12) = { i, j, k - 1 };
-				index.at(15) = { i, j + 1, k - 1 };
-				index.at(18) = { i + 1, j - 1, k - 1 };
-				index.at(21) = { i + 1, j, k - 1 };
-				index.at(24) = { i + 1, j + 1, k - 1 };
-
-				index.at(2) = { i - 1, j - 1, maxK - k };
-				index.at(5) = { i - 1, j, maxK - k };
-				index.at(8) = { i - 1, j + 1, maxK - k };
-				index.at(11) = { i, j - 1, maxK - k };
-				index.at(14) = { i, j, maxK - k };
-				index.at(17) = { i, j + 1, maxK - k };
-				index.at(20) = { i + 1, j - 1, maxK - k };
-				index.at(23) = { i + 1, j, maxK - k };
-				index.at(26) = { i + 1, j + 1, maxK - k };
-			}
-
-			index.at(1) = { i - 1, j - 1, k };
-			index.at(4) = { i - 1, j, k };
-			index.at(7) = { i - 1, j + 1, k };
-			index.at(10) = { i, j - 1, k };
-			index.at(13) = { i, j, k };
-			index.at(16) = { i, j + 1, k };
-			index.at(19) = { i + 1, j - 1, k };
-			index.at(22) = { i + 1, j, k };
-			index.at(25) = { i + 1, j + 1, k };
-
-		}
-		else if ((i == 0 || i == maxI) && (j == 0 || j == maxJ) && k != 0 && k != maxK)
-		{
-			if (i == 0)
-			{
-				if (j == 0)
-				{
-					index.at(0) = { maxI - i, maxJ - j, k - 1 };
-					index.at(1) = { maxI - i, maxJ - j, k };
-					index.at(2) = { maxI - i, maxJ - j, k + 1 };
-					index.at(9) = { i, maxJ - j, k - 1 };
-					index.at(10) = { i, maxJ - j, k };
-					index.at(11) = { i, maxJ - j, k + 1 };
-					index.at(18) = { i + 1, maxJ - j, k - 1 };
-					index.at(19) = { i + 1, maxJ - j, k };
-					index.at(20) = { i + 1, maxJ - j, k + 1 };
-
-					index.at(6) = { maxI - i, j + 1, k - 1 };
-					index.at(7) = { maxI - i, j + 1, k };
-					index.at(8) = { maxI - i, j + 1, k + 1 };
-					index.at(15) = { i, j + 1, k - 1 };
-					index.at(16) = { i, j + 1, k };
-					index.at(17) = { i, j + 1, k + 1 };
-					index.at(24) = { i + 1, j + 1, k - 1 };
-					index.at(25) = { i + 1, j + 1, k };
-					index.at(26) = { i + 1, j + 1, k + 1 };
-				}
-				else
-				{
-					index.at(0) = { maxI - i, j - 1, k - 1 };
-					index.at(1) = { maxI - i, j - 1, k };
-					index.at(2) = { maxI - i, j - 1, k + 1 };
-					index.at(9) = { i, j - 1, k - 1 };
-					index.at(10) = { i, j - 1, k };
-					index.at(11) = { i, j - 1, k + 1 };
-					index.at(18) = { i + 1, j - 1, k - 1 };
-					index.at(19) = { i + 1, j - 1, k };
-					index.at(20) = { i + 1, j - 1, k + 1 };
-
-					index.at(6) = { maxI - i, maxJ - j, k - 1 };
-					index.at(7) = { maxI - i, maxJ - j, k };
-					index.at(8) = { maxI - i, maxJ - j, k + 1 };
-					index.at(15) = { i, maxJ - j, k - 1 };
-					index.at(16) = { i, maxJ - j, k };
-					index.at(17) = { i, maxJ - j, k + 1 };
-					index.at(24) = { i + 1, maxJ - j, k - 1 };
-					index.at(25) = { i + 1, maxJ - j, k };
-					index.at(26) = { i + 1, maxJ - j, k + 1 };
-				}
-
-
-				index.at(3) = { maxI - i, j, k - 1 };
-				index.at(4) = { maxI - i, j, k };
-				index.at(5) = { maxI - i, j, k + 1 };
-
-				index.at(12) = { i, j, k - 1 };
-				index.at(13) = { i, j, k };
-				index.at(14) = { i, j, k + 1 };
-
-				index.at(21) = { i + 1, j, k - 1 };
-				index.at(22) = { i + 1, j, k };
-				index.at(23) = { i + 1, j, k + 1 };
-			}
-			else
-			{
-				if (j == 0)
-				{
-					index.at(0) = { i - 1, maxJ - j, k - 1 };
-					index.at(1) = { i - 1, maxJ - j, k };
-					index.at(2) = { i - 1, maxJ - j, k + 1 };
-					index.at(9) = { i, maxJ - j, k - 1 };
-					index.at(10) = { i, maxJ - j, k };
-					index.at(11) = { i, maxJ - j, k + 1 };
-					index.at(18) = { maxI - i, maxJ - j, k - 1 };
-					index.at(19) = { maxI - i, maxJ - j, k };
-					index.at(20) = { maxI - i, maxJ - j, k + 1 };
-
-					index.at(6) = { i - 1, j + 1, k - 1 };
-					index.at(7) = { i - 1, j + 1, k };
-					index.at(8) = { i - 1, j + 1, k + 1 };
-					index.at(15) = { i, j + 1, k - 1 };
-					index.at(16) = { i, j + 1, k };
-					index.at(17) = { i, j + 1, k + 1 };
-					index.at(24) = { maxI - i, j + 1, k - 1 };
-					index.at(25) = { maxI - i, j + 1, k };
-					index.at(26) = { maxI - i, j + 1, k + 1 };
-				}
-				else
-				{
-					index.at(0) = { i - 1, j - 1, k - 1 };
-					index.at(1) = { i - 1, j - 1, k };
-					index.at(2) = { i - 1, j - 1, k + 1 };
-					index.at(9) = { i, j - 1, k - 1 };
-					index.at(10) = { i, j - 1, k };
-					index.at(11) = { i, j - 1, k + 1 };
-					index.at(18) = { maxI - i, j - 1, k - 1 };
-					index.at(19) = { maxI - i, j - 1, k };
-					index.at(20) = { maxI - i, j - 1, k + 1 };
-
-					index.at(6) = { i - 1, maxJ - j, k - 1 };
-					index.at(7) = { i - 1, maxJ - j, k };
-					index.at(8) = { i - 1, maxJ - j, k + 1 };
-					index.at(15) = { i, maxJ - j, k - 1 };
-					index.at(16) = { i, maxJ - j, k };
-					index.at(17) = { i, maxJ - j, k + 1 };
-					index.at(24) = { maxI - i, maxJ - j, k - 1 };
-					index.at(25) = { maxI - i, maxJ - j, k };
-					index.at(26) = { maxI - i, maxJ - j, k + 1 };
-				}
-
-
-				index.at(3) = { i - 1, j, k - 1 };
-				index.at(4) = { i - 1, j, k };
-				index.at(5) = { i - 1, j, k + 1 };
-
-				index.at(12) = { i, j, k - 1 };
-				index.at(13) = { i, j, k };
-				index.at(14) = { i, j, k + 1 };
-
-				index.at(21) = { maxI - i, j, k - 1 };
-				index.at(22) = { maxI - i, j, k };
-				index.at(23) = { maxI - i, j, k + 1 };
-			}
-		}
-		else if ((k == 0 || k == maxK) && (j == 0 || j == maxJ) && i != 0 && i != maxI)
-		{
-			if (k == 0)
-			{
-				if (j == 0)
-				{
-					index.at(0) = { i - 1, maxJ - j, maxK - k };
-					index.at(1) = { i - 1, maxJ - j, k };
-					index.at(2) = { i - 1, maxJ - j, k + 1 };
-					index.at(9) = { i, maxJ - j, maxK - k };
-					index.at(10) = { i, maxJ - j, k };
-					index.at(11) = { i, maxJ - j, k + 1 };
-					index.at(18) = { i + 1, maxJ - j, maxK - k };
-					index.at(19) = { i + 1, maxJ - j, k };
-					index.at(20) = { i + 1, maxJ - j, k + 1 };
-
-					index.at(6) = { i - 1, j + 1, maxK - k };
-					index.at(7) = { i - 1, j + 1, k };
-					index.at(8) = { i - 1, j + 1, k + 1 };
-					index.at(15) = { i, j + 1, maxK - k };
-					index.at(16) = { i, j + 1, k };
-					index.at(17) = { i, j + 1, k + 1 };
-					index.at(24) = { i + 1, j + 1, maxK - k };
-					index.at(25) = { i + 1, j + 1, k };
-					index.at(26) = { i + 1, j + 1, k + 1 };
-				}
-				else
-				{
-					index.at(0) = { i - 1, j - 1, maxK - k };
-					index.at(1) = { i - 1, j - 1, k };
-					index.at(2) = { i - 1, j - 1, k + 1 };
-					index.at(9) = { i, j - 1, maxK - k };
-					index.at(10) = { i, j - 1, k };
-					index.at(11) = { i, j - 1, k + 1 };
-					index.at(18) = { i + 1, j - 1, maxK - k };
-					index.at(19) = { i + 1, j - 1, k };
-					index.at(20) = { i + 1, j - 1, k + 1 };
-
-					index.at(6) = { i - 1, maxJ - j, maxK - k };
-					index.at(7) = { i - 1, maxJ - j, k };
-					index.at(8) = { i - 1, maxJ - j, k + 1 };
-					index.at(15) = { i, maxJ - j, maxK - k };
-					index.at(16) = { i, maxJ - j, k };
-					index.at(17) = { i, maxJ - j, k + 1 };
-					index.at(24) = { i + 1, maxJ - j, maxK - k };
-					index.at(25) = { i + 1, maxJ - j, k };
-					index.at(26) = { i + 1, maxJ - j, k + 1 };
-				}
-
-
-				index.at(3) = { i - 1, j, maxK - k };
-				index.at(4) = { i - 1, j, k };
-				index.at(5) = { i - 1, j, k + 1 };
-
-				index.at(12) = { i, j, maxK - k };
-				index.at(13) = { i, j, k };
-				index.at(14) = { i, j, k + 1 };
-
-				index.at(21) = { i + 1, j, maxK - k };
-				index.at(22) = { i + 1, j, k };
-				index.at(23) = { i + 1, j, k + 1 };
-			}
-			else
-			{
-				if (j == 0)
-				{
-					index.at(0) = { i - 1, maxJ - j, k - 1 };
-					index.at(1) = { i - 1, maxJ - j, k };
-					index.at(2) = { i - 1, maxJ - j, maxK - k };
-					index.at(9) = { i, maxJ - j, k - 1 };
-					index.at(10) = { i, maxJ - j, k };
-					index.at(11) = { i, maxJ - j, maxK - k };
-					index.at(18) = { i + 1, maxJ - j, k - 1 };
-					index.at(19) = { i + 1, maxJ - j, k };
-					index.at(20) = { i + 1, maxJ - j, maxK - k };
-
-					index.at(6) = { i - 1, j + 1, k - 1 };
-					index.at(7) = { i - 1, j + 1, k };
-					index.at(8) = { i - 1, j + 1, maxK - k };
-					index.at(15) = { i, j + 1, k - 1 };
-					index.at(16) = { i, j + 1, k };
-					index.at(17) = { i, j + 1, maxK - k };
-					index.at(24) = { i + 1, j + 1, k - 1 };
-					index.at(25) = { i + 1, j + 1, k };
-					index.at(26) = { i + 1, j + 1, maxK - k };
-				}
-				else
-				{
-					index.at(0) = { i - 1, j - 1, k - 1 };
-					index.at(1) = { i - 1, j - 1, k };
-					index.at(2) = { i - 1, j - 1, maxK - k };
-					index.at(9) = { i, j - 1, k - 1 };
-					index.at(10) = { i, j - 1, k };
-					index.at(11) = { i, j - 1, maxK - k };
-					index.at(18) = { i + 1, j - 1, k - 1 };
-					index.at(19) = { i + 1, j - 1, k };
-					index.at(20) = { i + 1, j - 1, maxK - k };
-
-					index.at(6) = { i - 1, maxJ - j, k - 1 };
-					index.at(7) = { i - 1, maxJ - j, k };
-					index.at(8) = { i - 1, maxJ - j, maxK - k };
-					index.at(15) = { i, maxJ - j, k - 1 };
-					index.at(16) = { i, maxJ - j, k };
-					index.at(17) = { i, maxJ - j, maxK - k };
-					index.at(24) = { i + 1, maxJ - j, k - 1 };
-					index.at(25) = { i + 1, maxJ - j, k };
-					index.at(26) = { i + 1, maxJ - j, maxK - k };
-				}
-
-
-				index.at(3) = { i - 1, j, k - 1 };
-				index.at(4) = { i - 1, j, k };
-				index.at(5) = { i - 1, j, maxK - k };
-
-				index.at(12) = { i, j, k - 1 };
-				index.at(13) = { i, j, k };
-				index.at(14) = { i, j, maxK - k };
-
-				index.at(21) = { i + 1, j, k - 1 };
-				index.at(22) = { i + 1, j, k };
-				index.at(23) = { i + 1, j, maxK - k };
-			}
-		}
-		else if ((k == 0 || k == maxK) && (i == 0 || i == maxI) && j != 0 && j != maxJ)
-		{
-			if (k == 0)
-			{
-				if (i == 0)
-				{
-					index.at(0) = { maxI - i, j - 1, maxK - k };
-					index.at(1) = { maxI - i, j - 1, k };
-					index.at(2) = { maxI - i, j - 1, k + 1 };
-					index.at(3) = { maxI - i, j, maxK - k };
-					index.at(4) = { maxI - i, j, k };
-					index.at(5) = { maxI - i, j, k + 1 };
-					index.at(6) = { maxI - i, j + 1, maxK - k };
-					index.at(7) = { maxI - i, j + 1, k };
-					index.at(8) = { maxI - i, j + 1, k + 1 };
-
-					index.at(18) = { i + 1, j - 1, maxK - k };
-					index.at(19) = { i + 1, j - 1, k };
-					index.at(20) = { i + 1, j - 1, k + 1 };
-					index.at(21) = { i + 1, j, maxK - k };
-					index.at(22) = { i + 1, j, k };
-					index.at(23) = { i + 1, j, k + 1 };
-					index.at(24) = { i + 1, j + 1, maxK - k };
-					index.at(25) = { i + 1, j + 1, k };
-					index.at(26) = { i + 1, j + 1, k + 1 };
-				}
-				else
-				{
-					index.at(0) = { i - 1, j - 1, maxK - k };
-					index.at(1) = { i - 1, j - 1, k };
-					index.at(2) = { i - 1, j - 1, k + 1 };
-					index.at(3) = { i - 1, j, maxK - k };
-					index.at(4) = { i - 1, j, k };
-					index.at(5) = { i - 1, j, k + 1 };
-					index.at(6) = { i - 1, j + 1, maxK - k };
-					index.at(7) = { i - 1, j + 1, k };
-					index.at(8) = { i - 1, j + 1, k + 1 };
-
-					index.at(18) = { maxI - i, j - 1, maxK - k };
-					index.at(19) = { maxI - i, j - 1, k };
-					index.at(20) = { maxI - i, j - 1, k + 1 };
-					index.at(21) = { maxI - i, j, maxK - k };
-					index.at(22) = { maxI - i, j, k };
-					index.at(23) = { maxI - i, j, k + 1 };
-					index.at(24) = { maxI - i, j + 1, maxK - k };
-					index.at(25) = { maxI - i, j + 1, k };
-					index.at(26) = { maxI - i, j + 1, k + 1 };
-				}
-
-				index.at(9) = { i, j - 1, maxK - k };
-				index.at(10) = { i, j - 1, k };
-				index.at(11) = { i, j - 1, k + 1 };
-				index.at(12) = { i, j, maxK - k };
-				index.at(13) = { i, j, k };
-				index.at(14) = { i, j, k + 1 };
-				index.at(15) = { i, j + 1, maxK - k };
-				index.at(16) = { i, j + 1, k };
-				index.at(17) = { i, j + 1, k + 1 };
-			}
-			else
-			{
-				if (i == 0)
-				{
-					index.at(0) = { maxI - i, j - 1, k - 1 };
-					index.at(1) = { maxI - i, j - 1, k };
-					index.at(2) = { maxI - i, j - 1, maxK - k };
-					index.at(3) = { maxI - i, j, k - 1 };
-					index.at(4) = { maxI - i, j, k };
-					index.at(5) = { maxI - i, j, maxK - k };
-					index.at(6) = { maxI - i, j + 1, k - 1 };
-					index.at(7) = { maxI - i, j + 1, k };
-					index.at(8) = { maxI - i, j + 1, maxK - k };
-
-					index.at(18) = { i + 1, j - 1, k - 1 };
-					index.at(19) = { i + 1, j - 1, k };
-					index.at(20) = { i + 1, j - 1, maxK - k };
-					index.at(21) = { i + 1, j, k - 1 };
-					index.at(22) = { i + 1, j, k };
-					index.at(23) = { i + 1, j, maxK - k };
-					index.at(24) = { i + 1, j + 1, k - 1 };
-					index.at(25) = { i + 1, j + 1, k };
-					index.at(26) = { i + 1, j + 1, maxK - k };
-				}
-				else
-				{
-					index.at(0) = { i - 1, j - 1, k - 1 };
-					index.at(1) = { i - 1, j - 1, k };
-					index.at(2) = { i - 1, j - 1, maxK - k };
-					index.at(3) = { i - 1, j, k - 1 };
-					index.at(4) = { i - 1, j, k };
-					index.at(5) = { i - 1, j, maxK - k };
-					index.at(6) = { i - 1, j + 1, k - 1 };
-					index.at(7) = { i - 1, j + 1, k };
-					index.at(8) = { i - 1, j + 1, maxK - k };
-
-					index.at(18) = { maxI - i, j - 1, k - 1 };
-					index.at(19) = { maxI - i, j - 1, k };
-					index.at(20) = { maxI - i, j - 1, maxK - k };
-					index.at(21) = { maxI - i, j, k - 1 };
-					index.at(22) = { maxI - i, j, k };
-					index.at(23) = { maxI - i, j, maxK - k };
-					index.at(24) = { maxI - i, j + 1, k - 1 };
-					index.at(25) = { maxI - i, j + 1, k };
-					index.at(26) = { maxI - i, j + 1, maxK - k };
-				}
-
-				index.at(9) = { i, j - 1, k - 1 };
-				index.at(10) = { i, j - 1, k };
-				index.at(11) = { i, j - 1, maxK - k };
-				index.at(12) = { i, j, k - 1 };
-				index.at(13) = { i, j, k };
-				index.at(14) = { i, j, maxK - k };
-				index.at(15) = { i, j + 1, k - 1 };
-				index.at(16) = { i, j + 1, k };
-				index.at(17) = { i, j + 1, maxK - k };
-			}
-		}
-		else if ((k == 0 || k == maxK) && (i == 0 || i == maxI) && (j == 0 || j == maxJ))
-		{
-			if (k == 0)
-			{
-				if (i == 0)
-				{
-					if (j == 0)
-					{
-						index.at(0) = { maxI - i, maxJ - j, maxK - k };
-						index.at(1) = { maxI - i, maxJ - j, k };
-						index.at(2) = { maxI - i, maxJ - j, k + 1 };
-						index.at(9) = { i, maxJ - j, maxK - k };
-						index.at(10) = { i, maxJ - j, k };
-						index.at(11) = { i, maxJ - j, k + 1 };
-						index.at(18) = { i + 1, maxJ - j, maxK - k };
-						index.at(19) = { i + 1, maxJ - j, k };
-						index.at(20) = { i + 1, maxJ - j, k + 1 };
-
-						index.at(6) = { maxI - i, j + 1, maxK - k };
-						index.at(7) = { maxI - i, j + 1, k };
-						index.at(8) = { maxI - i, j + 1, k + 1 };
-						index.at(15) = { i, j + 1, maxK - k };
-						index.at(16) = { i, j + 1, k };
-						index.at(17) = { i, j + 1, k + 1 };
-						index.at(24) = { i + 1, j + 1, maxK - k };
-						index.at(25) = { i + 1, j + 1, k };
-						index.at(26) = { i + 1, j + 1, k + 1 };
-					}
-					else
-					{
-						index.at(0) = { maxI - i, j - 1, maxK - k };
-						index.at(1) = { maxI - i, j - 1, k };
-						index.at(2) = { maxI - i, j - 1, k + 1 };
-						index.at(9) = { i, j - 1, maxK - k };
-						index.at(10) = { i, j - 1, k };
-						index.at(11) = { i, j - 1, k + 1 };
-						index.at(18) = { i + 1, j - 1, maxK - k };
-						index.at(19) = { i + 1, j - 1, k };
-						index.at(20) = { i + 1, j - 1, k + 1 };
-
-						index.at(6) = { maxI - i, maxJ - j, maxK - k };
-						index.at(7) = { maxI - i, maxJ - j, k };
-						index.at(8) = { maxI - i, maxJ - j, k + 1 };
-						index.at(15) = { i, maxJ - j, maxK - k };
-						index.at(16) = { i, maxJ - j, k };
-						index.at(17) = { i, maxJ - j, k + 1 };
-						index.at(24) = { i + 1, maxJ - j, maxK - k };
-						index.at(25) = { i + 1, maxJ - j, k };
-						index.at(26) = { i + 1, maxJ - j, k + 1 };
-					}
-
-
-					index.at(3) = { maxI - i, j, maxK - k };
-					index.at(4) = { maxI - i, j, k };
-					index.at(5) = { maxI - i, j, k + 1 };
-
-					index.at(12) = { i, j, maxK - k };
-					index.at(13) = { i, j, k };
-					index.at(14) = { i, j, k + 1 };
-
-					index.at(21) = { i + 1, j, maxK - k };
-					index.at(22) = { i + 1, j, k };
-					index.at(23) = { i + 1, j, k + 1 };
-				}
-				else
-				{
-					if (j == 0)
-					{
-						index.at(0) = { i - 1, maxJ - j, maxK - k };
-						index.at(1) = { i - 1, maxJ - j, k };
-						index.at(2) = { i - 1, maxJ - j, k + 1 };
-						index.at(9) = { i, maxJ - j, maxK - k };
-						index.at(10) = { i, maxJ - j, k };
-						index.at(11) = { i, maxJ - j, k + 1 };
-						index.at(18) = { maxI - i, maxJ - j, maxK - k };
-						index.at(19) = { maxI - i, maxJ - j, k };
-						index.at(20) = { maxI - i, maxJ - j, k + 1 };
-
-						index.at(6) = { i - 1, j + 1, maxK - k };
-						index.at(7) = { i - 1, j + 1, k };
-						index.at(8) = { i - 1, j + 1, k + 1 };
-						index.at(15) = { i, j + 1, maxK - k };
-						index.at(16) = { i, j + 1, k };
-						index.at(17) = { i, j + 1, k + 1 };
-						index.at(24) = { maxI - i, j + 1, maxK - k };
-						index.at(25) = { maxI - i, j + 1, k };
-						index.at(26) = { maxI - i, j + 1, k + 1 };
-					}
-					else
-					{
-						index.at(0) = { i - 1, j - 1, maxK - k };
-						index.at(1) = { i - 1, j - 1, k };
-						index.at(2) = { i - 1, j - 1, k + 1 };
-						index.at(9) = { i, j - 1, maxK - k };
-						index.at(10) = { i, j - 1, k };
-						index.at(11) = { i, j - 1, k + 1 };
-						index.at(18) = { maxI - i, j - 1, maxK - k };
-						index.at(19) = { maxI - i, j - 1, k };
-						index.at(20) = { maxI - i, j - 1, k + 1 };
-
-						index.at(6) = { i - 1, maxJ - j, maxK - k };
-						index.at(7) = { i - 1, maxJ - j, k };
-						index.at(8) = { i - 1, maxJ - j, k + 1 };
-						index.at(15) = { i, maxJ - j, maxK - k };
-						index.at(16) = { i, maxJ - j, k };
-						index.at(17) = { i, maxJ - j, k + 1 };
-						index.at(24) = { maxI - i, maxJ - j, maxK - k };
-						index.at(25) = { maxI - i, maxJ - j, k };
-						index.at(26) = { maxI - i, maxJ - j, k + 1 };
-					}
-
-
-					index.at(3) = { i - 1, j, maxK - k };
-					index.at(4) = { i - 1, j, k };
-					index.at(5) = { i - 1, j, k + 1 };
-
-					index.at(12) = { i, j, maxK - k };
-					index.at(13) = { i, j, k };
-					index.at(14) = { i, j, k + 1 };
-
-					index.at(21) = { maxI - i, j, maxK - k };
-					index.at(22) = { maxI - i, j, k };
-					index.at(23) = { maxI - i, j, k + 1 };
-				}
-			}
-			else
-			{
-			if (i == 0)
-			{
-				if (j == 0)
-				{
-					index.at(0) = { maxI - i, maxJ - j, k - 1 };
-					index.at(1) = { maxI - i, maxJ - j, k };
-					index.at(2) = { maxI - i, maxJ - j, maxK - k };
-					index.at(9) = { i, maxJ - j, k - 1 };
-					index.at(10) = { i, maxJ - j, k };
-					index.at(11) = { i, maxJ - j, maxK - k };
-					index.at(18) = { i + 1, maxJ - j, k - 1 };
-					index.at(19) = { i + 1, maxJ - j, k };
-					index.at(20) = { i + 1, maxJ - j, maxK - k };
-
-					index.at(6) = { maxI - i, j + 1, k - 1 };
-					index.at(7) = { maxI - i, j + 1, k };
-					index.at(8) = { maxI - i, j + 1, maxK - k };
-					index.at(15) = { i, j + 1, k - 1 };
-					index.at(16) = { i, j + 1, k };
-					index.at(17) = { i, j + 1, maxK - k };
-					index.at(24) = { i + 1, j + 1, k - 1 };
-					index.at(25) = { i + 1, j + 1, k };
-					index.at(26) = { i + 1, j + 1, maxK - k };
-				}
-				else
-				{
-					index.at(0) = { maxI - i, j - 1, k - 1 };
-					index.at(1) = { maxI - i, j - 1, k };
-					index.at(2) = { maxI - i, j - 1, maxK - k };
-					index.at(9) = { i, j - 1, k - 1 };
-					index.at(10) = { i, j - 1, k };
-					index.at(11) = { i, j - 1, maxK - k };
-					index.at(18) = { i + 1, j - 1, k - 1 };
-					index.at(19) = { i + 1, j - 1, k };
-					index.at(20) = { i + 1, j - 1, maxK - k };
-
-					index.at(6) = { maxI - i, maxJ - j, k - 1 };
-					index.at(7) = { maxI - i, maxJ - j, k };
-					index.at(8) = { maxI - i, maxJ - j, maxK - k };
-					index.at(15) = { i, maxJ - j, k - 1 };
-					index.at(16) = { i, maxJ - j, k };
-					index.at(17) = { i, maxJ - j, maxK - k };
-					index.at(24) = { i + 1, maxJ - j, k - 1 };
-					index.at(25) = { i + 1, maxJ - j, k };
-					index.at(26) = { i + 1, maxJ - j, maxK - k };
-				}
-
-
-				index.at(3) = { maxI - i, j, k - 1 };
-				index.at(4) = { maxI - i, j, k };
-				index.at(5) = { maxI - i, j, maxK - k };
-
-				index.at(12) = { i, j, k - 1 };
-				index.at(13) = { i, j, k };
-				index.at(14) = { i, j, maxK - k };
-
-				index.at(21) = { i + 1, j, k - 1 };
-				index.at(22) = { i + 1, j, k };
-				index.at(23) = { i + 1, j, maxK - k };
-			}
-			else
-			{
-				if (j == 0)
-				{
-					index.at(0) = { i - 1, maxJ - j, k - 1 };
-					index.at(1) = { i - 1, maxJ - j, k };
-					index.at(2) = { i - 1, maxJ - j, maxK - k };
-					index.at(9) = { i, maxJ - j, k - 1 };
-					index.at(10) = { i, maxJ - j, k };
-					index.at(11) = { i, maxJ - j, maxK - k };
-					index.at(18) = { maxI - i, maxJ - j, k - 1 };
-					index.at(19) = { maxI - i, maxJ - j, k };
-					index.at(20) = { maxI - i, maxJ - j, maxK - k };
-
-					index.at(6) = { i - 1, j + 1, k - 1 };
-					index.at(7) = { i - 1, j + 1, k };
-					index.at(8) = { i - 1, j + 1, maxK - k };
-					index.at(15) = { i, j + 1, k - 1 };
-					index.at(16) = { i, j + 1, k };
-					index.at(17) = { i, j + 1, maxK - k };
-					index.at(24) = { maxI - i, j + 1, k - 1 };
-					index.at(25) = { maxI - i, j + 1, k };
-					index.at(26) = { maxI - i, j + 1, maxK - k };
-				}
-				else
-				{
-					index.at(0) = { i - 1, j - 1, k - 1 };
-					index.at(1) = { i - 1, j - 1, k };
-					index.at(2) = { i - 1, j - 1, maxK - k };
-					index.at(9) = { i, j - 1, k - 1 };
-					index.at(10) = { i, j - 1, k };
-					index.at(11) = { i, j - 1, maxK - k };
-					index.at(18) = { maxI - i, j - 1, k - 1 };
-					index.at(19) = { maxI - i, j - 1, k };
-					index.at(20) = { maxI - i, j - 1, maxK - k };
-
-					index.at(6) = { i - 1, maxJ - j, k - 1 };
-					index.at(7) = { i - 1, maxJ - j, k };
-					index.at(8) = { i - 1, maxJ - j, maxK - k };
-					index.at(15) = { i, maxJ - j, k - 1 };
-					index.at(16) = { i, maxJ - j, k };
-					index.at(17) = { i, maxJ - j, maxK - k };
-					index.at(24) = { maxI - i, maxJ - j, k - 1 };
-					index.at(25) = { maxI - i, maxJ - j, k };
-					index.at(26) = { maxI - i, maxJ - j, maxK - k };
-				}
-
-
-				index.at(3) = { i - 1, j, k - 1 };
-				index.at(4) = { i - 1, j, k };
-				index.at(5) = { i - 1, j, maxK - k };
-
-				index.at(12) = { i, j, k - 1 };
-				index.at(13) = { i, j, k };
-				index.at(14) = { i, j, maxK - k };
-
-				index.at(21) = { maxI - i, j, k - 1 };
-				index.at(22) = { maxI - i, j, k };
-				index.at(23) = { maxI - i, j, maxK - k };
-			}
-			}
-		}
-		else
-		{
-			cout << "Allt är skit!" << endl;
-		}
+		i = getAtomInAtomList(atomId)->getCellIndex()[0];
+		j = getAtomInAtomList(atomId)->getCellIndex()[1];
+		k = getAtomInAtomList(atomId)->getCellIndex()[2];
 		
-		for (unsigned int m{ 0 }; m <= 26; m++)
-		{	
+		lowerNeighbourI = i - 1;
+		upperNeighbourI = i + 1 ;
+		lowerNeighbourJ = j - 1;
+		upperNeighbourJ = j + 1;
+		lowerNeighbourK = k - 1;
+		upperNeighbourK = k + 1;
+
+		if (i == 0)
+		{
+			lowerNeighbourI = maxI;
+			upperNeighbourI = i + 1;
+		}
+		else if (i == maxI)
+		{
+			upperNeighbourI = 0;
+			lowerNeighbourI = i - 1;
+		}
+		if (j == 0)
+		{
+			lowerNeighbourJ = maxJ;
+			upperNeighbourJ = j + 1;
+		}
+		else if (j == maxJ)
+		{
+			upperNeighbourJ = 0;
+			lowerNeighbourJ = j - 1;
+		}
+		if (!is2D)
+		{
+			if (k == 0)
+			{
+				lowerNeighbourK = maxK;
+				upperNeighbourK = k + 1;
+			}
+			else if (k == maxK)
+			{
+				lowerNeighbourK = k - 1;
+				upperNeighbourK = 0;
+			}
+		}
+
+		index.at(0) = { lowerNeighbourI, lowerNeighbourJ, lowerNeighbourK };
+		index.at(1) = { lowerNeighbourI, lowerNeighbourJ, k };
+		index.at(2) = { lowerNeighbourI, lowerNeighbourJ, upperNeighbourK };
+		index.at(3) = { lowerNeighbourI, j, lowerNeighbourK };
+		index.at(4) = { lowerNeighbourI, j, k };
+		index.at(5) = { lowerNeighbourI, j, upperNeighbourK };
+		index.at(6) = { lowerNeighbourI, upperNeighbourJ, lowerNeighbourK };
+		index.at(7) = { lowerNeighbourI, upperNeighbourJ, k };
+		index.at(8) = { lowerNeighbourI, upperNeighbourJ, upperNeighbourK };
+
+		index.at(9) = { i, lowerNeighbourJ, lowerNeighbourK };
+		index.at(10) = { i, lowerNeighbourJ, k };
+		index.at(11) = { i, lowerNeighbourJ, upperNeighbourK };
+		index.at(12) = { i, j, lowerNeighbourK };
+		index.at(13) = { i, j, k };
+		index.at(14) = { i, j, upperNeighbourK };
+		index.at(15) = { i, upperNeighbourJ, lowerNeighbourK };
+		index.at(16) = { i, upperNeighbourJ, k };
+		index.at(17) = { i, upperNeighbourJ, upperNeighbourK };
+
+		index.at(18) = { upperNeighbourI, lowerNeighbourJ, lowerNeighbourK };
+		index.at(19) = { upperNeighbourI, lowerNeighbourJ, k };
+		index.at(20) = { upperNeighbourI, lowerNeighbourJ, upperNeighbourK };
+		index.at(21) = { upperNeighbourI, j, lowerNeighbourK };
+		index.at(22) = { upperNeighbourI, j, k };
+		index.at(23) = { upperNeighbourI, j, upperNeighbourK };
+		index.at(24) = { upperNeighbourI, upperNeighbourJ, lowerNeighbourK };
+		index.at(25) = { upperNeighbourI, upperNeighbourJ, k };
+		index.at(26) = { upperNeighbourI, upperNeighbourJ, upperNeighbourK };
+		
+		int m{ 0 };
+		if (k == 0 && is2D)
+		{
+			m = 1;
+		}
+		while (m <= 26)
+		{
 			for (unsigned int n{ 0 }; n < getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().size(); n++)
 			{
 				atomDistance = _mySimulation.calcDistanceWithBoundaryCondition(getAtomInAtomList(atomId), 
 					getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n), 
-					lengthX, lengthY, lengthZ)[0];
-				if (atomDistance < cutOffDistance && atomId < getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n)->getID())
+					lengthX, lengthY, lengthZ, is2D)[0];
+				if (atomDistance < cutOffDistance /*&& atomId < getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n)->getID()*/)
 				{
 					getAtomInAtomList(atomId)->addToNeighbourList(getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n));
 				}
 			}
+
+			m = incrementM(m, maxK, lowerNeighbourK, upperNeighbourK);
 		}
 
 	}
@@ -944,7 +225,7 @@ void World::setupNeighbourLists()
 
 void World::distributeInitialVelocities()
 {
-	double sigma = sqrt(k_boltzmann * _myParameters.getTemperature() / _myParameters.getChosenMaterial().getMass());
+	double sigma = sqrt(_myParameters.getBoltzmann() * _myParameters.getTemperature() / _myParameters.getChosenMaterial().getMass());
 	
 	random_device rand;
 	mt19937 generator(rand());

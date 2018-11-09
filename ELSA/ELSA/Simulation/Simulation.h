@@ -16,6 +16,7 @@ public:
 	std::array<double, 4> calcDistance(double, double, double, double, double, double) const;
 	std::array<double, 4> calcDistance(Atom*, Atom*) const;
 	std::array<double, 4> calcDistanceWithBoundaryCondition(Atom*, Atom*, double, double, double) const;
+	std::array<double, 4> calcDistanceWithBoundaryCondition(Atom*, Atom*, double, double, double, bool) const;
 	std::array<double, 3> calcPosition(std::array<double, 3>, std::array<double, 3>, std::array<double, 3>, double);
 	std::array<double, 3> calcVelocity(std::array<double, 3>, std::array<double, 3>, double);
 

@@ -6,7 +6,11 @@
 #include "../Parameters/Parameters.h"
 #include "../Results/Results.h"
 #include "../Simulation/Simulation.h"
+
+#include <cmath>
+#include <iostream>
 #include <vector>
+#include <random>
 
 class World
 {
@@ -16,14 +20,17 @@ private:
 	Parameters _myParameters;
 	Results _myResults;
 	Simulation _mySimulation;
+
+	int incrementM(int, unsigned int, unsigned int, unsigned int);
 	
 	void setupSystem(Parameters);
 	void generateAtomsAtScLattice(double, unsigned int, unsigned int, unsigned int);
 	void generateAtomsAtFccLattice(double, unsigned int, unsigned int, unsigned int);
-	void setupNeighbourLists();
+	void setupNeighbourLists(bool);
 	void distributeInitialVelocities();
 	void generateCells();
 	void populateCells();
+
 public:
 	World(Parameters);
 	~World() = default;
@@ -39,7 +46,6 @@ public:
 	void calcPotentialAndForce();
 
 	void calcPotentialEnergy();
-	void calcKineticEnergy();
 };
 
 #endif

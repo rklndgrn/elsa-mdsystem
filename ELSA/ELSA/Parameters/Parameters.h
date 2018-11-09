@@ -20,8 +20,11 @@ private:
 	unsigned int _numberOfCellsI;
 	unsigned int _numberOfCellsJ;
 	unsigned int _numberOfCellsK;
-	double _temperature;
+
+	double _boltzmann{ 1.3806485279E-23 };
 	double _collisionFrequency;
+	double _temperature;
+
 	bool _isThermostatOn;
 	bool _is2D;
 	Material _chosenMaterial;
@@ -36,8 +39,9 @@ public:
 	unsigned int getNumberOfCellsI() const;
 	unsigned int getNumberOfCellsJ() const;
 	unsigned int getNumberOfCellsK() const;
-	double getTemperature() const;
+	double getBoltzmann() const;
 	double getCollisionFrequency() const;
+	double getTemperature() const;
 	bool getIsThermostatOn() const;
 	bool getIs2D() const;
 	Material getChosenMaterial() const;
