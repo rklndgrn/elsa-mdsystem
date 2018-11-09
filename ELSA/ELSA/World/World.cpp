@@ -1,5 +1,5 @@
 #include "World.h"
-
+#include <iostream>
 
 using namespace std;
 
@@ -334,23 +334,31 @@ void World::generateCells()
 //Add atoms to the cells
 void World::populateCells()
 {
+	omp_set_num_threads(4);
+
 	unsigned int i;
 	unsigned int j;
 	unsigned int k;
 
 	double cellSize{ _myParameters.getChosenMaterial().getCellSize() };
+	Atom* a;
 
-	for (unsigned int atomId = 0; atomId < _myParameters.getNumberOfAtoms(); atomId++)
+
+	#pragma omp parallel shared(cellSize) private(a, i, j, k)
 	{
-		Atom* a = getAtomInAtomList(atomId);
-
-		//Find index of the cell tha atom is currently in
-		i = (unsigned int)floor(a->getPositionX() / cellSize);
-		j = (unsigned int)floor(a->getPositionY() / cellSize);
-		k = (unsigned int)floor(a->getPositionZ() / cellSize);
-
-		getCellInCellList(i, j, k)->addAtomToCellList(a);
-		a->setCellIndex(i, j, k);
+		#pragma omp for schedule(static)
+		for (int atomId = 0; atomId < (int) _myParameters.getNumberOfAtoms(); atomId++)
+		{
+			a = getAtomInAtomList(atomId);
+			
+			//Find index of the cell tha atom is currently in
+			i = (unsigned int)floor(a->getPositionX() / cellSize);
+			j = (unsigned int)floor(a->getPositionY() / cellSize);
+			k = (unsigned int)floor(a->getPositionZ() / cellSize);
+			
+			getCellInCellList(i, j, k)->addAtomToCellList(a);
+			a->setCellIndex(i, j, k);
+		}
 	}
 }
 
@@ -477,6 +485,7 @@ void World::solveEquationsOfMotion(double elapsedTime)
 	double randomValue;
 
 	//Go through the atom list and assign new positions and velocities using the Velocity Verlet Algorithm.
+	//Parallelize here. 
 	for (int i{ 0 }; i < _atomList.size(); i++)
 	{
 		thisAtom = _atomList.at(i);

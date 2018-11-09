@@ -9,8 +9,10 @@
 
 #include <cmath>
 #include <iostream>
-#include <vector>
+#include <omp.h>
 #include <random>
+#include <vector>
+
 
 class World
 {
