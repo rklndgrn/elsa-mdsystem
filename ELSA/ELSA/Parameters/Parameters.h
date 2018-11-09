@@ -15,9 +15,6 @@ private:
 	unsigned int _numberOfAtoms;
 	unsigned int _timeStep;
 	unsigned int _simulationTime;
-
-	double _boltzmann{ 1.3806485279E-23 };
-
 	unsigned int _numberOfUnitCellsX;
 	unsigned int _numberOfUnitCellsY;
 	unsigned int _numberOfUnitCellsZ;
@@ -25,10 +22,16 @@ private:
 	unsigned int _numberOfCellsJ;
 	unsigned int _numberOfCellsK;
 
-	double _temperature;
+	double _boltzmann{ 1.3806485279E-23 };
 	double _collisionFrequency;
+	double _lengthX;
+	double _lengthY;
+	double _lengthZ;
+	double _temperature;
+
 	bool _isThermostatOn;
 	bool _is2D;
+
 	Material _chosenMaterial;
 
 public:
@@ -67,8 +70,9 @@ public:
 	unsigned int getNumberOfCellsJ() const;
 	unsigned int getNumberOfCellsK() const;
 
-
-
+	double getLengthX() const;
+	double getLengthY() const;
+	double getLengthZ() const;
 
 	void setNumberOfAtoms(unsigned int noa);
 	void setTimeStep(unsigned int ts);

@@ -57,9 +57,6 @@ double Simulation::calcMeanSquareDisplacement(double** currentPositionArray, dou
 		}
 
 		sum += pow(currPos[0] - initPos[0], 2) + pow(currPos[1] - initPos[1], 2) + pow(currPos[2] - initPos[2], 2);
-
-		cout << "currPos is " << currPos[0] << ", " << currPos[1] << ", " << currPos[2] << "!" << endl;
-		cout << "initPos is " << initPos[0] << ", " << initPos[1] << ", " << initPos[2] << "!" << endl;
 	}
 	return sum/((double) numberOfAtoms);
 }
@@ -136,12 +133,39 @@ array<double, 3> Simulation::calcAcceleration(double fx, double fy, double fz)
 	return a;
 }
 
-array<double, 4> Simulation::calcDistance(Atom* a1, Atom* a2) const
+array<double, 4> Simulation::calcDistance(Atom* a1, Atom* a2, double lengthX, double lengthY, double lengthZ, bool is2D) const
 {
 	double rx, ry, rz, r;
 	rx = a1->getPosX() - a2->getPosX();
+	if (rx > lengthX / 2.0)
+	{
+		rx -= lengthX;
+	}
+	else if (rx < -lengthX / 2.0)
+	{
+		rx += lengthX;
+	}
 	ry = a1->getPosY() - a2->getPosY();
+	if (ry > lengthY / 2.0)
+	{
+		ry -= lengthY;
+	}
+	else if (ry < -lengthY / 2.0)
+	{
+		ry += lengthY;
+	}
 	rz = a1->getPosZ() - a2->getPosZ();
+	if (!is2D)
+	{
+		if (rz > lengthZ / 2.0)
+		{
+			rz -= lengthZ;
+		}
+		else if (rz < -lengthZ / 2.0)
+		{
+			rz += lengthZ;
+		}
+	}
 	r = sqrt(pow(rx, 2) + pow(ry, 2) + pow(rz, 2));
 	rx = rx / r;
 	ry = ry / r;
@@ -177,17 +201,4 @@ array<double, 3> Simulation::calcVelocity(std::array<double, 3> v, std::array<do
 	return newV;
 }
 
-array<double, 4> Simulation::calcDistance(double x1, double y1, double z1, double x2, double y2, double z2) const
-{
-	double rx, ry, rz, r;
-	rx = x1 - x2;
-	ry = y1 - y2;
-	rz = z1 - z2;
-	r = sqrt(pow(rx, 2) + pow(ry, 2) + pow(rz, 2));
-	rx = rx / r;
-	ry = ry / r;
-	rz = rz / r;
-	array<double, 4> temp = { r, rx, ry, rz };
-	return temp;
-}
 

@@ -11,11 +11,16 @@ class Simulation
 private:
 	Material _mat;
 public:
-
 	Simulation() = default;
 	Simulation(Material mat);
 
 	~Simulation() = default;
+
+	std::array<double, 3> calcAcceleration(double, double, double);
+	std::array<double, 4> calcDistance(Atom*, Atom*, double, double, double, bool) const;
+	std::array<double, 3> calcPosition(std::array<double, 3>, std::array<double, 3>, std::array<double, 3>, double);
+	std::array<double, 3> calcVelocity(std::array<double, 3>, std::array<double, 3>, double);
+	std::array<double, 3> generateGaussianVelocity(double);
 
 	double calcCohesiveEnergy(double, double);
 	double calcDebyeTemperature(double, double, double, double, double);
@@ -28,10 +33,4 @@ public:
 	double calcTemperature(double, double, double);
 	double calcTotalEnergy(double, double);
 
-	std::array<double, 3> calcAcceleration(double, double, double);
-	std::array<double, 4> calcDistance(double, double, double, double, double, double) const;
-	std::array<double, 4> calcDistance(Atom*, Atom*) const;
-	std::array<double, 3> calcPosition(std::array<double, 3>, std::array<double, 3>, std::array<double, 3>, double);
-	std::array<double, 3> calcVelocity(std::array<double, 3>, std::array<double, 3>, double);
-	std::array<double, 3> generateGaussianVelocity(double);
 };

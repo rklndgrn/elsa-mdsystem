@@ -39,7 +39,11 @@ Parameters::Parameters(
 	_isThermostatOn{ isThermostatOn },
 	_is2D{ is2D },
 	_chosenMaterial{ chosenMaterial }
-{}
+{
+	_lengthX = getNumberOfUnitCellsX()*getChosenMaterial().getLatticeConstant();
+	_lengthY = getNumberOfUnitCellsY()*getChosenMaterial().getLatticeConstant();
+	_lengthZ = getNumberOfUnitCellsZ()*getChosenMaterial().getLatticeConstant();
+}
 
 double Parameters::getBoltzmann() const
 {
@@ -91,15 +95,31 @@ unsigned int Parameters::getSimulationTime() const
 	return _simulationTime;
 }
 
+double Parameters::getCollisionFrequency() const
+{
+	return _collisionFrequency;
+}
+
 double Parameters::getTemperature() const
 {
 	return _temperature;
 }
 
-double Parameters::getCollisionFrequency() const
+double Parameters::getLengthX() const
 {
-	return _collisionFrequency;
+	return _lengthX;
 }
+
+double Parameters::getLengthY() const
+{
+	return _lengthY;
+}
+
+double Parameters::getLengthZ() const
+{
+	return _lengthZ;
+}
+
 
 bool Parameters::getIsThermostatOn() const
 {
