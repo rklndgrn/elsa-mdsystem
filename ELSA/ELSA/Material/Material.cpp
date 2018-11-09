@@ -32,6 +32,7 @@ Material::Material(
 	_cutOffDistance{ cutOffDistance },
 	_mass{ mass }
 {
+	//Calculate cell size from cut off distance
 	_cellSize = ceil(cutOffDistance / latticeConstant)*latticeConstant;
 }
 
@@ -39,44 +40,11 @@ Material::Material(
 Material::~Material()
 {}
 
-string Material::getCrystalStructure() const
-{
-	return _crystalStructure;
-}
 
-void Material::setCrystalStructure(string str)
+//getters
+double Material::getCellSize() const
 {
-	_crystalStructure = str;
-}
-
-double Material::getLatticeConstant() const
-{
-	return _latticeConstant;
-}
-
-void Material::setLatticeConstant(double lc)
-{
-	_latticeConstant = lc;
-}
-
-double Material::getEpsilon() const
-{
-	return _epsilon;
-}
-
-void Material::setEpsilon(double eps)
-{
-	_epsilon = eps;
-}
-
-double Material::getSigma() const
-{
-	return _sigma;
-}
-
-void Material::setSigma(double sig)
-{
-	_sigma = sig;
+	return _cellSize;
 }
 
 double Material::getCutOffDistance() const
@@ -84,24 +52,60 @@ double Material::getCutOffDistance() const
 	return _cutOffDistance;
 }
 
-void Material::setCutOffDistance(double cod)
+double Material::getEpsilon() const
 {
-	_cutOffDistance = cod;
+	return _epsilon;
 }
 
-double Material::getCellSize() const
+double Material::getLatticeConstant() const
 {
-	return _cellSize;
-}
-
-void Material::setCellSize(double cellSize)
-{
-	_cellSize = cellSize;
+	return _latticeConstant;
 }
 
 double Material::getMass() const
 {
 	return _mass;
+}
+
+double Material::getSigma() const
+{
+	return _sigma;
+}
+
+string Material::getCrystalStructure() const
+{
+	return _crystalStructure;
+}
+
+//setters
+void Material::setCellSize(double cellSize)
+{
+	_cellSize = cellSize;
+}
+
+void Material::setCrystalStructure(string str)
+{
+	_crystalStructure = str;
+}
+
+void Material::setCutOffDistance(double cod)
+{
+	_cutOffDistance = cod;
+}
+
+void Material::setEpsilon(double eps)
+{
+	_epsilon = eps;
+}
+
+void Material::setLatticeConstant(double lc)
+{
+	_latticeConstant = lc;
+}
+
+void Material::setSigma(double sig)
+{
+	_sigma = sig;
 }
 
 void Material::setMass(double m)

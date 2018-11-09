@@ -9,12 +9,16 @@ class Atom
 {
 private:
 	unsigned int _id{};
-	std::array<unsigned int, 3> _cellIndex = { 0, 0, 0 };
+
+	double _potential{};
+
+	std::array<double, 3> _acceleration = { 0, 0, 0 };
+	std::array<double, 3> _force{};
 	std::array<double, 3> _position = { 0, 0, 0 };
 	std::array<double, 3> _velocity = { 0, 0, 0 };
-	std::array<double, 3> _acceleration = { 0, 0, 0 };
-	double _potential{};
-	std::array<double, 3> _force{};
+
+	std::array<unsigned int, 3> _cellIndex = { 0, 0, 0 };
+
 	std::vector<Atom*> _neighbourList;
 
 public:
@@ -22,18 +26,23 @@ public:
 	Atom() = default;
 	~Atom() = default;
 
+
+
+	void addToNeighbourList(Atom*);
+
+	//getters
 	unsigned int getID() const;
 
-	double getAccX() const;
-	double getAccY() const;
-	double getAccZ() const;
-	double getPosX() const;
-	double getPosY() const;
-	double getPosZ() const;
-	double getPotential() const;
+	double getAccelerationX() const;
+	double getAccelerationY() const;
+	double getAccelerationZ() const;
 	double getForceX() const;
 	double getForceY() const;
 	double getForceZ() const;
+	double getPositionX() const;
+	double getPositionY() const;
+	double getPositionZ() const;
+	double getPotential() const;
 	double getVelocityX() const;
 	double getVelocityY() const;
 	double getVelocityZ() const;
@@ -42,21 +51,21 @@ public:
 	std::array<unsigned int, 3> getCellIndex() const;
 	std::vector<Atom*> getNeighbourList() const;
 
-	void addToNeighbourList(Atom*);
-	void setAccX(double);
-	void setAccY(double);
-	void setAccZ(double);
+	//setters
+	void setAccelerationX(double);
+	void setAccelerationY(double);
+	void setAccelerationZ(double);
 	void setAcceleration(std::array<double, 3>);
 	void setCellIndex(int, int, int);
-	void setPosX(double);
-	void setPosY(double);
-	void setPosZ(double);
-	void setPosition(std::array<double, 3>);
-	void setPotential(double);
 	void setForceX(double);
 	void setForceY(double);
 	void setForceZ(double);
 	void setForce(std::array<double, 3>);
+	void setPositionX(double);
+	void setPositionY(double);
+	void setPositionZ(double);
+	void setPosition(std::array<double, 3>);
+	void setPotential(double);
 	void setVelocityX(double);
 	void setVelocityY(double);
 	void setVelocityZ(double);

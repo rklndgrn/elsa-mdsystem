@@ -28,6 +28,9 @@ public:
 	Results(int, int, int);
 	~Results() = default;
 
+	void printPositions();
+
+	//getters
 	double** getCohesiveEnergy();
 	double** getDebyeTemperature();
 	double** getDiffusionConstant();
@@ -40,8 +43,7 @@ public:
 	double** getTemperature();
 	double** getTotalEnergy();
 
-	void printPositions();
-
+	//setters
 	void setCohesiveEnergy(double, int);
 	void setDebyeTemperature(double, int);
 	void setDiffusionConstant(double, int);

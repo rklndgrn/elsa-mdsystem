@@ -29,6 +29,21 @@ Results::Results(int simulationTime, int timeStep, int numberOfParticles)
 	}
 }
 
+//For testing the 3D array. Delete if unnecessary.
+void Results::printPositions()
+{
+	for (unsigned int t = 0; t < _arrayLength; t++)
+	{
+		cout << "At time step " << t << ":" << endl;
+		for (unsigned int n = 0; n < _numberOfAtoms; n++)
+		{
+			cout << "   Atom " << n << " has position: (" << _positions[t][n][0] << ", " << _positions[t][n][1] << ", " << _positions[t][n][2] << ")!" << endl;
+		}
+		cout << endl;
+	}
+}
+
+//getters
 double** Results::getCohesiveEnergy()
 {
 	return &_cohesiveEnergy;
@@ -84,20 +99,7 @@ double** Results::getTotalEnergy()
 	return &_totalEnergy;
 }
 
-//For testing the 3D array. Delete if unnecessary.
-void Results::printPositions()
-{
-	for (unsigned int t = 0; t < _arrayLength; t++)
-	{
-		cout << "At time step " << t << ":" << endl;
-		for (unsigned int n = 0; n < _numberOfAtoms; n++)
-		{
-			cout << "   Atom " << n << " has position: (" << _positions[t][n][0] << ", " << _positions[t][n][1] << ", " << _positions[t][n][2] << ")!" << endl;
-		}
-		cout << endl;
-	}
-}
-
+//setters
 void Results::setCohesiveEnergy(double value, int index)
 {
 	_cohesiveEnergy[index] = value;

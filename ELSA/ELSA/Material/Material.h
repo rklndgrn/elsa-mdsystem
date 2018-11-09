@@ -10,41 +10,39 @@
 class Material
 {
 private:
-	std::string _crystalStructure;
-	double _latticeConstant;
-	double _epsilon;
-	double _sigma;
 	double _cutOffDistance;
 	double _cellSize;
+	double _epsilon;
+	double _latticeConstant;
 	double _mass;
+	double _sigma;
+
+	std::string _crystalStructure;
 
 public:
 	Material();
-	Material(
-		std::string crystalStructure,
-		double latticeConstant,
-		double epsilon,
-		double sigma,
-		double cutOffDistance,
-		double mass);
+	Material(std::string, double, double, double, double, double);
 	~Material();
 
-	double getLatticeConstant() const;
-	double getEpsilon() const;
-	double getSigma() const;
-	double getCutOffDistance() const;
+	//getters
 	double getCellSize() const;
+	double getCutOffDistance() const;
+	double getEpsilon() const;
+	double getLatticeConstant() const;
 	double getMass() const;
+	double getSigma() const;
 
 	std::string getCrystalStructure() const;
 
-	void setCrystalStructure(std::string str);
-	void setLatticeConstant(double lc);
-	void setEpsilon(double eps);
-	void setSigma(double sig);
-	void setCutOffDistance(double cod);
+	//setters
 	void setCellSize(double);
+	void setCrystalStructure(std::string str);
+	void setCutOffDistance(double cod);
+	void setEpsilon(double eps);
+	void setLatticeConstant(double lc);
 	void setMass(double m);
+	void setSigma(double sig);
+
 
 
 };

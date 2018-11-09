@@ -40,16 +40,28 @@ Parameters::Parameters(
 	_is2D{ is2D },
 	_chosenMaterial{ chosenMaterial }
 {
+	//Length of simulation box
 	_lengthX = getNumberOfUnitCellsX()*getChosenMaterial().getLatticeConstant();
 	_lengthY = getNumberOfUnitCellsY()*getChosenMaterial().getLatticeConstant();
 	_lengthZ = getNumberOfUnitCellsZ()*getChosenMaterial().getLatticeConstant();
+
+	//Number of cells in each dimension of the simulation box
+	_numberOfCellsI = (unsigned int)ceil(
+		_numberOfUnitCellsX * _chosenMaterial.getLatticeConstant() / 
+		_chosenMaterial.getCellSize());
+	_numberOfCellsJ = (unsigned int)ceil(
+		_numberOfUnitCellsY * _chosenMaterial.getLatticeConstant() /
+		_chosenMaterial.getCellSize());
+	_numberOfCellsK = (unsigned int)ceil(
+		_numberOfUnitCellsZ * _chosenMaterial.getLatticeConstant() /
+		_chosenMaterial.getCellSize());
+
+
 }
 
-double Parameters::getBoltzmann() const
-{
-	return _boltzmann;
-}
 
+
+//getters
 unsigned int Parameters::getNumberOfAtoms() const
 {
 	return _numberOfAtoms;
@@ -85,24 +97,25 @@ unsigned int Parameters::getNumberOfUnitCellsZ() const
 	return _numberOfUnitCellsZ;
 }
 
-unsigned int Parameters::getTimeStep() const
-{
-	return _timeStep;
-}
-
 unsigned int Parameters::getSimulationTime() const
 {
 	return _simulationTime;
 }
 
+unsigned int Parameters::getTimeStep() const
+{
+	return _timeStep;
+}
+
+
+double Parameters::getBoltzmann() const
+{
+	return _boltzmann;
+}
+
 double Parameters::getCollisionFrequency() const
 {
 	return _collisionFrequency;
-}
-
-double Parameters::getTemperature() const
-{
-	return _temperature;
 }
 
 double Parameters::getLengthX() const
@@ -120,10 +133,9 @@ double Parameters::getLengthZ() const
 	return _lengthZ;
 }
 
-
-bool Parameters::getIsThermostatOn() const
+double Parameters::getTemperature() const
 {
-	return _isThermostatOn;
+	return _temperature;
 }
 
 bool Parameters::getIs2D() const
@@ -131,29 +143,22 @@ bool Parameters::getIs2D() const
 	return _is2D;
 }
 
+bool Parameters::getIsThermostatOn() const
+{
+	return _isThermostatOn;
+}
+
 Material Parameters::getChosenMaterial() const
 {
 	return _chosenMaterial;
 }
 
-void Parameters::setNumberOfAtoms(unsigned int noa)
-{
-	_numberOfAtoms = noa;
-}
 
-void Parameters::setTimeStep(unsigned int ts)
-{
-	_timeStep = ts;
-}
+//setters
 
-void Parameters::setSimulationTime(unsigned int st)
+void Parameters::setChosenMaterial(Material mat)
 {
-	_simulationTime = st;
-}
-
-void Parameters::setTemperature(double temp)
-{
-	_temperature = temp;
+	_chosenMaterial = mat;
 }
 
 void Parameters::setCollisionFrequency(double cf)
@@ -161,19 +166,37 @@ void Parameters::setCollisionFrequency(double cf)
 	_collisionFrequency = cf;
 }
 
-void Parameters::setIsThermostatOn(bool isT)
-{
-	_isThermostatOn = isT;
-}
-
 void Parameters::setIs2D(bool is2)
 {
 	_is2D = is2;
 }
 
-void Parameters::setChosenMaterial(Material mat)
+void Parameters::setIsThermostatOn(bool isT)
 {
-	_chosenMaterial = mat;
+	_isThermostatOn = isT;
 }
+
+void Parameters::setNumberOfAtoms(unsigned int noa)
+{
+	_numberOfAtoms = noa;
+}
+
+void Parameters::setSimulationTime(unsigned int st)
+{
+	_simulationTime = st;
+}
+
+
+void Parameters::setTemperature(double temp)
+{
+	_temperature = temp;
+}
+
+void Parameters::setTimeStep(unsigned int ts)
+{
+	_timeStep = ts;
+}
+
+
 
 

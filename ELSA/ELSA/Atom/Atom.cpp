@@ -11,55 +11,33 @@ Atom::Atom(int newID, double newPosX, double newPosY, double newPosZ)
 	_position[2] = newPosZ;
 }
 
+
+//Append atom to neighbour list
+void Atom::addToNeighbourList(Atom* a)
+{
+	_neighbourList.push_back(a);
+}
+
 //Getters
-double Atom::getAccX() const
-{
-	return _acceleration[0];
-}
-
-double Atom::getAccY() const
-{
-	return _acceleration[1];
-}
-
-double Atom::getAccZ() const
-{
-	return _acceleration[2];
-}
-
-std::array<unsigned int, 3> Atom::getCellIndex() const
-{
-	return _cellIndex;
-}
-
-vector<Atom*> Atom::getNeighbourList() const
-{
-	return _neighbourList;
-}
 
 unsigned int Atom::getID() const
 {
 	return _id;
 }
 
-double Atom::getPosX() const
+double Atom::getAccelerationX() const
 {
-	return _position[0];
+	return _acceleration[0];
 }
 
-double Atom::getPosY() const
+double Atom::getAccelerationY() const
 {
-	return _position[1];
+	return _acceleration[1];
 }
 
-double Atom::getPosZ() const
+double Atom::getAccelerationZ() const
 {
-	   	return _position[2];
-}
-
-double Atom::getPotential() const
-{
-	return _potential;
+	return _acceleration[2];
 }
 
 double Atom::getForceX() const
@@ -77,6 +55,26 @@ double Atom::getForceZ() const
 	return _force[2];
 }
 
+double Atom::getPositionX() const
+{
+	return _position[0];
+}
+
+double Atom::getPositionY() const
+{
+	return _position[1];
+}
+
+double Atom::getPositionZ() const
+{
+	   	return _position[2];
+}
+
+double Atom::getPotential() const
+{
+	return _potential;
+}
+
 double Atom::getVelocityX() const
 {
 	return _velocity[0];
@@ -92,34 +90,40 @@ double Atom::getVelocityZ() const
 	return _velocity[2];
 }
 
+std::array<unsigned int, 3> Atom::getCellIndex() const
+{
+	return _cellIndex;
+}
+
+vector<Atom*> Atom::getNeighbourList() const
+{
+	return _neighbourList;
+}
+
 
 
 //Setters
-void Atom::addToNeighbourList(Atom* a)
-{
-	_neighbourList.push_back(a);
-}
 
-void Atom::setAccX(double newPos)
+void Atom::setAccelerationX(double newPos)
 {
 	_acceleration[0] = newPos;
 }
 
-void Atom::setAccY(double newPos)
+void Atom::setAccelerationY(double newPos)
 {
 	_acceleration[1] = newPos;
 }
 
-void Atom::setAccZ(double newPos)
+void Atom::setAccelerationZ(double newPos)
 {
 	_acceleration[2] = newPos;
 }
 
 void Atom::setAcceleration(array<double, 3> a)
 {
-	setAccX(a[0]);
-	setAccY(a[1]);
-	setAccZ(a[2]);
+	setAccelerationX(a[0]);
+	setAccelerationY(a[1]);
+	setAccelerationZ(a[2]);
 }
 
 void Atom::setCellIndex(int i, int j, int k)
@@ -127,33 +131,6 @@ void Atom::setCellIndex(int i, int j, int k)
 	_cellIndex[0] = i;
 	_cellIndex[1] = j;
 	_cellIndex[2] = k;
-}
-
-void Atom::setPosX(double newPos)
-{
-	_position[0] = newPos;
-}
-
-void Atom::setPosY(double newPos)
-{
-	_position[1] = newPos;
-}
-
-void Atom::setPosZ(double newPos)
-{
-	_position[2] = newPos;
-}
-
-void Atom::setPosition(array<double, 3> r)
-{
-	setPosX(r[0]);
-	setPosY(r[1]);
-	setPosZ(r[2]);
-}
-
-void Atom::setPotential(double u)
-{
-	_potential = u;
 }
 
 void Atom::setForceX(double F)
@@ -176,6 +153,33 @@ void Atom::setForce(array<double, 3> F)
 	setForceX(F[0]);
 	setForceY(F[1]);
 	setForceZ(F[2]);
+}
+
+void Atom::setPositionX(double newPos)
+{
+	_position[0] = newPos;
+}
+
+void Atom::setPositionY(double newPos)
+{
+	_position[1] = newPos;
+}
+
+void Atom::setPositionZ(double newPos)
+{
+	_position[2] = newPos;
+}
+
+void Atom::setPosition(array<double, 3> r)
+{
+	setPositionX(r[0]);
+	setPositionY(r[1]);
+	setPositionZ(r[2]);
+}
+
+void Atom::setPotential(double u)
+{
+	_potential = u;
 }
 
 void Atom::setVelocityX(double newV)

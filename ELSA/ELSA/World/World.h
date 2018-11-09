@@ -15,21 +15,24 @@
 class World
 {
 private:
+	//Member objects
 	std::vector<Atom*> _atomList;
 	std::vector<Cell*> _cellList;
+
 	Parameters _myParameters;
 	Results _myResults;
 	Simulation _mySimulation;
 
+	//Member functions
 	int incrementM(int, unsigned int, unsigned int, unsigned int);
-	
-	void setupSystem(Parameters);
-	void generateAtomsAtScLattice(double, unsigned int, unsigned int, unsigned int);
-	void generateAtomsAtFccLattice(double, unsigned int, unsigned int, unsigned int);
-	void setupNeighbourLists(bool);
+
 	void distributeInitialVelocities();
+	void generateAtomsAtFccLattice(double, unsigned int, unsigned int, unsigned int);
+	void generateAtomsAtScLattice(double, unsigned int, unsigned int, unsigned int);
 	void generateCells();
 	void populateCells();
+	void setupNeighbourLists(bool);
+	void setupSystem(Parameters);
 
 public:
 	World() = default;
@@ -39,16 +42,15 @@ public:
 	Results getResults();
 
 	Atom* getAtomInAtomList(unsigned int);
+
 	Cell* getCellInCellList(unsigned int, unsigned int, unsigned int);
 
 	double getWorldVolume() const;
 
 	void addAtomToAtomList(Atom*);
 	void addCellToCellList(Cell*);
-
 	void calcPotentialAndForce();
 	void calcPotentialEnergy();
-
 	void calcPressure(double);
 	void solveEquationsOfMotion(double);
 

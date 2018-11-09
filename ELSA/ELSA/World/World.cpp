@@ -3,11 +3,9 @@
 
 using namespace std;
 
-World::World(Parameters p)
-{
-	setupSystem(p);
-}
-
+/* PRIVATE */
+//Function for incrementing the while loop in the setupNeighbourLists function.
+//Checks if we are to skip adding neighbour atoms in certain cells due to the simulation being in 2D.
 int World::incrementM(int m, unsigned int maxK, unsigned int lowerK, unsigned int upperK)
 {
 	double m_check = m;
@@ -39,13 +37,19 @@ int World::incrementM(int m, unsigned int maxK, unsigned int lowerK, unsigned in
 	}
 }
 
+/* PUBLIC */
+//Constructor.
+World::World(Parameters p)
+{
+	setupSystem(p);
+}
+
+//Initialize the MD software by setting up the system and creating atoms, cells and neighbour lists.
 void World::setupSystem(Parameters p)
 {
 	_myParameters = p;
-
 	_myResults = Results{ (int)p.getSimulationTime(), (int)p.getTimeStep(), (int)p.getNumberOfAtoms() };
 	_mySimulation = Simulation(p.getChosenMaterial());
-
 
 	unsigned int nOfUnitCellsX{ _myParameters.getNumberOfUnitCellsX() };
 	unsigned int nOfUnitCellsY{ _myParameters.getNumberOfUnitCellsY() };
@@ -69,6 +73,7 @@ void World::setupSystem(Parameters p)
 
 }
 
+//Populate an FCC lattice with atoms.
 void World::generateAtomsAtFccLattice(double latticeConstant, unsigned int nOfUnitCellsX, unsigned int nOfUnitCellsY, unsigned int nOfUnitCellsZ)
 {
 	unsigned int atomId{ 0 };
@@ -78,6 +83,7 @@ void World::generateAtomsAtFccLattice(double latticeConstant, unsigned int nOfUn
 		{
 			for (unsigned int x = 0; x < nOfUnitCellsX; x++)
 			{
+				//Place atoms in the corner and in the middle of the neighbouring sides of the "dice."
 				Atom* a0 = new Atom(atomId++, x*latticeConstant, y*latticeConstant, z*latticeConstant);
 				Atom* ax = new Atom(atomId++, x*latticeConstant, (y + 0.5)*latticeConstant, (z + 0.5)*latticeConstant);
 				Atom* ay = new Atom(atomId++, (x + 0.5)*latticeConstant, y*latticeConstant, (z + 0.5)*latticeConstant);
@@ -92,6 +98,7 @@ void World::generateAtomsAtFccLattice(double latticeConstant, unsigned int nOfUn
 	}
 }
 
+//Populate an SC lattice with atoms.
 void World::generateAtomsAtScLattice(double latticeConstant, unsigned int nOfUnitCellsX, unsigned int nOfUnitCellsY, unsigned int nOfUnitCellsZ)
 {
 	unsigned int atomId{ 0 };
@@ -108,20 +115,30 @@ void World::generateAtomsAtScLattice(double latticeConstant, unsigned int nOfUni
 	}
 }
 
+//Function for setting up the list of atoms that will contribute to a certain atom's potential.
 void World::setupNeighbourLists(bool is2D)
 {
-	double cutOffDistance{ _myParameters.getChosenMaterial().getCutOffDistance() };
+	//Distance between two atoms for the control if they are neighbours.
 	double atomDistance{ 0 };
+	double cutOffDistance{ _myParameters.getChosenMaterial().getCutOffDistance() };
+
+	//The maximum cell index in each dimension.
 	unsigned int maxI = _myParameters.getNumberOfCellsI() - 1;
 	unsigned int maxJ = _myParameters.getNumberOfCellsJ() - 1;
 	unsigned int maxK = _myParameters.getNumberOfCellsK() - 1;
 
+	//The length of the simulation box in each dimension.
 	double lengthX = _myParameters.getLengthX();
 	double lengthY = _myParameters.getLengthY();
 	double lengthZ = _myParameters.getLengthZ();
 
-
-	unsigned int i, j, k, lowerNeighbourI, upperNeighbourI, lowerNeighbourJ, upperNeighbourJ, lowerNeighbourK, upperNeighbourK;
+	//The cell index.
+	unsigned int i, j, k;
+	//The cell indices of a certain cell's neighbours.
+	unsigned int lowerNeighbourI, upperNeighbourI;
+	unsigned int lowerNeighbourJ, upperNeighbourJ;
+	unsigned int lowerNeighbourK, upperNeighbourK;
+	//Array containing all neighbouring cells' indices.
 	array<array<unsigned int, 3>, 27> index;
 
 	for (unsigned int atomId = 0; atomId < _myParameters.getNumberOfAtoms(); atomId++)
@@ -130,6 +147,7 @@ void World::setupNeighbourLists(bool is2D)
 		j = getAtomInAtomList(atomId)->getCellIndex()[1];
 		k = getAtomInAtomList(atomId)->getCellIndex()[2];
 		
+		//Standard case.
 		lowerNeighbourI = i - 1;
 		upperNeighbourI = i + 1 ;
 		lowerNeighbourJ = j - 1;
@@ -137,6 +155,7 @@ void World::setupNeighbourLists(bool is2D)
 		lowerNeighbourK = k - 1;
 		upperNeighbourK = k + 1;
 
+		//At sides, edges and corners, there is a special case for periodic boundary conditions.
 		if (i == 0)
 		{
 			lowerNeighbourI = maxI;
@@ -157,6 +176,7 @@ void World::setupNeighbourLists(bool is2D)
 			upperNeighbourJ = 0;
 			lowerNeighbourJ = j - 1;
 		}
+		//Except if it's 2D, then the periodic boundary conditions in the z-direction are removed.
 		if (!is2D)
 		{
 			if (k == 0)
@@ -171,6 +191,7 @@ void World::setupNeighbourLists(bool is2D)
 			}
 		}
 
+		//Fill the array of neighouring cell indices
 		index.at(0) = { lowerNeighbourI, lowerNeighbourJ, lowerNeighbourK };
 		index.at(1) = { lowerNeighbourI, lowerNeighbourJ, k };
 		index.at(2) = { lowerNeighbourI, lowerNeighbourJ, upperNeighbourK };
@@ -202,10 +223,12 @@ void World::setupNeighbourLists(bool is2D)
 		index.at(26) = { upperNeighbourI, upperNeighbourJ, upperNeighbourK };
 		
 		int m{ 0 };
+		//Special case for 2D not handled by the function incrementM.
 		if (k == 0 && is2D)
 		{
 			m = 1;
 		}
+		//Find the neighbouring atoms.
 		while (m <= 26)
 		{
 			for (unsigned int n{ 0 }; n < getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().size(); n++)
@@ -213,46 +236,55 @@ void World::setupNeighbourLists(bool is2D)
 				atomDistance = _mySimulation.calcDistance(getAtomInAtomList(atomId), 
 					getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n), 
 					lengthX, lengthY, lengthZ, is2D)[0];
-				if (atomDistance < cutOffDistance /*&& atomId < getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n)->getID()*/)
+				//Add neighbour to a certain atom if distance < cut-off and
+				//the neighbour's index is larger than its own.
+				if (atomDistance < cutOffDistance && atomId < getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n)->getID())
 				{
 					getAtomInAtomList(atomId)->addToNeighbourList(getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n));
 				}
 			}
 
+			//If it's 2D, some of the neighbouring cells should be discarded.
 			m = incrementM(m, maxK, lowerNeighbourK, upperNeighbourK);
 		}
 
 	}
 }
 
+//Set the atoms' velocities from temperature according to Maxwell-Boltzmann distribution 
 void World::distributeInitialVelocities()
 {
-	double sigma = sqrt(_myParameters.getBoltzmann() * _myParameters.getTemperature() / _myParameters.getChosenMaterial().getMass());
+	//double sigma = sqrt(_myParameters.getBoltzmann() * _myParameters.getTemperature() / _myParameters.getChosenMaterial().getMass());
+	double variance = _myParameters.getBoltzmann() * _myParameters.getTemperature() / _myParameters.getChosenMaterial().getMass();
+
+	array<double, 3> v;
 	
-	random_device rand;
-	mt19937 generator(rand());
-	normal_distribution<double> distribution(0, sigma);
+	//random_device rand;
+	//mt19937 generator(rand());
+	//normal_distribution<double> distribution(0, sigma);
 
 	for (unsigned int atomId = 0; atomId < _myParameters.getNumberOfAtoms(); atomId++)
 	{
-
-		_atomList.at(atomId)->setVelocityX( distribution(generator));
-		_atomList.at(atomId)->setVelocityY( distribution(generator));
-		_atomList.at(atomId)->setVelocityZ( distribution(generator));
+		v = _mySimulation.generateGaussianVelocity(variance);
+		_atomList.at(atomId)->setVelocityX(v[0]);
+		_atomList.at(atomId)->setVelocityY(v[1]);
+		_atomList.at(atomId)->setVelocityZ(v[2]);
 	}
 }
 
+//Creates cells for faster neighbourlist setup
 void World::generateCells()
 {
 	unsigned int nOfUnitCellsX{ _myParameters.getNumberOfUnitCellsX() };
 	unsigned int nOfUnitCellsY{ _myParameters.getNumberOfUnitCellsY() };
 	unsigned int nOfUnitCellsZ{ _myParameters.getNumberOfUnitCellsZ() };
+
 	double latticeConstant{ _myParameters.getChosenMaterial().getLatticeConstant() };
 	double cellSize{ _myParameters.getChosenMaterial().getCellSize() };
 
-	unsigned int numberOfCellsI{ (unsigned int)ceil(nOfUnitCellsX * latticeConstant / cellSize) };
-	unsigned int numberOfCellsJ{ (unsigned int)ceil(nOfUnitCellsY * latticeConstant / cellSize) };
-	unsigned int numberOfCellsK{ (unsigned int)ceil(nOfUnitCellsZ * latticeConstant / cellSize) };
+	unsigned int numberOfCellsI{ _myParameters.getNumberOfCellsI() };
+	unsigned int numberOfCellsJ{ _myParameters.getNumberOfCellsJ() };
+	unsigned int numberOfCellsK{ _myParameters.getNumberOfCellsK() };
 
 	for (unsigned int k = 0; k < numberOfCellsK; k++)
 	{
@@ -267,6 +299,7 @@ void World::generateCells()
 	}
 }
 
+//Add atoms to the cells
 void World::populateCells()
 {
 	unsigned int i;
@@ -279,55 +312,60 @@ void World::populateCells()
 	{
 		Atom* a = getAtomInAtomList(atomId);
 
-		i = (unsigned int)floor(a->getPosX() / cellSize);
-		j = (unsigned int)floor(a->getPosY() / cellSize);
-		k = (unsigned int)floor(a->getPosZ() / cellSize);
+		//Find index of the cell tha atom is currently in
+		i = (unsigned int)floor(a->getPositionX() / cellSize);
+		j = (unsigned int)floor(a->getPositionY() / cellSize);
+		k = (unsigned int)floor(a->getPositionZ() / cellSize);
 
 		getCellInCellList(i, j, k)->addAtomToCellList(a);
 		a->setCellIndex(i, j, k);
 	}
 }
 
+//Get atom from the atom list at index
 Atom* World::getAtomInAtomList(unsigned int index)
 {
 	return _atomList.at(index);
 }
 
-
+//Get cell from the cell list at index i, j, k
 Cell* World::getCellInCellList(unsigned int i, unsigned int j, unsigned int k)
 {
 	unsigned int index = i + j * _myParameters.getNumberOfCellsI() + k * _myParameters.getNumberOfCellsI()*_myParameters.getNumberOfCellsJ();
 	return _cellList.at(index);
 }
 
+//Returns results object
 Results World::getResults()
 {
 	return _myResults;
 }
 
+//Gets the volume of the simulation box
 double World::getWorldVolume() const
 {
 	double numberOfUnitCells = _myParameters.getNumberOfUnitCellsX()*_myParameters.getNumberOfUnitCellsY()*_myParameters.getNumberOfUnitCellsZ();
 	return numberOfUnitCells*pow(_myParameters.getChosenMaterial().getLatticeConstant(), 3);
 }
 
+//Append atom to the atom list
 void World::addAtomToAtomList(Atom* a)
 {
 	_atomList.push_back(a);
 }
 
+//Append cell to the cell list
 void World::addCellToCellList(Cell* c)
 {
 	_cellList.push_back(c);
 }
 
-
 //	Calculates the force and potential and stores them in the atoms. The force is directional but the potential is not.
 void World::calcPotentialAndForce()
 {
-	double pot{0};
-	double f{0};
-	array<double, 3> force;
+	double potential{0};
+	double force{0};
+	//array<double, 3> force;
 	Atom* a1;
 	Atom* a2;
 	array<double, 4> r;
@@ -341,19 +379,19 @@ void World::calcPotentialAndForce()
 			
 			// Returns the distance as a homogeneous vector
 			r = _mySimulation.calcDistance(a1, a2, _myParameters.getLengthX(), _myParameters.getLengthY(), _myParameters.getLengthZ(), _myParameters.getIs2D());
-			f = _mySimulation.calcForce(r[0]);
+			force = _mySimulation.calcForce(r[0]);
 
-			pot = _mySimulation.calcLJPotential(r[0]);
+			potential = _mySimulation.calcLJPotential(r[0]);
 
-			a1->setPotential(a1->getPotential() + pot);
-			a2->setPotential(a2->getPotential() + pot);
+			a1->setPotential(a1->getPotential() + potential);
+			a2->setPotential(a2->getPotential() + potential);
 
-			a1->setForceX(a1->getForceX() + force[0]);
-			a2->setForceX(a2->getForceX() - force[0]);
-			a1->setForceY(a1->getForceY() + force[1]);
-			a2->setForceY(a2->getForceY() - force[1]);
-			a1->setForceZ(a1->getForceZ() + force[2]);
-			a2->setForceZ(a2->getForceZ() - force[2]);
+			a1->setForceX(a1->getForceX() + force*r[1]);
+			a2->setForceX(a2->getForceX() - force*r[1]);
+			a1->setForceY(a1->getForceY() + force*r[2]);
+			a2->setForceY(a2->getForceY() - force*r[2]);
+			a1->setForceZ(a1->getForceZ() + force*r[3]);
+			a2->setForceZ(a2->getForceZ() - force*r[3]);
 		}
 	}
 }
@@ -369,7 +407,7 @@ void World::calcPotentialEnergy()
 	}
 }
 
-
+//Calculate the internal pressure at a certain time
 void World::calcPressure(double elapsedTime)
 {
 	double pressure{0};
@@ -422,11 +460,11 @@ void World::solveEquationsOfMotion(double elapsedTime)
 	uniform_real_distribution<double> distribution(0, 1);
 	double randomValue;
 
-	//Go through the atom list and assign new positions and velocities using the Velociy Verlet Algorithm.
+	//Go through the atom list and assign new positions and velocities using the Velocity Verlet Algorithm.
 	for (int i{ 0 }; i < _atomList.size(); i++)
 	{
 		thisAtom = _atomList.at(i);
-		oldR = {thisAtom->getPosX(), thisAtom->getPosY(), thisAtom->getPosZ()};
+		oldR = {thisAtom->getPositionX(), thisAtom->getPositionY(), thisAtom->getPositionZ()};
 		oldV = {thisAtom->getVelocityX(), thisAtom->getVelocityY(), thisAtom->getVelocityZ()};
 		oldA = _mySimulation.calcAcceleration(thisAtom->getForceX(), thisAtom->getForceY(), thisAtom->getForceZ());
 
@@ -448,7 +486,7 @@ void World::solveEquationsOfMotion(double elapsedTime)
 	_myResults.setKineticEnergy(K, (int) (elapsedTime / timeStep));
 	_myResults.setTemperature(T, (int) (elapsedTime / timeStep));
 
-	if (T > 0)
+	if (T > 0 && _myParameters.getIsThermostatOn())
 	{
 		//Anderson thermostat.
 		for (int i{ 0 }; i < _atomList.size(); i++)
