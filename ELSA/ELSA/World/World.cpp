@@ -7,6 +7,37 @@ World::World(Parameters p)
 	setupSystem(p);
 }
 
+int World::incrementM(int m, unsigned int maxK, unsigned int lowerK, unsigned int upperK)
+{
+	double m_check = m;
+	if (upperK <= maxK && lowerK < maxK)
+	{
+		return m + 1;
+	}
+	else if (upperK > maxK)
+	{
+		if ((m - 1) / 3 == (m_check - 1) / 3)
+		{
+			return m + 2;
+		}
+		else
+		{
+			return m + 1;
+		}
+	}
+	else
+	{
+		if ((m + 1) / 3 == (m_check + 1) / 3)
+		{
+			return m + 2;
+		}
+		else
+		{
+			return m + 1;
+		}
+	}
+}
+
 void World::setupSystem(Parameters p)
 {
 	_myParameters = p;
@@ -31,7 +62,7 @@ void World::setupSystem(Parameters p)
 	generateCells();
 	populateCells();
 
-	setupNeighbourLists();
+	setupNeighbourLists(_myParameters.getIs2D());
 	distributeInitialVelocities();
 
 }
@@ -75,7 +106,7 @@ void World::generateAtomsAtScLattice(double latticeConstant, unsigned int nOfUni
 	}
 }
 
-void World::setupNeighbourLists()
+void World::setupNeighbourLists(bool is2D)
 {
 	double cutOffDistance{ _myParameters.getChosenMaterial().getCutOffDistance() };
 	double atomDistance{ 0 };
@@ -83,9 +114,9 @@ void World::setupNeighbourLists()
 	unsigned int maxJ = _myParameters.getNumberOfCellsJ() - 1;
 	unsigned int maxK = _myParameters.getNumberOfCellsK() - 1;
 	unsigned int i, j, k, lowerNeighbourI, upperNeighbourI, lowerNeighbourJ, upperNeighbourJ, lowerNeighbourK, upperNeighbourK;
+	array<array<unsigned int, 3>, 27> index;
 	for (unsigned int atomId = 0; atomId < _myParameters.getNumberOfAtoms(); atomId++)
 	{
-		array<array<unsigned int,3>, 27> index; 
 		i = getAtomInAtomList(atomId)->getCellIndex()[0];
 		j = getAtomInAtomList(atomId)->getCellIndex()[1];
 		k = getAtomInAtomList(atomId)->getCellIndex()[2];
@@ -117,15 +148,18 @@ void World::setupNeighbourLists()
 			upperNeighbourJ = 0;
 			lowerNeighbourJ = j - 1;
 		}
-		if (k == 0)
+		if (!is2D)
 		{
-			lowerNeighbourK = maxK;
-			upperNeighbourK = k + 1;
-		}
-		else if (k == maxK)
-		{
-			lowerNeighbourK = k - 1;
-			upperNeighbourK = 0;
+			if (k == 0)
+			{
+				lowerNeighbourK = maxK;
+				upperNeighbourK = k + 1;
+			}
+			else if (k == maxK)
+			{
+				lowerNeighbourK = k - 1;
+				upperNeighbourK = 0;
+			}
 		}
 
 		index.at(0) = { lowerNeighbourI, lowerNeighbourJ, lowerNeighbourK };
@@ -158,8 +192,13 @@ void World::setupNeighbourLists()
 		index.at(25) = { upperNeighbourI, upperNeighbourJ, k };
 		index.at(26) = { upperNeighbourI, upperNeighbourJ, upperNeighbourK };
 		
-		for (unsigned int m{ 0 }; m <= 26; m++)
-		{	
+		int m{ 0 };
+		if (k == 0)
+		{
+			m = 1;
+		}
+		while (m <= 26)
+		{
 			for (unsigned int n{ 0 }; n < getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().size(); n++)
 			{
 				atomDistance = _mySimulation.calcDistance(getAtomInAtomList(atomId), getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n))[0];
@@ -168,6 +207,8 @@ void World::setupNeighbourLists()
 					getAtomInAtomList(atomId)->addToNeighbourList(getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n));
 				}
 			}
+
+			m = incrementM(m, maxK, lowerNeighbourK, upperNeighbourK);
 		}
 
 	}

@@ -20,14 +20,17 @@ private:
 	Parameters _myParameters;
 	Results _myResults;
 	Simulation _mySimulation;
+
+	int incrementM(int, unsigned int, unsigned int, unsigned int);
 	
 	void setupSystem(Parameters);
 	void generateAtomsAtScLattice(double, unsigned int, unsigned int, unsigned int);
 	void generateAtomsAtFccLattice(double, unsigned int, unsigned int, unsigned int);
-	void setupNeighbourLists();
+	void setupNeighbourLists(bool);
 	void distributeInitialVelocities();
 	void generateCells();
 	void populateCells();
+
 public:
 	World(Parameters);
 	~World() = default;

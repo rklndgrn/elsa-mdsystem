@@ -13,12 +13,10 @@ using namespace std;
 int main()
 {
 	Material anotherMaterial("sc", 2, 1, 1, 2, 100);
-	Parameters myParameters(1, 1, 3, 3, 3, 10000, 10, false, false, anotherMaterial);
+	Parameters myParameters(1, 1, 3, 3, 3, 10000, 10, false, true, anotherMaterial);
 
 
 	World myWorld(myParameters);
-
-	double Ken1{ 0 }, Ken2;
 
 	
 	for (unsigned int i = 0; i < myParameters.getNumberOfAtoms(); i++)
