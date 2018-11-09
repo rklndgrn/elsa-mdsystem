@@ -50,10 +50,12 @@ int main()
 	ofstream myfile;
 	myfile.open("erik.txt");
 
+	int numberOfNeighbours{ 0 };
 	for (unsigned int i = 0; i < myParameters.getNumberOfAtoms(); i++)
 	{
-	/*	cout << " id: " << myworld.getatominatomlist(i)->getid();
-		cout <<
+		numberOfNeighbours = 0;
+		cout << " id: " << myWorld.getAtomInAtomList(i)->getID();
+		/*cout <<
 			" x: " << myworld.getatominatomlist(i)->getx() <<
 			" y: " << myworld.getatominatomlist(i)->getvelocityy() <<
 			" z: " << myworld.getatominatomlist(i)->getvelocityz() << endl;*/
@@ -69,8 +71,11 @@ int main()
 		cout << " nid: ";
 		for (unsigned int j = 0; j < myWorld.getAtomInAtomList(i)->getNeighbourList().size(); j++)
 		{
-			cout << myWorld.getAtomInAtomList(i)->getNeighbourList()[j]->getID() << ", ";
+			//cout << myWorld.getAtomInAtomList(i)->getNeighbourList()[j]->getID() << ", ";
+			numberOfNeighbours++;
+
 		}
+		cout << numberOfNeighbours;
 		cout << endl;
 	}
 

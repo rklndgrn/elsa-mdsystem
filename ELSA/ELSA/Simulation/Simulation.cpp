@@ -59,6 +59,84 @@ array<double, 4> Simulation::calcDistance(Atom* a1, Atom* a2) const
 	return temp;
 }
 
+array<double, 4> Simulation::calcDistanceWithBoundaryCondition(Atom* a1, Atom* a2, double lengthX, double lengthY, double lengthZ) const
+{
+	double rx, ry, rz, r;
+	rx = a1->getPosX() - a2->getPosX();
+	if (rx > lengthX / 2.0)
+	{
+		rx -= lengthX;
+	}
+	else if (rx < -lengthX / 2.0)
+	{
+		rx += lengthX;
+	}
+	ry = a1->getPosY() - a2->getPosY();
+	if (ry > lengthY / 2.0)
+	{
+		ry -= lengthY;
+	}
+	else if (ry < -lengthY / 2.0)
+	{
+		ry += lengthY;
+	}
+	rz = a1->getPosZ() - a2->getPosZ();
+	if (rz > lengthZ / 2.0)
+	{
+		rz -= lengthZ;
+	}
+	else if (rz < -lengthZ / 2.0)
+	{
+		rz += lengthZ;
+	}
+	r = sqrt(pow(rx, 2) + pow(ry, 2) + pow(rz, 2));
+	rx = rx / r;
+	ry = ry / r;
+	rz = rz / r;
+	array<double, 4> temp = { r, rx, ry, rz };
+	return temp;
+}
+array<double, 4> Simulation::calcDistanceWithBoundaryCondition(Atom* a1, Atom* a2, double lengthX, double lengthY, double lengthZ, bool is2D) const
+{
+	double rx, ry, rz, r;
+	rx = a1->getPosX() - a2->getPosX();
+	if (rx > lengthX / 2.0)
+	{
+		rx -= lengthX;
+	}
+	else if (rx < -lengthX / 2.0)
+	{
+		rx += lengthX;
+	}
+	ry = a1->getPosY() - a2->getPosY();
+	if (ry > lengthY / 2.0)
+	{
+		ry -= lengthY;
+	}
+	else if (ry < -lengthY / 2.0)
+	{
+		ry += lengthY;
+	}
+	rz = a1->getPosZ() - a2->getPosZ();
+	if (!is2D)
+	{
+		if (rz > lengthZ / 2.0)
+		{
+			rz -= lengthZ;
+		}
+		else if (rz < -lengthZ / 2.0)
+		{
+			rz += lengthZ;
+		}
+	}
+	r = sqrt(pow(rx, 2) + pow(ry, 2) + pow(rz, 2));
+	rx = rx / r;
+	ry = ry / r;
+	rz = rz / r;
+	array<double, 4> temp = { r, rx, ry, rz };
+	return temp;
+}
+
 //Function to calculate the position using the Velocity Verlet Algorithm.
 array<double, 3> Simulation::calcPosition(std::array<double, 3> r, std::array<double, 3> v, std::array<double, 3> a, double timeStep)
 {

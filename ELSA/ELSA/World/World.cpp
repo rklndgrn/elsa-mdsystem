@@ -87,6 +87,11 @@ void World::setupNeighbourLists()
 	unsigned int maxI = _myParameters.getNumberOfCellsI() - 1;
 	unsigned int maxJ = _myParameters.getNumberOfCellsJ() - 1;
 	unsigned int maxK = _myParameters.getNumberOfCellsK() - 1;
+
+	unsigned int lengthX = _myParameters.getNumberOfUnitCellsX()*_myParameters.getChosenMaterial().getLatticeConstant();
+	unsigned int lengthY = _myParameters.getNumberOfUnitCellsY()*_myParameters.getChosenMaterial().getLatticeConstant();
+	unsigned int lengthZ = _myParameters.getNumberOfUnitCellsZ()*_myParameters.getChosenMaterial().getLatticeConstant();
+
 	for (unsigned int atomId = 0; atomId < _myParameters.getNumberOfAtoms(); atomId++)
 	{
 		array<array<unsigned int,3>, 27> index; 
@@ -924,8 +929,10 @@ void World::setupNeighbourLists()
 		{	
 			for (unsigned int n{ 0 }; n < getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().size(); n++)
 			{
-				atomDistance = _mySimulation.calcDistance(getAtomInAtomList(atomId), getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n))[0];
-				if (atomDistance < cutOffDistance /*&& atomId < getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n)->getID()*/)
+				atomDistance = _mySimulation.calcDistanceWithBoundaryCondition(getAtomInAtomList(atomId), 
+					getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n), 
+					lengthX, lengthY, lengthZ)[0];
+				if (atomDistance < cutOffDistance && atomId < getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n)->getID())
 				{
 					getAtomInAtomList(atomId)->addToNeighbourList(getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n));
 				}
