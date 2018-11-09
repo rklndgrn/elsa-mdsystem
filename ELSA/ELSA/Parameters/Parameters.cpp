@@ -102,14 +102,19 @@ unsigned int Parameters::getNumberOfCellsK() const
 	return _numberOfCellsK;
 }
 
-double Parameters::getTemperature() const
+double Parameters::getBoltzmann() const
 {
-	return _temperature;
+	return _boltzmann;
 }
 
 double Parameters::getCollisionFrequency() const
 {
 	return _collisionFrequency;
+}
+
+double Parameters::getTemperature() const
+{
+	return _temperature;
 }
 
 bool Parameters::getIsThermostatOn() const

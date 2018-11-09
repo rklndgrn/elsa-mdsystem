@@ -6,7 +6,11 @@
 #include "../Parameters/Parameters.h"
 #include "../Results/Results.h"
 #include "../Simulation/Simulation.h"
+
+#include <cmath>
+#include <iostream>
 #include <vector>
+#include <random>
 
 class World
 {
@@ -39,7 +43,6 @@ public:
 	void calcPotentialAndForce();
 
 	void calcPotentialEnergy();
-	void calcKineticEnergy();
 };
 
 #endif
