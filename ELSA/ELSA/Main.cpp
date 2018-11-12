@@ -13,7 +13,7 @@ using namespace std;
 int main()
 {
 	//Material(crystalStructure, latticeConstant, epsilon, sigma, cutOffDistance, mass)
-	Material anotherMaterial("fcc", 408.53e-12, 0.34*(1.6021766208E-19), 2.65e-10, 7e-10, 107.8682*(1.660539040e-27));
+	Material anotherMaterial("sc", 408.53e-12, 0.34*(1.6021766208E-19), 2.65e-10, 7e-10, 107.8682*(1.660539040e-27));
 	//Parameters(timeStep, simulationTime, numberOfUnitCellsX, numberOfUnitCellsY, numberOfUnitCellsZ,
 	//			temperature, collisionFrequency, isThermostatOn, is2D, chosenMaterial)
 	Parameters myParameters(1e-12, 1e-10, 10, 10, 10, 10, 10, false, false, anotherMaterial);
@@ -36,6 +36,11 @@ int main()
 	
 	for (double t = deltaT; t <= myParameters.getSimulationTime() - deltaT; t += deltaT)
 	{
+		if (t > deltaT)
+		{
+			myWorld.updateCells();
+			myWorld.updateNeighbourList();
+		}
 		myWorld.calcPotentialAndForce(t);
 		myWorld.solveEquationsOfMotion(t);
 		myWorld.calcPressure(t);

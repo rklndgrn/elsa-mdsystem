@@ -62,6 +62,8 @@ public:
 	void calcPotentialEnergy(double);
 	void calcPressure(double);
 	void solveEquationsOfMotion(double);
+	void updateCells();
+	void updateNeighbourList();
 
 };
 
