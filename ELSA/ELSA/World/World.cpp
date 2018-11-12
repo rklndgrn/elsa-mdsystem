@@ -589,10 +589,11 @@ void World::solveEquationsOfMotion(double elapsedTime)
 				_myResults.setPositions(newR[0], newR[1], newR[2], (int)round(elapsedTime / timeStep), i);
 			}
 
-			newV = _mySimulation.calcVelocity(oldV, oldA, timeStep);
+			newV = _mySimulation.calcVelocity(oldV, oldA, newA, timeStep);
 
 			thisAtom->setPosition(newR);
 			thisAtom->setVelocity(newV);
+			thisAtom->setAcceleration(newA);
 
 			K += _mySimulation.calcKineticEnergy(newV[0], newV[1], newV[2]);
 		}

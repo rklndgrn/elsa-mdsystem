@@ -30,7 +30,7 @@ public:
 	std::array<double, 3> calcAcceleration(double, double, double);
 	std::array<double, 4> calcDistance(Atom*, Atom*, double, double, double, bool) const;
 	std::array<double, 3> calcPosition(std::array<double, 3>, std::array<double, 3>, std::array<double, 3>, double);
-	std::array<double, 3> calcVelocity(std::array<double, 3>, std::array<double, 3>, double);
+	std::array<double, 3> calcVelocity(std::array<double, 3>, std::array<double, 3>, std::array<double, 3>, double);
 	std::array<double, 3> generateGaussianVelocity(double);
 
 };

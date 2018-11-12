@@ -13,7 +13,7 @@ using namespace std;
 int main()
 {
 	//Material(crystalStructure, latticeConstant, epsilon, sigma, cutOffDistance, mass)
-	Material anotherMaterial("sc", 408.53e-12, 0.34*(1.6021766208E-19), 2.65e-10, 7e-10, 107.8682*(1.660539040e-27));
+	Material anotherMaterial("fcc", 408.53e-12, 0.34*(1.6021766208E-19), 2.65e-10, 7e-10, 107.8682*(1.660539040e-27));
 	//Parameters(timeStep, simulationTime, numberOfUnitCellsX, numberOfUnitCellsY, numberOfUnitCellsZ,
 	//			temperature, collisionFrequency, isThermostatOn, is2D, chosenMaterial)
 	Parameters myParameters(1e-12, 1e-10, 10, 10, 10, 10, 10, false, false, anotherMaterial);
@@ -29,10 +29,11 @@ int main()
 	double deltaT = myParameters.getTimeStep();
 
 	cout << "Time 0: " << endl;
-	//cout << "   Velocity of atom 0: (" << myWorld.getAtomInAtomList(0)->getVelocityX() << ", " << myWorld.getAtomInAtomList(0)->getVelocityY() << ", " << myWorld.getAtomInAtomList(0)->getVelocityZ() << ")" << endl;
-	cout << "   Potential energy: " << U[index] << endl;
-	cout << "   Kinetic energy: " << K[index] << endl;
+	//cout << "   Potential energy: " << U[index] << endl;
+	//cout << "   Kinetic energy: " << K[index] << endl;
 	//cout << "   Temperature: " << T[index] << endl;
+	cout << "   Position of atom 555: (" << myWorld.getAtomInAtomList(555)->getPositionX() << ", " << myWorld.getAtomInAtomList(555)->getPositionY() << ", " << myWorld.getAtomInAtomList(555)->getPositionZ() << ")" << endl;
+	cout << "   Velocity of atom 555: (" << myWorld.getAtomInAtomList(555)->getVelocityX() << ", " << myWorld.getAtomInAtomList(555)->getVelocityY() << ", " << myWorld.getAtomInAtomList(555)->getVelocityZ() << ")" << endl;
 	
 	for (double t = deltaT; t <= myParameters.getSimulationTime() - deltaT; t += deltaT)
 	{
@@ -50,13 +51,14 @@ int main()
 		index = (int)round(t / deltaT);
 		
 		cout << "Time " << t << ": " << endl;
+		cout << "   Position of atom 555: (" << myWorld.getAtomInAtomList(555)->getPositionX() << ", " << myWorld.getAtomInAtomList(555)->getPositionY() << ", " << myWorld.getAtomInAtomList(555)->getPositionZ() << ")" << endl;
+		cout << "   Velocity of atom 555: (" << myWorld.getAtomInAtomList(555)->getVelocityX() << ", " << myWorld.getAtomInAtomList(555)->getVelocityY() << ", " << myWorld.getAtomInAtomList(555)->getVelocityZ() << ")" << endl;
 		
-		cout << "   Potential energy: " << U[index] << endl;
-		cout << "   Kinetic energy: " << K[index] << endl;
+		//cout << "   Potential energy: " << U[index] << endl;
+		//cout << "   Kinetic energy: " << K[index] << endl;
 		cout << "   Total energy: " << U[index] + K[index] << endl;
 		//cout << "   Temperature: " << T[index] << endl;
 		
-		//cout << "   Velocity of atom 0: (" << myWorld.getAtomInAtomList(0)->getVelocityX() << ", " << myWorld.getAtomInAtomList(0)->getVelocityY() << ", " << myWorld.getAtomInAtomList(0)->getVelocityZ() << ")" << endl;
 	}
 	
 

@@ -125,22 +125,22 @@ vector<Atom*> Atom::getNeighbourList() const
 
 //Setters
 
-void Atom::setAccelerationX(double newPos)
+void Atom::setAccelerationX(double a)
 {
 	_previousAcceleration[0] = _acceleration[0];
-	_acceleration[0] = newPos;
+	_acceleration[0] = a;
 }
 
-void Atom::setAccelerationY(double newPos)
+void Atom::setAccelerationY(double a)
 {
 	_previousAcceleration[1] = _acceleration[1];
-	_acceleration[1] = newPos;
+	_acceleration[1] = a;
 }
 
-void Atom::setAccelerationZ(double newPos)
+void Atom::setAccelerationZ(double a)
 {
 	_previousAcceleration[2] = _acceleration[2];
-	_acceleration[2] = newPos;
+	_acceleration[2] = a;
 }
 
 void Atom::setAcceleration(array<double, 3> a)
