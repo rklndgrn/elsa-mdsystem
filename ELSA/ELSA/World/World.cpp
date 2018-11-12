@@ -578,7 +578,7 @@ void World::solveEquationsOfMotion(double elapsedTime)
 			thisAtom = _atomList.at(i);
 			oldR = { thisAtom->getPositionX(), thisAtom->getPositionY(), thisAtom->getPositionZ() };
 			oldV = { thisAtom->getVelocityX(), thisAtom->getVelocityY(), thisAtom->getVelocityZ() };
-			oldA = { thisAtom->getPreviousAccelerationX(), thisAtom->getPreviousAccelerationY(), thisAtom->getPreviousAccelerationZ() };
+			oldA = { thisAtom->getAccelerationX(), thisAtom->getAccelerationY(), thisAtom->getAccelerationZ() };
 			newA = _mySimulation.calcAcceleration(thisAtom->getForceX(), thisAtom->getForceY(), thisAtom->getForceZ());
 
 			newR = _mySimulation.calcPosition(oldR, oldV, oldA, timeStep);
