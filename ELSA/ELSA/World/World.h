@@ -27,6 +27,8 @@ private:
 
 	double _pressureRFSum{ 0 };
 
+	int numberOfThreads{ 4 };
+
 	//Member functions
 	int incrementM(int, unsigned int, unsigned int, unsigned int);
 	void correctPositions(std::array<double, 3>&);

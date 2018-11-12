@@ -172,16 +172,16 @@ void World::setupNeighbourLists(bool is2D)
 	unsigned int lowerNeighbourK, upperNeighbourK;
 	//Array containing all neighbouring cells' indices.
 	array<array<unsigned int, 3>, 27> index;
-
+	
 	for (unsigned int atomId = 0; atomId < _myParameters.getNumberOfAtoms(); atomId++)
 	{
 		i = getAtomInAtomList(atomId)->getCellIndex()[0];
 		j = getAtomInAtomList(atomId)->getCellIndex()[1];
 		k = getAtomInAtomList(atomId)->getCellIndex()[2];
-		
+
 		//Standard case.
 		lowerNeighbourI = i - 1;
-		upperNeighbourI = i + 1 ;
+		upperNeighbourI = i + 1;
 		lowerNeighbourJ = j - 1;
 		upperNeighbourJ = j + 1;
 		lowerNeighbourK = k - 1;
@@ -207,7 +207,7 @@ void World::setupNeighbourLists(bool is2D)
 		{
 			upperNeighbourJ = 0;
 			lowerNeighbourJ = j - 1;
-		}
+			}
 		//Except if it's 2D, then the periodic boundary conditions in the z-direction are removed.
 		if (!is2D)
 		{
@@ -222,7 +222,6 @@ void World::setupNeighbourLists(bool is2D)
 				upperNeighbourK = 0;
 			}
 		}
-
 		//Fill the array of neighouring cell indices
 		index.at(0) = { lowerNeighbourI, lowerNeighbourJ, lowerNeighbourK };
 		index.at(1) = { lowerNeighbourI, lowerNeighbourJ, k };
@@ -243,7 +242,6 @@ void World::setupNeighbourLists(bool is2D)
 		index.at(15) = { i, upperNeighbourJ, lowerNeighbourK };
 		index.at(16) = { i, upperNeighbourJ, k };
 		index.at(17) = { i, upperNeighbourJ, upperNeighbourK };
-
 		index.at(18) = { upperNeighbourI, lowerNeighbourJ, lowerNeighbourK };
 		index.at(19) = { upperNeighbourI, lowerNeighbourJ, k };
 		index.at(20) = { upperNeighbourI, lowerNeighbourJ, upperNeighbourK };
@@ -253,7 +251,7 @@ void World::setupNeighbourLists(bool is2D)
 		index.at(24) = { upperNeighbourI, upperNeighbourJ, lowerNeighbourK };
 		index.at(25) = { upperNeighbourI, upperNeighbourJ, k };
 		index.at(26) = { upperNeighbourI, upperNeighbourJ, upperNeighbourK };
-		
+
 		int m{ 0 };
 		//Special case for 2D not handled by the function incrementM.
 		if (k == 0 && is2D)
@@ -265,27 +263,27 @@ void World::setupNeighbourLists(bool is2D)
 		{
 			for (unsigned int n{ 0 }; n < getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().size(); n++)
 			{
-				atomDistance = _mySimulation.calcDistance(getAtomInAtomList(atomId), 
-					getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n), 
+				atomDistance = _mySimulation.calcDistance(getAtomInAtomList(atomId),
+					getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n),
 					lengthX, lengthY, lengthZ, is2D)[0];
 				//Add neighbour to a certain atom if distance < cut-off and
 				//the neighbour's index is larger than its own.
 				if (atomDistance < cutOffDistance && atomId < getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n)->getID())
 				{
-					getAtomInAtomList(atomId)->addToNeighbourList(getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n));
+						getAtomInAtomList(atomId)->addToNeighbourList(getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n));
 				}
 			}
 
 			//If it's 2D, some of the neighbouring cells should be discarded.
 			m = incrementM(m, maxK, lowerNeighbourK, upperNeighbourK);
 		}
-
 	}
 }
 
 //Set the atoms' velocities from temperature according to Maxwell-Boltzmann distribution 
 void World::distributeInitialVelocities()
 {
+	omp_set_num_threads(numberOfThreads);
 	//double sigma = sqrt(_myParameters.getBoltzmann() * _myParameters.getTemperature() / _myParameters.getChosenMaterial().getMass());
 	double variance = _myParameters.getBoltzmann() * _myParameters.getTemperature() / _myParameters.getChosenMaterial().getMass();
 
@@ -295,12 +293,16 @@ void World::distributeInitialVelocities()
 	//mt19937 generator(rand());
 	//normal_distribution<double> distribution(0, sigma);
 
-	for (unsigned int atomId = 0; atomId < _myParameters.getNumberOfAtoms(); atomId++)
+	#pragma omp parallel private(v) shared(variance)
 	{
-		v = _mySimulation.generateGaussianVelocity(variance);
-		_atomList.at(atomId)->setVelocityX(v[0]);
-		_atomList.at(atomId)->setVelocityY(v[1]);
-		_atomList.at(atomId)->setVelocityZ(v[2]);
+		#pragma omp for
+		for (int atomId = 0; atomId < (int) _myParameters.getNumberOfAtoms(); atomId++)
+		{
+			v = _mySimulation.generateGaussianVelocity(variance);
+			_atomList.at(atomId)->setVelocityX(v[0]);
+			_atomList.at(atomId)->setVelocityY(v[1]);
+			_atomList.at(atomId)->setVelocityZ(v[2]);
+		}
 	}
 }
 
@@ -334,7 +336,7 @@ void World::generateCells()
 //Add atoms to the cells
 void World::populateCells()
 {
-	omp_set_num_threads(4);
+	omp_set_num_threads(numberOfThreads);
 
 	unsigned int i;
 	unsigned int j;
@@ -356,10 +358,8 @@ void World::populateCells()
 			j = (unsigned int)floor(a->getPositionY() / cellSize);
 			k = (unsigned int)floor(a->getPositionZ() / cellSize);
 			
-			#pragma omp critical
-			{
-				getCellInCellList(i, j, k)->addAtomToCellList(a);
-			}
+			
+			getCellInCellList(i, j, k)->addAtomToCellList(a);
 			a->setCellIndex(i, j, k);
 		}
 	}
@@ -470,6 +470,8 @@ void World::calcPressure(double elapsedTime)
 //Function to solve the equations of motion. Finds new velocities and positions of atoms and calculates their kinetic energy and temperature.
 void World::solveEquationsOfMotion(double elapsedTime)
 {
+	omp_set_num_threads(numberOfThreads);
+
 	Atom* thisAtom;
 	array<double, 3> oldR;
 	array<double, 3> oldV;
