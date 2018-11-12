@@ -65,29 +65,29 @@ bool World::checkM(int m, bool is2D, unsigned int maxK, unsigned int lowerK, uns
 //Correct positions according to periodic boundary conditions
 void World::correctPositions(array<double, 3>& r)
 {
-	if (r[0] < 0)
+	while (r[0] < 0)
 	{
 		r[0] += _myParameters.getLengthX();
 	}
-	else if (r[0] > _myParameters.getLengthX())
+	while (r[0] > _myParameters.getLengthX())
 	{
 		r[0] -= _myParameters.getLengthX();
 	}
-	if (r[1] < 0)
+	while (r[1] < 0)
 	{
 		r[1] += _myParameters.getLengthY();
 	}
-	else if (r[1] > _myParameters.getLengthY())
+	while (r[1] > _myParameters.getLengthY())
 	{
 		r[1] -= _myParameters.getLengthY();
 	}
 	if (!_myParameters.getIs2D())
 	{
-		if (r[2] < 0)
+		while (r[2] < 0)
 		{
 			r[2] += _myParameters.getLengthZ();
 		}
-		else if (r[2] > _myParameters.getLengthZ())
+		while (r[2] > _myParameters.getLengthZ())
 		{
 			r[2] -= _myParameters.getLengthZ();
 		}
@@ -114,6 +114,41 @@ void World::initializeAtoms()
 	}
 	_myResults.setKineticEnergy(K, 0);
 	calcPressure(0);
+}
+
+//Add atoms to the cells
+void World::populateCells()
+{
+	omp_set_num_threads(numberOfThreads);
+
+	unsigned int i;
+	unsigned int j;
+	unsigned int k;
+
+	double cellSize{ _myParameters.getChosenMaterial().getCellSize() };
+	Atom* a;
+
+
+#pragma omp parallel shared(cellSize) private(a, i, j, k)
+	{
+#pragma omp for schedule(static)
+		for (int atomId = 0; atomId < (int)_myParameters.getNumberOfAtoms(); atomId++)
+		{
+			a = getAtomInAtomList(atomId);
+
+			//Find index of the cell tha atom is currently in
+			i = (unsigned int)floor(a->getPositionX() / cellSize);
+			j = (unsigned int)floor(a->getPositionY() / cellSize);
+			k = (unsigned int)floor(a->getPositionZ() / cellSize);
+
+
+#pragma omp critical
+			{
+				getCellInCellList(i, j, k)->addAtomToCellList(a);
+				a->setCellIndex(i, j, k);
+			}
+		}
+	}
 }
 
 /* PUBLIC */
@@ -406,41 +441,6 @@ void World::generateCells()
 	}
 }
 
-//Add atoms to the cells
-void World::populateCells()
-{
-	omp_set_num_threads(numberOfThreads);
-
-	unsigned int i;
-	unsigned int j;
-	unsigned int k;
-
-	double cellSize{ _myParameters.getChosenMaterial().getCellSize() };
-	Atom* a;
-
-
-	#pragma omp parallel shared(cellSize) private(a, i, j, k)
-	{
-		#pragma omp for schedule(static)
-		for (int atomId = 0; atomId < (int) _myParameters.getNumberOfAtoms(); atomId++)
-		{
-			a = getAtomInAtomList(atomId);
-			
-			//Find index of the cell tha atom is currently in
-			i = (unsigned int)floor(a->getPositionX() / cellSize);
-			j = (unsigned int)floor(a->getPositionY() / cellSize);
-			k = (unsigned int)floor(a->getPositionZ() / cellSize);
-			
-			
-			#pragma omp critical
-			{
-				getCellInCellList(i, j, k)->addAtomToCellList(a);
-				a->setCellIndex(i, j, k);
-			}
-		}
-	}
-}
-
 //Get atom from the atom list at index
 Atom* World::getAtomInAtomList(unsigned int index)
 {
@@ -556,6 +556,7 @@ void World::solveEquationsOfMotion(double elapsedTime)
 	array<double, 3> oldA;
 	array<double, 3> newR;
 	array<double, 3> newV;
+	array<double, 3> newA;
 
 	double K{0}; //Kinetic energy.
 	double T{0}; //Instantenous temperature
@@ -577,7 +578,8 @@ void World::solveEquationsOfMotion(double elapsedTime)
 			thisAtom = _atomList.at(i);
 			oldR = { thisAtom->getPositionX(), thisAtom->getPositionY(), thisAtom->getPositionZ() };
 			oldV = { thisAtom->getVelocityX(), thisAtom->getVelocityY(), thisAtom->getVelocityZ() };
-			oldA = _mySimulation.calcAcceleration(thisAtom->getForceX(), thisAtom->getForceY(), thisAtom->getForceZ());
+			oldA = { thisAtom->getPreviousAccelerationX(), thisAtom->getPreviousAccelerationY(), thisAtom->getPreviousAccelerationZ() };
+			newA = _mySimulation.calcAcceleration(thisAtom->getForceX(), thisAtom->getForceY(), thisAtom->getForceZ());
 
 			newR = _mySimulation.calcPosition(oldR, oldV, oldA, timeStep);
 			correctPositions(newR);
@@ -622,4 +624,26 @@ void World::solveEquationsOfMotion(double elapsedTime)
 			}
 		}
 	}
+}
+
+void World::updateCells()
+{
+	for (int i{0}; i < _cellList.size(); i++)
+	{
+		Cell* c = _cellList.at(i);
+		c->clearAtomsInCellList();
+	}
+
+	populateCells();
+}
+
+void World::updateNeighbourList()
+{
+	for (int i{ 0 }; i < _atomList.size(); i++)
+	{
+		Atom* a = _atomList.at(i);
+		a->clearNeighbourList();
+	}
+
+	setupNeighbourLists(_myParameters.getIs2D());
 }

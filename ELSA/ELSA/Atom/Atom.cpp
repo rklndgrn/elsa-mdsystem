@@ -18,6 +18,12 @@ void Atom::addToNeighbourList(Atom* a)
 	_neighbourList.push_back(a);
 }
 
+//Clear the neighbour list.
+void Atom::clearNeighbourList()
+{
+	_neighbourList.clear();
+}
+
 //Getters
 
 unsigned int Atom::getID() const
@@ -75,6 +81,21 @@ double Atom::getPotential() const
 	return _potential;
 }
 
+double Atom::getPreviousAccelerationX() const
+{
+	return _previousAcceleration[0];
+}
+
+double Atom::getPreviousAccelerationY() const
+{
+	return  _previousAcceleration[1];
+}
+
+double Atom::getPreviousAccelerationZ() const
+{
+	return  _previousAcceleration[2];
+}
+
 double Atom::getVelocityX() const
 {
 	return _velocity[0];
@@ -106,16 +127,19 @@ vector<Atom*> Atom::getNeighbourList() const
 
 void Atom::setAccelerationX(double newPos)
 {
+	_previousAcceleration[0] = _acceleration[0];
 	_acceleration[0] = newPos;
 }
 
 void Atom::setAccelerationY(double newPos)
 {
+	_previousAcceleration[1] = _acceleration[1];
 	_acceleration[1] = newPos;
 }
 
 void Atom::setAccelerationZ(double newPos)
 {
+	_previousAcceleration[2] = _acceleration[2];
 	_acceleration[2] = newPos;
 }
 
