@@ -119,7 +119,7 @@ double Simulation::calcTotalEnergy(double potentialEnergy, double kineticEnergy)
 array<double, 3> Simulation::calcAcceleration(double fx, double fy, double fz)
 {
 	double m = _mat.getMass();
-	array<double, 3> a = { m*fx, m*fy, m*fz };
+	array<double, 3> a = { fx/m, fy/m, fz/m };
 	return a;
 }
 

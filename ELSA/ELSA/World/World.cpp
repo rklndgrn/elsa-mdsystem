@@ -94,6 +94,28 @@ void World::correctPositions(array<double, 3>& r)
 	}
 }
 
+void World::initializeAtoms()
+{
+	omp_set_num_threads(numberOfThreads);
+	distributeInitialVelocities();
+	calcPotentialAndForce(0);
+	double K{0};
+	Atom* thisAtom;
+	#pragma omp parallel private(thisAtom) reduction (+: K)
+	{
+		#pragma omp for
+		for (int i = 0; i < (int) _myParameters.getNumberOfAtoms(); i++)
+		{
+			thisAtom = getAtomInAtomList(i);
+
+			K += _mySimulation.calcKineticEnergy(thisAtom->getVelocityX(), thisAtom->getVelocityY(), 
+												thisAtom->getVelocityZ());
+		}
+	}
+	_myResults.setKineticEnergy(K, 0);
+	calcPressure(0);
+}
+
 /* PUBLIC */
 //Constructor.
 World::World(Parameters p)
@@ -126,8 +148,8 @@ void World::setupSystem(Parameters p)
 	populateCells();
 
 	setupNeighbourLists(_myParameters.getIs2D());
-	distributeInitialVelocities();
 
+	initializeAtoms();
 }
 
 //Populate an FCC lattice with atoms.
@@ -149,6 +171,10 @@ void World::generateAtomsAtFccLattice(double latticeConstant, unsigned int nOfUn
 				addAtomToAtomList(ax);
 				addAtomToAtomList(ay);
 				addAtomToAtomList(az);
+				_myResults.setPositions(a0->getPositionX(), a0->getPositionY(), a0->getPositionY(), 0, atomId - 4);
+				_myResults.setPositions(ax->getPositionX(), ax->getPositionY(), ax->getPositionY(), 0, atomId - 3);
+				_myResults.setPositions(ay->getPositionX(), ay->getPositionY(), ay->getPositionY(), 0, atomId - 2);
+				_myResults.setPositions(az->getPositionX(), az->getPositionY(), az->getPositionY(), 0, atomId - 1);
 
 			}
 		}
@@ -159,14 +185,20 @@ void World::generateAtomsAtFccLattice(double latticeConstant, unsigned int nOfUn
 void World::generateAtomsAtScLattice(double latticeConstant, unsigned int nOfUnitCellsX, unsigned int nOfUnitCellsY, unsigned int nOfUnitCellsZ)
 {
 	unsigned int atomId{ 0 };
+	double xPos{ 0 }, yPos{ 0 }, zPos{ 0 };
 	for (unsigned int z = 0; z < nOfUnitCellsZ; z++)
 	{
 		for (unsigned int y = 0; y < nOfUnitCellsY; y++)
 		{
 			for (unsigned int x = 0; x < nOfUnitCellsX; x++)
 			{
-				Atom* a = new Atom(atomId++, x*latticeConstant, y*latticeConstant, z*latticeConstant);
+				xPos = x * latticeConstant;
+				yPos = y * latticeConstant;
+				zPos = z * latticeConstant;
+				Atom* a = new Atom(atomId, xPos, yPos, zPos);
 				addAtomToAtomList(a);
+				_myResults.setPositions(xPos, yPos, zPos, 0, atomId);
+				atomId++;
 			}
 		}
 	}
@@ -333,10 +365,6 @@ void World::distributeInitialVelocities()
 	double variance = _myParameters.getBoltzmann() * _myParameters.getTemperature() / _myParameters.getChosenMaterial().getMass();
 
 	array<double, 3> v;
-	
-	//random_device rand;
-	//mt19937 generator(rand());
-	//normal_distribution<double> distribution(0, sigma);
 
 	#pragma omp parallel private(v) shared(variance)
 	{
@@ -452,7 +480,7 @@ void World::addCellToCellList(Cell* c)
 }
 
 //	Calculates the force and potential and stores them in the atoms. The force is directional but the potential is not.
-void World::calcPotentialAndForce()
+void World::calcPotentialAndForce(double elapsedTime)
 {
 	double potential{0};
 	double force{0};
@@ -488,6 +516,8 @@ void World::calcPotentialAndForce()
 			_pressureRFSum += r[0] * force;
 		}
 	}
+
+	_myResults.setPotentialEnergy(potential, (int)round(elapsedTime / _myParameters.getTimeStep()));
 	
 }
 

@@ -38,6 +38,7 @@ private:
 	void generateAtomsAtFccLattice(double, unsigned int, unsigned int, unsigned int);
 	void generateAtomsAtScLattice(double, unsigned int, unsigned int, unsigned int);
 	void generateCells();
+	void initializeAtoms();
 	void populateCells();
 	void setupNeighbourLists(bool);
 	void setupSystem(Parameters);
@@ -57,7 +58,7 @@ public:
 
 	void addAtomToAtomList(Atom*);
 	void addCellToCellList(Cell*);
-	void calcPotentialAndForce();
+	void calcPotentialAndForce(double);
 	void calcPotentialEnergy(double);
 	void calcPressure(double);
 	void solveEquationsOfMotion(double);

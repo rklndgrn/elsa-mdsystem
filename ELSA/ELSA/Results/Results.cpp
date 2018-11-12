@@ -13,6 +13,7 @@ Results::Results(double simulationTime, double timeStep, unsigned int numberOfPa
 	_internalPressure = new double[_arrayLength];
 	_kineticEnergy = new double[_arrayLength];
 	_meanSquareDisplacement = new double[_arrayLength];
+	_potentialEnergy = new double[_arrayLength];
 	_specificHeat = new double[_arrayLength];
 	_temperature = new double[_arrayLength];
 	_totalEnergy = new double[_arrayLength];
