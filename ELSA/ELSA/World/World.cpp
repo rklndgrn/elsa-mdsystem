@@ -1,5 +1,4 @@
 #include "World.h"
-#include <iostream>
 
 using namespace std;
 
@@ -39,6 +38,7 @@ int World::incrementM(int m, unsigned int maxK, unsigned int lowerK, unsigned in
 }
 */
 
+//Replacement for the function incrementM.
 bool World::checkM(int m, bool is2D, unsigned int maxK, unsigned int lowerK, unsigned int upperK)
 {
 	double m_check = m;
