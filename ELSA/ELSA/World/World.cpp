@@ -6,6 +6,7 @@ using namespace std;
 /* PRIVATE */
 //Function for incrementing the while loop in the setupNeighbourLists function.
 //Checks if we are to skip adding neighbour atoms in certain cells due to the simulation being in 2D.
+/*
 int World::incrementM(int m, unsigned int maxK, unsigned int lowerK, unsigned int upperK)
 {
 	double m_check = m;
@@ -35,6 +36,30 @@ int World::incrementM(int m, unsigned int maxK, unsigned int lowerK, unsigned in
 			return m + 1;
 		}
 	}
+}
+*/
+
+bool World::checkM(int m, bool is2D, unsigned int maxK, unsigned int lowerK, unsigned int upperK)
+{
+	double m_check = m;
+	if (is2D)
+	{
+		if (lowerK > maxK)
+		{
+			if (m/3 == m_check/3)
+			{
+				return false;
+			}
+		}
+		else if (upperK > maxK)
+		{
+			if ((m + 1) / 3 == (m_check + 1) / 3)
+			{
+				return false;
+			}
+		}
+	}
+	return true;
 }
 
 //Correct positions according to periodic boundary conditions
@@ -173,109 +198,127 @@ void World::setupNeighbourLists(bool is2D)
 	//Array containing all neighbouring cells' indices.
 	array<array<unsigned int, 3>, 27> index;
 	
-	for (unsigned int atomId = 0; atomId < _myParameters.getNumberOfAtoms(); atomId++)
+	#pragma omp parallel shared(index, cutOffDistance, i, j, k, lowerNeighbourI, lowerNeighbourJ, lowerNeighbourK, upperNeighbourI, upperNeighbourJ, upperNeighbourK, lengthX, lengthY, lengthZ, maxI, maxJ, maxK) private(atomDistance)
 	{
-		i = getAtomInAtomList(atomId)->getCellIndex()[0];
-		j = getAtomInAtomList(atomId)->getCellIndex()[1];
-		k = getAtomInAtomList(atomId)->getCellIndex()[2];
-
-		//Standard case.
-		lowerNeighbourI = i - 1;
-		upperNeighbourI = i + 1;
-		lowerNeighbourJ = j - 1;
-		upperNeighbourJ = j + 1;
-		lowerNeighbourK = k - 1;
-		upperNeighbourK = k + 1;
-
-		//At sides, edges and corners, there is a special case for periodic boundary conditions.
-		if (i == 0)
+		for (unsigned int atomId = 0; atomId < _myParameters.getNumberOfAtoms(); atomId++)
 		{
-			lowerNeighbourI = maxI;
-			upperNeighbourI = i + 1;
-		}
-		else if (i == maxI)
-		{
-			upperNeighbourI = 0;
-			lowerNeighbourI = i - 1;
-		}
-		if (j == 0)
-		{
-			lowerNeighbourJ = maxJ;
-			upperNeighbourJ = j + 1;
-		}
-		else if (j == maxJ)
-		{
-			upperNeighbourJ = 0;
-			lowerNeighbourJ = j - 1;
-			}
-		//Except if it's 2D, then the periodic boundary conditions in the z-direction are removed.
-		if (!is2D)
-		{
-			if (k == 0)
+			#pragma omp single
 			{
-				lowerNeighbourK = maxK;
-				upperNeighbourK = k + 1;
-			}
-			else if (k == maxK)
-			{
+				i = getAtomInAtomList(atomId)->getCellIndex()[0];
+				j = getAtomInAtomList(atomId)->getCellIndex()[1];
+				k = getAtomInAtomList(atomId)->getCellIndex()[2];
+
+				//Standard case.
+				lowerNeighbourI = i - 1;
+				upperNeighbourI = i + 1;
+				lowerNeighbourJ = j - 1;
+				upperNeighbourJ = j + 1;
 				lowerNeighbourK = k - 1;
-				upperNeighbourK = 0;
-			}
-		}
-		//Fill the array of neighouring cell indices
-		index.at(0) = { lowerNeighbourI, lowerNeighbourJ, lowerNeighbourK };
-		index.at(1) = { lowerNeighbourI, lowerNeighbourJ, k };
-		index.at(2) = { lowerNeighbourI, lowerNeighbourJ, upperNeighbourK };
-		index.at(3) = { lowerNeighbourI, j, lowerNeighbourK };
-		index.at(4) = { lowerNeighbourI, j, k };
-		index.at(5) = { lowerNeighbourI, j, upperNeighbourK };
-		index.at(6) = { lowerNeighbourI, upperNeighbourJ, lowerNeighbourK };
-		index.at(7) = { lowerNeighbourI, upperNeighbourJ, k };
-		index.at(8) = { lowerNeighbourI, upperNeighbourJ, upperNeighbourK };
+				upperNeighbourK = k + 1;
 
-		index.at(9) = { i, lowerNeighbourJ, lowerNeighbourK };
-		index.at(10) = { i, lowerNeighbourJ, k };
-		index.at(11) = { i, lowerNeighbourJ, upperNeighbourK };
-		index.at(12) = { i, j, lowerNeighbourK };
-		index.at(13) = { i, j, k };
-		index.at(14) = { i, j, upperNeighbourK };
-		index.at(15) = { i, upperNeighbourJ, lowerNeighbourK };
-		index.at(16) = { i, upperNeighbourJ, k };
-		index.at(17) = { i, upperNeighbourJ, upperNeighbourK };
-		index.at(18) = { upperNeighbourI, lowerNeighbourJ, lowerNeighbourK };
-		index.at(19) = { upperNeighbourI, lowerNeighbourJ, k };
-		index.at(20) = { upperNeighbourI, lowerNeighbourJ, upperNeighbourK };
-		index.at(21) = { upperNeighbourI, j, lowerNeighbourK };
-		index.at(22) = { upperNeighbourI, j, k };
-		index.at(23) = { upperNeighbourI, j, upperNeighbourK };
-		index.at(24) = { upperNeighbourI, upperNeighbourJ, lowerNeighbourK };
-		index.at(25) = { upperNeighbourI, upperNeighbourJ, k };
-		index.at(26) = { upperNeighbourI, upperNeighbourJ, upperNeighbourK };
-
-		int m{ 0 };
-		//Special case for 2D not handled by the function incrementM.
-		if (k == 0 && is2D)
-		{
-			m = 1;
-		}
-		//Find the neighbouring atoms.
-		while (m <= 26)
-		{
-			for (unsigned int n{ 0 }; n < getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().size(); n++)
-			{
-				atomDistance = _mySimulation.calcDistance(getAtomInAtomList(atomId),
-					getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n),
-					lengthX, lengthY, lengthZ, is2D)[0];
-				//Add neighbour to a certain atom if distance < cut-off and
-				//the neighbour's index is larger than its own.
-				if (atomDistance < cutOffDistance && atomId < getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n)->getID())
+				//At sides, edges and corners, there is a special case for periodic boundary conditions.
+				if (i == 0)
 				{
-						getAtomInAtomList(atomId)->addToNeighbourList(getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n));
+					lowerNeighbourI = maxI;
+					upperNeighbourI = i + 1;
 				}
+				else if (i == maxI)
+				{
+					upperNeighbourI = 0;
+					lowerNeighbourI = i - 1;
+				}
+				if (j == 0)
+				{
+					lowerNeighbourJ = maxJ;
+					upperNeighbourJ = j + 1;
+				}
+				else if (j == maxJ)
+				{
+					upperNeighbourJ = 0;
+					lowerNeighbourJ = j - 1;
+				}
+				//Except if it's 2D, then the periodic boundary conditions in the z-direction are removed.
+				if (!is2D)
+				{
+					if (k == 0)
+					{
+						lowerNeighbourK = maxK;
+						upperNeighbourK = k + 1;
+					}
+					else if (k == maxK)
+					{
+						lowerNeighbourK = k - 1;
+						upperNeighbourK = 0;
+					}
+				}
+				//Fill the array of neighouring cell indices
+				index.at(0) = { lowerNeighbourI, lowerNeighbourJ, lowerNeighbourK };
+				index.at(1) = { lowerNeighbourI, lowerNeighbourJ, k };
+				index.at(2) = { lowerNeighbourI, lowerNeighbourJ, upperNeighbourK };
+				index.at(3) = { lowerNeighbourI, j, lowerNeighbourK };
+				index.at(4) = { lowerNeighbourI, j, k };
+				index.at(5) = { lowerNeighbourI, j, upperNeighbourK };
+				index.at(6) = { lowerNeighbourI, upperNeighbourJ, lowerNeighbourK };
+				index.at(7) = { lowerNeighbourI, upperNeighbourJ, k };
+				index.at(8) = { lowerNeighbourI, upperNeighbourJ, upperNeighbourK };
+
+				index.at(9) = { i, lowerNeighbourJ, lowerNeighbourK };
+				index.at(10) = { i, lowerNeighbourJ, k };
+				index.at(11) = { i, lowerNeighbourJ, upperNeighbourK };
+				index.at(12) = { i, j, lowerNeighbourK };
+				index.at(13) = { i, j, k };
+				index.at(14) = { i, j, upperNeighbourK };
+				index.at(15) = { i, upperNeighbourJ, lowerNeighbourK };
+				index.at(16) = { i, upperNeighbourJ, k };
+				index.at(17) = { i, upperNeighbourJ, upperNeighbourK };
+				index.at(18) = { upperNeighbourI, lowerNeighbourJ, lowerNeighbourK };
+				index.at(19) = { upperNeighbourI, lowerNeighbourJ, k };
+				index.at(20) = { upperNeighbourI, lowerNeighbourJ, upperNeighbourK };
+				index.at(21) = { upperNeighbourI, j, lowerNeighbourK };
+				index.at(22) = { upperNeighbourI, j, k };
+				index.at(23) = { upperNeighbourI, j, upperNeighbourK };
+				index.at(24) = { upperNeighbourI, upperNeighbourJ, lowerNeighbourK };
+				index.at(25) = { upperNeighbourI, upperNeighbourJ, k };
+				index.at(26) = { upperNeighbourI, upperNeighbourJ, upperNeighbourK };
 			}
 
-			//If it's 2D, some of the neighbouring cells should be discarded.
-			m = incrementM(m, maxK, lowerNeighbourK, upperNeighbourK);
+			int startValue{ 0 };
+			//Special case for 2D not handled by the function incrementM.
+			if (k == 0 && is2D)
+			{
+				startValue = 1;
+			}
+			//Find the neighbouring atoms.
+			#pragma omp for schedule(static)
+			for (int m = startValue; m < 27; m++)
+			{
+				//If it's 2D, some of the neighbouring cells should be discarded.
+				if (checkM(m, is2D, maxK, lowerNeighbourK, upperNeighbourK))
+				{
+					//cout << "Thread " << omp_get_thread_num() << " takes loop number " << m << "!" << endl;
+					for (unsigned int n{ 0 }; n < getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().size(); n++)
+					{
+						atomDistance = _mySimulation.calcDistance(getAtomInAtomList(atomId),
+						getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n),
+						lengthX, lengthY, lengthZ, is2D)[0];
+						//Add neighbour to a certain atom if distance < cut-off and
+						//the neighbour's index is larger than its own.
+						if (atomDistance < cutOffDistance && atomId < getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n)->getID())
+						{
+							#pragma omp critical
+							{
+								getAtomInAtomList(atomId)->addToNeighbourList(getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n));
+							}
+						}
+					}
+				}
+				/*
+				else
+				{
+					cout << "Hello! k = " << k << " from thread " << omp_get_thread_num() << " yields that m = " << m << " is not okay!" << endl;
+				}
+				*/
+			} 
 		}
 	}
 }
