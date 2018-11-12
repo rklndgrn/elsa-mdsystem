@@ -404,8 +404,11 @@ void World::populateCells()
 			k = (unsigned int)floor(a->getPositionZ() / cellSize);
 			
 			
-			getCellInCellList(i, j, k)->addAtomToCellList(a);
-			a->setCellIndex(i, j, k);
+			#pragma omp critical
+			{
+				getCellInCellList(i, j, k)->addAtomToCellList(a);
+				a->setCellIndex(i, j, k);
+			}
 		}
 	}
 }
