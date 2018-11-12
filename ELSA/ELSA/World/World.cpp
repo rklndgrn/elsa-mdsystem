@@ -251,6 +251,7 @@ void World::setupNeighbourLists(bool is2D)
 						upperNeighbourK = 0;
 					}
 				}
+
 				//Fill the array of neighouring cell indices
 				index.at(0) = { lowerNeighbourI, lowerNeighbourJ, lowerNeighbourK };
 				index.at(1) = { lowerNeighbourI, lowerNeighbourJ, k };
@@ -271,6 +272,7 @@ void World::setupNeighbourLists(bool is2D)
 				index.at(15) = { i, upperNeighbourJ, lowerNeighbourK };
 				index.at(16) = { i, upperNeighbourJ, k };
 				index.at(17) = { i, upperNeighbourJ, upperNeighbourK };
+
 				index.at(18) = { upperNeighbourI, lowerNeighbourJ, lowerNeighbourK };
 				index.at(19) = { upperNeighbourI, lowerNeighbourJ, k };
 				index.at(20) = { upperNeighbourI, lowerNeighbourJ, upperNeighbourK };
@@ -570,17 +572,20 @@ void World::solveEquationsOfMotion(double elapsedTime)
 
 	if (T > 0 && _myParameters.getIsThermostatOn())
 	{
-		//Anderson thermostat.
-		for (int i{ 0 }; i < _atomList.size(); i++)
+		#pragma omp parallel private(newV, randomValue, thisAtom) shared(distribution, generator)
 		{
-			thisAtom = _atomList.at(i);
-
-			randomValue = distribution(generator);
-
-			if (randomValue < _myParameters.getCollisionFrequency()*elapsedTime)
+			//Anderson thermostat.
+			#pragma omp for schedule(static)
+			for (int i{ 0 }; i < _atomList.size(); i++)
 			{
-				newV = _mySimulation.generateGaussianVelocity(T);
-				thisAtom->setVelocity(newV);
+				thisAtom = _atomList.at(i);
+				randomValue = distribution(generator);
+
+				if (randomValue < _myParameters.getCollisionFrequency()*elapsedTime)
+				{
+					newV = _mySimulation.generateGaussianVelocity(T);
+					thisAtom->setVelocity(newV);
+				}
 			}
 		}
 	}
