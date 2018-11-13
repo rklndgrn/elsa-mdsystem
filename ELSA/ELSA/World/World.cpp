@@ -450,6 +450,7 @@ void World::calcPotentialAndForce(double elapsedTime)
 
 	double potential{0};
 	double force{0};
+	double totalPotential{0};
 	Atom* a1;
 	Atom* a2;
 	array<double, 4> r; 
@@ -480,22 +481,12 @@ void World::calcPotentialAndForce(double elapsedTime)
 
 			//Accumulate for internal pressure calculation
 			_pressureRFSum += r[0] * force;
+
+			totalPotential += potential;
 		}
 	}
 
-	_myResults.setPotentialEnergy(potential, (int)round(elapsedTime / _myParameters.getTimeStep()));
-	
-}
-
-// Calculate the potential energy as the sum of the potential of all the atoms.
-void World::calcPotentialEnergy(double elapsedTime)
-{
-	Atom* a1;
-	for (unsigned int i{ 0 }; i < _myParameters.getNumberOfAtoms() - 1; i++)
-	{
-		a1 = _atomList.at(i);
-		_myResults.setPotentialEnergy(**_myResults.getPotentialEnergy() + a1->getPotential(),(int)round(elapsedTime/_myParameters.getTimeStep()));
-	}
+	_myResults.setPotentialEnergy(totalPotential, (int)(elapsedTime / _myParameters.getTimeStep()));
 }
 
 //Calculate the internal pressure at a certain time
