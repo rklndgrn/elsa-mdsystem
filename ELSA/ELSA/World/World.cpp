@@ -444,11 +444,15 @@ void World::addCellToCellList(Cell* c)
 //	Calculates the force and potential and stores them in the atoms. The force is directional but the potential is not.
 void World::calcPotentialAndForce(double elapsedTime)
 {
+	//Reset before the next iteration.
+	resetAllPotentialsAndForces();
+	_pressureRFSum = 0;
+
 	double potential{0};
 	double force{0};
 	Atom* a1;
 	Atom* a2;
-	array<double, 4> r;
+	array<double, 4> r; 
 
 	for (int i{ 0 }; i < (int) _myParameters.getNumberOfAtoms() - 1; i++)
 	{
@@ -520,13 +524,14 @@ void World::solveEquationsOfMotion(double elapsedTime)
 	array<double, 3> newV;
 	array<double, 3> newA;
 
+	double m = _myParameters.getChosenMaterial().getMass();
 	double K{0}; //Kinetic energy.
 	double T{0}; //Instantenous temperature
 	double timeStep = _myParameters.getTimeStep();
 	_myParameters.setTemperature(T);
 
 	//Go through the atom list and assign new positions and velocities using the Velocity Verlet Algorithm.
-	#pragma omp parallel private(thisAtom, oldR, oldV, oldA, newR, newV) shared(timeStep) reduction(+: K)
+	#pragma omp parallel private(thisAtom, oldR, oldV, oldA, newR, newV) shared(timeStep) shared(m) reduction(+: K)
 	{
 		#pragma omp for 
 		for (int i{ 0 }; i < _atomList.size(); i++)
@@ -550,6 +555,8 @@ void World::solveEquationsOfMotion(double elapsedTime)
 			thisAtom->setPosition(newR);
 			thisAtom->setVelocity(newV);
 			thisAtom->setAcceleration(newA);
+
+			_myResults.addToMomentum(m*newV[0], m*newV[1], m*newV[2], (int)round(elapsedTime / timeStep));
 
 			K += _mySimulation.calcKineticEnergy(newV[0], newV[1], newV[2]);
 		}
@@ -584,6 +591,24 @@ void World::solveEquationsOfMotion(double elapsedTime)
 					thisAtom->setVelocity(newV);
 				}
 			}
+		}
+	}
+}
+
+void World::resetAllPotentialsAndForces()
+{
+	omp_set_num_threads(numberOfThreads);
+	Atom* a;
+	#pragma omp parallel private(a)
+	{
+		#pragma omp for schedule(static)
+		for (int i{ 0 }; i < _atomList.size(); i++)
+		{
+			a = getAtomInAtomList(i);
+			a->setPotential(0);
+			a->setForceX(0);
+			a->setForceY(0);
+			a->setForceZ(0);
 		}
 	}
 }

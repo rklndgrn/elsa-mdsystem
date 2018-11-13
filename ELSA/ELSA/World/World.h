@@ -60,6 +60,7 @@ public:
 	void calcPotentialAndForce(double);
 	void calcPotentialEnergy(double);
 	void calcPressure(double);
+	void resetAllPotentialsAndForces();
 	void solveEquationsOfMotion(double);
 	void updateCells();
 	void updateNeighbourList();

@@ -174,8 +174,6 @@ array<double, 3> Simulation::calcPosition(std::array<double, 3> r, std::array<do
 	double rY = r[1] + timeStep * v[1] + 0.5*pow(timeStep, 2)*a[1];
 	double rZ = r[2] + timeStep * v[2] + 0.5*pow(timeStep, 2)*a[2];
 
-	
-
 	array<double, 3> newR = { rX, rY, rZ };
 	return newR;
 }
@@ -183,13 +181,9 @@ array<double, 3> Simulation::calcPosition(std::array<double, 3> r, std::array<do
 //Function to calculate the velocity using the Velocity Verlet Algorithm.
 array<double, 3> Simulation::calcVelocity(std::array<double, 3> v, std::array<double, 3> aOld, std::array<double, 3> aNew, double timeStep)
 {
-	double halfStepVX = v[0] + 0.5*timeStep*aOld[0];
-	double halfStepVY = v[1] + 0.5*timeStep*aOld[1];
-	double halfStepVZ = v[2] + 0.5*timeStep*aOld[2];
-
-	double newVX = halfStepVX + 0.5*timeStep*aNew[0];
-	double newVY = halfStepVY + 0.5*timeStep*aNew[1];
-	double newVZ = halfStepVZ + 0.5*timeStep*aNew[2];
+	double newVX = v[0] + 0.5*timeStep*(aOld[0] + aNew[0]);
+	double newVY = v[1] + 0.5*timeStep*(aOld[1] + aNew[1]);
+	double newVZ = v[2] + 0.5*timeStep*(aOld[2] + aNew[2]);
 
 	array<double, 3> newV = { newVX, newVY, newVZ };
 
