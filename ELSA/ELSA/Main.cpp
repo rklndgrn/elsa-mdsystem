@@ -21,10 +21,10 @@ int main()
 
 	double** potArray = myWorld.getResults().getPotentialEnergy();
 	double** kinArray = myWorld.getResults().getKineticEnergy();
-	double** tempArray = myWorld.getResults().getTemperature();
+	//double** tempArray = myWorld.getResults().getTemperature();
 	double* U = *potArray;
 	double* K = *kinArray;
-	double* T = *tempArray;
+	//double* T = *tempArray;
 	int index{ 0 };
 	double deltaT = myParameters.getTimeStep();
 
@@ -34,6 +34,7 @@ int main()
 	//cout << "   Temperature: " << T[index] << endl;
 	cout << "   Position of atom 555: (" << myWorld.getAtomInAtomList(555)->getPositionX() << ", " << myWorld.getAtomInAtomList(555)->getPositionY() << ", " << myWorld.getAtomInAtomList(555)->getPositionZ() << ")" << endl;
 	cout << "   Velocity of atom 555: (" << myWorld.getAtomInAtomList(555)->getVelocityX() << ", " << myWorld.getAtomInAtomList(555)->getVelocityY() << ", " << myWorld.getAtomInAtomList(555)->getVelocityZ() << ")" << endl;
+	cout << "   Total energy: " << U[index] + K[index] << endl;
 	
 	for (double t = deltaT; t <= myParameters.getSimulationTime() - deltaT; t += deltaT)
 	{
@@ -47,7 +48,7 @@ int main()
 		myWorld.calcPressure(t);
 		U = *potArray;
 		K = *kinArray;
-		T = *tempArray;
+		//T = *tempArray;
 		index = (int)round(t / deltaT);
 		
 		cout << "Time " << t << ": " << endl;

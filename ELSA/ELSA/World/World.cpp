@@ -3,42 +3,8 @@
 using namespace std;
 
 /* PRIVATE */
-//Function for incrementing the while loop in the setupNeighbourLists function.
+//Function for checking whether the while loop in the setupNeighbourLists function should execute.
 //Checks if we are to skip adding neighbour atoms in certain cells due to the simulation being in 2D.
-/*
-int World::incrementM(int m, unsigned int maxK, unsigned int lowerK, unsigned int upperK)
-{
-	double m_check = m;
-	if (upperK <= maxK && lowerK <= maxK)
-	{
-		return m + 1;
-	}
-	else if (upperK > maxK)
-	{
-		if ((m - 1) / 3 == (m_check - 1) / 3)
-		{
-			return m + 2;
-		}
-		else
-		{
-			return m + 1;
-		}
-	}
-	else
-	{
-		if ((m + 1) / 3 == (m_check + 1) / 3)
-		{
-			return m + 2;
-		}
-		else
-		{
-			return m + 1;
-		}
-	}
-}
-*/
-
-//Replacement for the function incrementM.
 bool World::checkM(int m, bool is2D, unsigned int maxK, unsigned int lowerK, unsigned int upperK)
 {
 	double m_check = m;
@@ -94,97 +60,26 @@ void World::correctPositions(array<double, 3>& r)
 	}
 }
 
-void World::initializeAtoms()
+//Set the atoms' velocities from temperature according to Maxwell-Boltzmann distribution 
+void World::distributeInitialVelocities()
 {
 	omp_set_num_threads(numberOfThreads);
-	distributeInitialVelocities();
-	calcPotentialAndForce(0);
-	double K{0};
-	Atom* thisAtom;
-	#pragma omp parallel private(thisAtom) reduction (+: K)
+	//double sigma = sqrt(_myParameters.getBoltzmann() * _myParameters.getTemperature() / _myParameters.getChosenMaterial().getMass());
+	double variance = _myParameters.getBoltzmann() * _myParameters.getTemperature() / _myParameters.getChosenMaterial().getMass();
+
+	array<double, 3> v;
+
+	#pragma omp parallel private(v) shared(variance)
 	{
 		#pragma omp for
-		for (int i = 0; i < (int) _myParameters.getNumberOfAtoms(); i++)
-		{
-			thisAtom = getAtomInAtomList(i);
-
-			K += _mySimulation.calcKineticEnergy(thisAtom->getVelocityX(), thisAtom->getVelocityY(), 
-												thisAtom->getVelocityZ());
-		}
-	}
-	_myResults.setKineticEnergy(K, 0);
-	calcPressure(0);
-}
-
-//Add atoms to the cells
-void World::populateCells()
-{
-	omp_set_num_threads(numberOfThreads);
-
-	unsigned int i;
-	unsigned int j;
-	unsigned int k;
-
-	double cellSize{ _myParameters.getChosenMaterial().getCellSize() };
-	Atom* a;
-
-
-#pragma omp parallel shared(cellSize) private(a, i, j, k)
-	{
-#pragma omp for schedule(static)
 		for (int atomId = 0; atomId < (int)_myParameters.getNumberOfAtoms(); atomId++)
 		{
-			a = getAtomInAtomList(atomId);
-
-			//Find index of the cell tha atom is currently in
-			i = (unsigned int)floor(a->getPositionX() / cellSize);
-			j = (unsigned int)floor(a->getPositionY() / cellSize);
-			k = (unsigned int)floor(a->getPositionZ() / cellSize);
-
-
-#pragma omp critical
-			{
-				getCellInCellList(i, j, k)->addAtomToCellList(a);
-				a->setCellIndex(i, j, k);
-			}
+			v = _mySimulation.generateGaussianVelocity(variance);
+			_atomList.at(atomId)->setVelocityX(v[0]);
+			_atomList.at(atomId)->setVelocityY(v[1]);
+			_atomList.at(atomId)->setVelocityZ(v[2]);
 		}
 	}
-}
-
-/* PUBLIC */
-//Constructor.
-World::World(Parameters p)
-{
-	setupSystem(p);
-}
-
-//Initialize the MD software by setting up the system and creating atoms, cells and neighbour lists.
-void World::setupSystem(Parameters p)
-{
-	_myParameters = p;
-	_myResults = Results{ p.getSimulationTime(), p.getTimeStep(), p.getNumberOfAtoms() };
-	_mySimulation = Simulation(p.getChosenMaterial());
-
-	unsigned int nOfUnitCellsX{ _myParameters.getNumberOfUnitCellsX() };
-	unsigned int nOfUnitCellsY{ _myParameters.getNumberOfUnitCellsY() };
-	unsigned int nOfUnitCellsZ{ _myParameters.getNumberOfUnitCellsZ() };
-	double latticeConstant{ _myParameters.getChosenMaterial().getLatticeConstant() };
-	string crystalStructure{ _myParameters.getChosenMaterial().getCrystalStructure() };
-	
-	if (crystalStructure == "fcc")
-	{
-		generateAtomsAtFccLattice(latticeConstant, nOfUnitCellsX, nOfUnitCellsY, nOfUnitCellsZ);
-	}
-	else if (crystalStructure == "sc")
-	{
-		generateAtomsAtScLattice(latticeConstant, nOfUnitCellsX, nOfUnitCellsY, nOfUnitCellsZ);
-	}
-	generateCells();
-	populateCells();
-
-	setupNeighbourLists(_myParameters.getIs2D());
-
-	initializeAtoms();
 }
 
 //Populate an FCC lattice with atoms.
@@ -239,6 +134,92 @@ void World::generateAtomsAtScLattice(double latticeConstant, unsigned int nOfUni
 	}
 }
 
+void World::initializeAtoms()
+{
+	omp_set_num_threads(numberOfThreads);
+	distributeInitialVelocities();
+	calcPotentialAndForce(0);
+	double K{0};
+	Atom* thisAtom;
+	#pragma omp parallel private(thisAtom) reduction (+: K)
+	{
+		#pragma omp for
+		for (int i = 0; i < (int) _myParameters.getNumberOfAtoms(); i++)
+		{
+			thisAtom = getAtomInAtomList(i);
+
+			K += _mySimulation.calcKineticEnergy(thisAtom->getVelocityX(), thisAtom->getVelocityY(), 
+												thisAtom->getVelocityZ());
+		}
+	}
+	double T = _mySimulation.calcTemperature(K, _myParameters.getBoltzmann(), _myParameters.getNumberOfAtoms());
+	_myResults.setKineticEnergy(K, 0);
+	_myResults.setTemperature(T, 0);
+	calcPressure(0);
+}
+
+//Creates cells for faster neighbourlist setup
+void World::generateCells()
+{
+	unsigned int nOfUnitCellsX{ _myParameters.getNumberOfUnitCellsX() };
+	unsigned int nOfUnitCellsY{ _myParameters.getNumberOfUnitCellsY() };
+	unsigned int nOfUnitCellsZ{ _myParameters.getNumberOfUnitCellsZ() };
+
+	double latticeConstant{ _myParameters.getChosenMaterial().getLatticeConstant() };
+	double cellSize{ _myParameters.getChosenMaterial().getCellSize() };
+
+	unsigned int numberOfCellsI{ _myParameters.getNumberOfCellsI() };
+	unsigned int numberOfCellsJ{ _myParameters.getNumberOfCellsJ() };
+	unsigned int numberOfCellsK{ _myParameters.getNumberOfCellsK() };
+
+	for (unsigned int k = 0; k < numberOfCellsK; k++)
+	{
+		for (unsigned int j = 0; j < numberOfCellsJ; j++)
+		{
+			for (unsigned int i = 0; i < numberOfCellsI; i++)
+			{
+				Cell* c = new Cell(i, j, k);
+				addCellToCellList(c);
+			}
+		}
+	}
+}
+
+//Add atoms to the cells
+void World::populateCells()
+{
+	omp_set_num_threads(numberOfThreads);
+
+	unsigned int i;
+	unsigned int j;
+	unsigned int k;
+
+	double cellSize{ _myParameters.getChosenMaterial().getCellSize() };
+	Atom* a;
+
+
+	#pragma omp parallel shared(cellSize) private(a, i, j, k)
+	{
+		#pragma omp for schedule(static)
+		for (int atomId = 0; atomId < (int)_myParameters.getNumberOfAtoms(); atomId++)
+		{
+			a = getAtomInAtomList(atomId);
+
+			//Find index of the cell tha atom is currently in
+			i = (unsigned int)floor(a->getPositionX() / cellSize);
+			j = (unsigned int)floor(a->getPositionY() / cellSize);
+			k = (unsigned int)floor(a->getPositionZ() / cellSize);
+
+
+			#pragma omp critical
+			{
+				getCellInCellList(i, j, k)->addAtomToCellList(a);
+				a->setCellIndex(i, j, k);
+			}
+		}
+	}
+}
+
 //Function for setting up the list of atoms that will contribute to a certain atom's potential.
 void World::setupNeighbourLists(bool is2D)
 {
@@ -264,7 +245,7 @@ void World::setupNeighbourLists(bool is2D)
 	unsigned int lowerNeighbourK, upperNeighbourK;
 	//Array containing all neighbouring cells' indices.
 	array<array<unsigned int, 3>, 27> index;
-	
+
 	#pragma omp parallel shared(index, cutOffDistance, i, j, k, lowerNeighbourI, lowerNeighbourJ, lowerNeighbourK, upperNeighbourI, upperNeighbourJ, upperNeighbourK, lengthX, lengthY, lengthZ, maxI, maxJ, maxK) private(atomDistance)
 	{
 		for (unsigned int atomId = 0; atomId < _myParameters.getNumberOfAtoms(); atomId++)
@@ -368,8 +349,8 @@ void World::setupNeighbourLists(bool is2D)
 					for (unsigned int n{ 0 }; n < getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().size(); n++)
 					{
 						atomDistance = _mySimulation.calcDistance(getAtomInAtomList(atomId),
-						getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n),
-						lengthX, lengthY, lengthZ, is2D)[0];
+							getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n),
+							lengthX, lengthY, lengthZ, is2D)[0];
 						//Add neighbour to a certain atom if distance < cut-off and
 						//the neighbour's index is larger than its own.
 						if (atomDistance < cutOffDistance && atomId < getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n)->getID())
@@ -381,64 +362,45 @@ void World::setupNeighbourLists(bool is2D)
 						}
 					}
 				}
-				/*
-				else
-				{
-					cout << "Hello! k = " << k << " from thread " << omp_get_thread_num() << " yields that m = " << m << " is not okay!" << endl;
-				}
-				*/
-			} 
-		}
-	}
-}
-
-//Set the atoms' velocities from temperature according to Maxwell-Boltzmann distribution 
-void World::distributeInitialVelocities()
-{
-	omp_set_num_threads(numberOfThreads);
-	//double sigma = sqrt(_myParameters.getBoltzmann() * _myParameters.getTemperature() / _myParameters.getChosenMaterial().getMass());
-	double variance = _myParameters.getBoltzmann() * _myParameters.getTemperature() / _myParameters.getChosenMaterial().getMass();
-
-	array<double, 3> v;
-
-	#pragma omp parallel private(v) shared(variance)
-	{
-		#pragma omp for
-		for (int atomId = 0; atomId < (int) _myParameters.getNumberOfAtoms(); atomId++)
-		{
-			v = _mySimulation.generateGaussianVelocity(variance);
-			_atomList.at(atomId)->setVelocityX(v[0]);
-			_atomList.at(atomId)->setVelocityY(v[1]);
-			_atomList.at(atomId)->setVelocityZ(v[2]);
-		}
-	}
-}
-
-//Creates cells for faster neighbourlist setup
-void World::generateCells()
-{
-	unsigned int nOfUnitCellsX{ _myParameters.getNumberOfUnitCellsX() };
-	unsigned int nOfUnitCellsY{ _myParameters.getNumberOfUnitCellsY() };
-	unsigned int nOfUnitCellsZ{ _myParameters.getNumberOfUnitCellsZ() };
-
-	double latticeConstant{ _myParameters.getChosenMaterial().getLatticeConstant() };
-	double cellSize{ _myParameters.getChosenMaterial().getCellSize() };
-
-	unsigned int numberOfCellsI{ _myParameters.getNumberOfCellsI() };
-	unsigned int numberOfCellsJ{ _myParameters.getNumberOfCellsJ() };
-	unsigned int numberOfCellsK{ _myParameters.getNumberOfCellsK() };
-
-	for (unsigned int k = 0; k < numberOfCellsK; k++)
-	{
-		for (unsigned int j = 0; j < numberOfCellsJ; j++)
-		{
-			for (unsigned int i = 0; i < numberOfCellsI; i++)
-			{
-				Cell* c = new Cell(i, j, k);
-				addCellToCellList(c);
 			}
 		}
 	}
+}
+
+//Initialize the MD software by setting up the system and creating atoms, cells and neighbour lists.
+void World::setupSystem(Parameters p)
+{
+	_myParameters = p;
+	_myResults = Results{ p.getSimulationTime(), p.getTimeStep(), p.getNumberOfAtoms() };
+	_mySimulation = Simulation(p.getChosenMaterial());
+
+	unsigned int nOfUnitCellsX{ _myParameters.getNumberOfUnitCellsX() };
+	unsigned int nOfUnitCellsY{ _myParameters.getNumberOfUnitCellsY() };
+	unsigned int nOfUnitCellsZ{ _myParameters.getNumberOfUnitCellsZ() };
+	double latticeConstant{ _myParameters.getChosenMaterial().getLatticeConstant() };
+	string crystalStructure{ _myParameters.getChosenMaterial().getCrystalStructure() };
+
+	if (crystalStructure == "fcc")
+	{
+		generateAtomsAtFccLattice(latticeConstant, nOfUnitCellsX, nOfUnitCellsY, nOfUnitCellsZ);
+	}
+	else if (crystalStructure == "sc")
+	{
+		generateAtomsAtScLattice(latticeConstant, nOfUnitCellsX, nOfUnitCellsY, nOfUnitCellsZ);
+	}
+	generateCells();
+	populateCells();
+
+	setupNeighbourLists(_myParameters.getIs2D());
+
+	initializeAtoms();
+}
+
+/* PUBLIC */
+//Constructor.
+World::World(Parameters p)
+{
+	setupSystem(p);
 }
 
 //Get atom from the atom list at index
@@ -484,10 +446,10 @@ void World::calcPotentialAndForce(double elapsedTime)
 {
 	double potential{0};
 	double force{0};
-	//array<double, 3> force;
 	Atom* a1;
 	Atom* a2;
 	array<double, 4> r;
+
 	for (int i{ 0 }; i < (int) _myParameters.getNumberOfAtoms() - 1; i++)
 	{
 		a1 = _atomList.at(i);
@@ -563,12 +525,6 @@ void World::solveEquationsOfMotion(double elapsedTime)
 	double timeStep = _myParameters.getTimeStep();
 	_myParameters.setTemperature(T);
 
-	//Stuff related to the Gaussian velocity for the Anderson thermostat.
-	random_device rd;
-	mt19937 generator(rd());
-	uniform_real_distribution<double> distribution(0, 1);
-	double randomValue;
-
 	//Go through the atom list and assign new positions and velocities using the Velocity Verlet Algorithm.
 	#pragma omp parallel private(thisAtom, oldR, oldV, oldA, newR, newV) shared(timeStep) reduction(+: K)
 	{
@@ -608,6 +564,11 @@ void World::solveEquationsOfMotion(double elapsedTime)
 
 	if (T > 0 && _myParameters.getIsThermostatOn())
 	{
+		random_device rd;
+		mt19937 generator(rd());
+		uniform_real_distribution<double> distribution(0, 1);
+		double randomValue;
+
 		#pragma omp parallel private(newV, randomValue, thisAtom) shared(distribution, generator)
 		{
 			//Anderson thermostat.

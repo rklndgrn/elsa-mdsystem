@@ -31,9 +31,8 @@ private:
 
 	//Member functions
 	bool checkM(int, bool, unsigned int, unsigned int, unsigned int);
-	//int incrementM(int, unsigned int, unsigned int, unsigned int);
-	void correctPositions(std::array<double, 3>&);
 
+	void correctPositions(std::array<double, 3>&);
 	void distributeInitialVelocities();
 	void generateAtomsAtFccLattice(double, unsigned int, unsigned int, unsigned int);
 	void generateAtomsAtScLattice(double, unsigned int, unsigned int, unsigned int);

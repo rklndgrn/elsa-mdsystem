@@ -196,7 +196,7 @@ array<double, 3> Simulation::calcVelocity(std::array<double, 3> v, std::array<do
 	return newV;
 }
 
-//Function for assigning a new Gaussian velocity if an Anderson thermostat is to be used. T is the variance/temperature. 
+//Function for assigning a new Gaussian velocity for initial velocity distribution and if an Anderson thermostat is to be used. 
 array<double, 3> Simulation::generateGaussianVelocity(double variance)
 {
 	random_device rd;
