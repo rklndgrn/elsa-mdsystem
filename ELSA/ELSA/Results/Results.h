@@ -61,7 +61,7 @@ public:
 	void setPotentialEnergy(double, int);
 	void setSpecificHeat(double, int);
 	void setTemperature(double, int);
-	void setTotalEnergy(double, int);
+	void setTotalEnergy(int);
 };
 
 #endif

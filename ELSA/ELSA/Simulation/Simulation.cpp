@@ -123,8 +123,8 @@ array<double, 3> Simulation::calcAcceleration(double fx, double fy, double fz)
 	return a;
 }
 
-//Calc euclidean distance with respect to periodic boundary conditions
-//element 0: total distance; element 1, 2, 3: normalized x-,y-,z-components
+//Calc Euclidean distance with respect to periodic boundary conditions
+//element 0: total distance; element 1, 2, 3: normalized x-,y-,z-components.
 array<double, 4> Simulation::calcDistance(Atom* a1, Atom* a2, double lengthX, double lengthY, double lengthZ, bool is2D) const
 {
 	double rx, ry, rz, r;
@@ -137,6 +137,7 @@ array<double, 4> Simulation::calcDistance(Atom* a1, Atom* a2, double lengthX, do
 	{
 		rx += lengthX;
 	}
+
 	ry = a1->getPositionY() - a2->getPositionY();
 	if (ry > lengthY / 2.0)
 	{
@@ -146,6 +147,7 @@ array<double, 4> Simulation::calcDistance(Atom* a1, Atom* a2, double lengthX, do
 	{
 		ry += lengthY;
 	}
+
 	rz = a1->getPositionZ() - a2->getPositionZ();
 	if (!is2D)
 	{
@@ -158,6 +160,7 @@ array<double, 4> Simulation::calcDistance(Atom* a1, Atom* a2, double lengthX, do
 			rz += lengthZ;
 		}
 	}
+
 	r = sqrt(pow(rx, 2) + pow(ry, 2) + pow(rz, 2));
 	rx = rx / r;
 	ry = ry / r;

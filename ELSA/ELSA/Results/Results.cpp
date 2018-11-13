@@ -192,7 +192,7 @@ void Results::setTemperature(double value, int index)
 	_temperature[index] = value;
 }
 
-void Results::setTotalEnergy(double value, int index)
+void Results::setTotalEnergy(int index)
 {
-	_totalEnergy[index] = value;
+	_totalEnergy[index] = _potentialEnergy[index] + _kineticEnergy[index];
 }

@@ -58,6 +58,7 @@ public:
 	void addAtomToAtomList(Atom*);
 	void addCellToCellList(Cell*);
 	void calcPotentialAndForce(double);
+	void calcPotentialAndForcePerAtom(Atom*, double);
 	void calcPressure(double);
 	void resetAllPotentialsAndForces();
 	void solveEquationsOfMotion(double);

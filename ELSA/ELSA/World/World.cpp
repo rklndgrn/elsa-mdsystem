@@ -31,33 +31,38 @@ bool World::checkM(int m, bool is2D, unsigned int maxK, unsigned int lowerK, uns
 //Correct positions according to periodic boundary conditions
 void World::correctPositions(array<double, 3>& r)
 {
-	while (r[0] < 0)
+	double factorX = abs(r[0] / _myParameters.getLengthX());
+	double factorY = abs(r[1] / _myParameters.getLengthY());
+	double factorZ = abs(r[2] / _myParameters.getLengthZ());
+
+	if (r[0] < 0)
 	{
-		r[0] += _myParameters.getLengthX();
+		r[0] += ceil(factorX)*_myParameters.getLengthX();
 	}
-	while (r[0] > _myParameters.getLengthX())
+	else if (r[0] > _myParameters.getLengthX())
 	{
-		r[0] -= _myParameters.getLengthX();
+		r[0] -= floor(factorX)*_myParameters.getLengthX();
 	}
-	while (r[1] < 0)
+	if (r[1] < 0)
 	{
-		r[1] += _myParameters.getLengthY();
+		r[1] += ceil(factorY)*_myParameters.getLengthY();
 	}
-	while (r[1] > _myParameters.getLengthY())
+	else if (r[1] > _myParameters.getLengthY())
 	{
-		r[1] -= _myParameters.getLengthY();
+		r[1] -= floor(factorY)*_myParameters.getLengthY();
 	}
 	if (!_myParameters.getIs2D())
 	{
-		while (r[2] < 0)
+		if (r[2] < 0)
 		{
-			r[2] += _myParameters.getLengthZ();
+			r[2] += ceil(factorZ)*_myParameters.getLengthZ();
 		}
-		while (r[2] > _myParameters.getLengthZ())
+		else if (r[2] > _myParameters.getLengthZ())
 		{
-			r[2] -= _myParameters.getLengthZ();
+			r[2] -= floor(factorZ)*_myParameters.getLengthZ();
 		}
 	}
+
 }
 
 //Set the atoms' velocities from temperature according to Maxwell-Boltzmann distribution 
@@ -136,9 +141,18 @@ void World::generateAtomsAtScLattice(double latticeConstant, unsigned int nOfUni
 
 void World::initializeAtoms()
 {
-	omp_set_num_threads(numberOfThreads);
+	//omp_set_num_threads(numberOfThreads);
 	distributeInitialVelocities();
 	calcPotentialAndForce(0);
+	Atom* thisAtom;
+	array<double, 3> newA;
+	for (int i = 0; i < _atomList.size(); i++)
+	{
+		thisAtom = _atomList.at(i);
+		newA = _mySimulation.calcAcceleration(thisAtom->getForceX(), thisAtom->getForceY(), thisAtom->getForceZ());
+		thisAtom->setAcceleration(newA);
+	}
+	/*
 	double K{0};
 	Atom* thisAtom;
 	#pragma omp parallel private(thisAtom) reduction (+: K)
@@ -155,7 +169,9 @@ void World::initializeAtoms()
 	double T = _mySimulation.calcTemperature(K, _myParameters.getBoltzmann(), _myParameters.getNumberOfAtoms());
 	_myResults.setKineticEnergy(K, 0);
 	_myResults.setTemperature(T, 0);
-	calcPressure(0);
+	*/
+	//solveEquationsOfMotion(0);
+	//calcPressure(0);
 }
 
 //Creates cells for faster neighbourlist setup
@@ -458,7 +474,7 @@ void World::calcPotentialAndForce(double elapsedTime)
 	for (int i{ 0 }; i < (int) _myParameters.getNumberOfAtoms() - 1; i++)
 	{
 		a1 = _atomList.at(i);
-		// For all atoms close to a1
+		// For all atoms sufficiently close to a1.
 		for (int j{ 0 }; j < a1->getNeighbourList().size(); j++)
 		{
 			a2 = a1->getNeighbourList().at(j);
@@ -473,10 +489,11 @@ void World::calcPotentialAndForce(double elapsedTime)
 			a2->setPotential(a2->getPotential() + potential);
 
 			a1->setForceX(a1->getForceX() + force * r[1]);
-			a2->setForceX(a2->getForceX() - force * r[1]);
 			a1->setForceY(a1->getForceY() + force * r[2]);
-			a2->setForceY(a2->getForceY() - force * r[2]);
 			a1->setForceZ(a1->getForceZ() + force * r[3]);
+
+			a2->setForceX(a2->getForceX() - force * r[1]);
+			a2->setForceY(a2->getForceY() - force * r[2]);
 			a2->setForceZ(a2->getForceZ() - force * r[3]);
 
 			//Accumulate for internal pressure calculation
@@ -487,6 +504,52 @@ void World::calcPotentialAndForce(double elapsedTime)
 	}
 
 	_myResults.setPotentialEnergy(totalPotential, (int)(elapsedTime / _myParameters.getTimeStep()));
+}
+
+//	Calculates the force and potential per atom and stores them in the atoms. The force is directional but the potential is not.
+void World::calcPotentialAndForcePerAtom(Atom* a1, double elapsedTime)
+{
+	//Reset before the next iteration.
+
+	//_pressureRFSum = 0;
+
+	double potential{ 0 };
+	double force{ 0 };
+	//double totalPotential{ 0 };
+
+	Atom* a2;
+	array<double, 4> r;
+
+	// For all atoms sufficiently close to a1.
+	for (int j{ 0 }; j < a1->getNeighbourList().size(); j++)
+	{
+		a2 = a1->getNeighbourList().at(j);
+
+		// Returns the distance as a homogeneous vector
+		r = _mySimulation.calcDistance(a1, a2, _myParameters.getLengthX(), _myParameters.getLengthY(), _myParameters.getLengthZ(), _myParameters.getIs2D());
+		force = _mySimulation.calcForce(r[0]);
+
+		potential = _mySimulation.calcLJPotential(r[0]);
+
+		a1->setPotential(a1->getPotential() + potential);
+		a2->setPotential(a2->getPotential() + potential);
+
+		a1->setForceX(a1->getForceX() + force * r[1]);
+		a1->setForceY(a1->getForceY() + force * r[2]);
+		a1->setForceZ(a1->getForceZ() + force * r[3]);
+
+		a2->setForceX(a2->getForceX() - force * r[1]);
+		a2->setForceY(a2->getForceY() - force * r[2]);
+		a2->setForceZ(a2->getForceZ() - force * r[3]);
+
+		//Accumulate for internal pressure calculation
+		_pressureRFSum += r[0] * force;
+
+		//totalPotential += potential;
+	}
+	
+
+	//_myResults.setPotentialEnergy(totalPotential, (int)(elapsedTime / _myParameters.getTimeStep()));
 }
 
 //Calculate the internal pressure at a certain time
@@ -518,11 +581,13 @@ void World::solveEquationsOfMotion(double elapsedTime)
 	double m = _myParameters.getChosenMaterial().getMass();
 	double K{0}; //Kinetic energy.
 	double T{0}; //Instantenous temperature
+	double px{ 0 }, py{ 0 }, pz{ 0 };
 	double timeStep = _myParameters.getTimeStep();
-	_myParameters.setTemperature(T);
+	int index = (int)round(elapsedTime / timeStep);
+	//_myParameters.setTemperature(T);
 
 	//Go through the atom list and assign new positions and velocities using the Velocity Verlet Algorithm.
-	#pragma omp parallel private(thisAtom, oldR, oldV, oldA, newR, newV) shared(m, timeStep) reduction(+: K)
+	#pragma omp parallel private(thisAtom, oldR, oldV, oldA, newR, newV) shared(m, timeStep) reduction(+: K, px, py, pz)
 	{
 		#pragma omp for 
 		for (int i{ 0 }; i < _atomList.size(); i++)
@@ -531,33 +596,39 @@ void World::solveEquationsOfMotion(double elapsedTime)
 			oldR = { thisAtom->getPositionX(), thisAtom->getPositionY(), thisAtom->getPositionZ() };
 			oldV = { thisAtom->getVelocityX(), thisAtom->getVelocityY(), thisAtom->getVelocityZ() };
 			oldA = { thisAtom->getAccelerationX(), thisAtom->getAccelerationY(), thisAtom->getAccelerationZ() };
-			newA = _mySimulation.calcAcceleration(thisAtom->getForceX(), thisAtom->getForceY(), thisAtom->getForceZ());
 
 			newR = _mySimulation.calcPosition(oldR, oldV, oldA, timeStep);
 			correctPositions(newR);
+			thisAtom->setPosition(newR);
 
+			#pragma omp critical
+			{
+				calcPotentialAndForcePerAtom(thisAtom, elapsedTime);
+				_myResults.setPositions(newR[0], newR[1], newR[2], index, i);
+			}
+
+			newA = _mySimulation.calcAcceleration(thisAtom->getForceX(), thisAtom->getForceY(), thisAtom->getForceZ());
 			newV = _mySimulation.calcVelocity(oldV, oldA, newA, timeStep);
 
-			thisAtom->setPosition(newR);
 			thisAtom->setVelocity(newV);
 			thisAtom->setAcceleration(newA);
 
 			K += _mySimulation.calcKineticEnergy(newV[0], newV[1], newV[2]);
-
-			#pragma omp critical
-			{
-				_myResults.setPositions(newR[0], newR[1], newR[2], (int)round(elapsedTime / timeStep), i);
-				_myResults.addToMomentum(m*newV[0], m*newV[1], m*newV[2], (int)round(elapsedTime / timeStep));
-			}
+			px += m * newV[0];
+			py += m * newV[1];
+			pz += m * newV[2];
 		}
 	}
+
+	_myResults.addToMomentum(px, py, pz, index);
 
 	T = _mySimulation.calcTemperature(K, _myParameters.getBoltzmann(), _myParameters.getNumberOfAtoms());
 
 
 	//Save the kinetic energy and temperature for the results presentation.
-	_myResults.setKineticEnergy(K, (int) round(elapsedTime / timeStep));
-	_myResults.setTemperature(T, (int) round(elapsedTime / timeStep));
+	_myResults.setKineticEnergy(K, index);
+	_myResults.setTotalEnergy(index);
+	_myResults.setTemperature(T, index);
 
 	if (T > 0 && _myParameters.getIsThermostatOn())
 	{
