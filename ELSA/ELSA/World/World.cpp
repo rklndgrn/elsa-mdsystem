@@ -522,7 +522,7 @@ void World::solveEquationsOfMotion(double elapsedTime)
 	_myParameters.setTemperature(T);
 
 	//Go through the atom list and assign new positions and velocities using the Velocity Verlet Algorithm.
-	#pragma omp parallel private(thisAtom, oldR, oldV, oldA, newR, newV) shared(timeStep) shared(m) reduction(+: K)
+	#pragma omp parallel private(thisAtom, oldR, oldV, oldA, newR, newV) shared(m, timeStep) reduction(+: K)
 	{
 		#pragma omp for 
 		for (int i{ 0 }; i < _atomList.size(); i++)
@@ -536,20 +536,19 @@ void World::solveEquationsOfMotion(double elapsedTime)
 			newR = _mySimulation.calcPosition(oldR, oldV, oldA, timeStep);
 			correctPositions(newR);
 
-			#pragma omp critical
-			{
-				_myResults.setPositions(newR[0], newR[1], newR[2], (int)round(elapsedTime / timeStep), i);
-			}
-
 			newV = _mySimulation.calcVelocity(oldV, oldA, newA, timeStep);
 
 			thisAtom->setPosition(newR);
 			thisAtom->setVelocity(newV);
 			thisAtom->setAcceleration(newA);
 
-			_myResults.addToMomentum(m*newV[0], m*newV[1], m*newV[2], (int)round(elapsedTime / timeStep));
-
 			K += _mySimulation.calcKineticEnergy(newV[0], newV[1], newV[2]);
+
+			#pragma omp critical
+			{
+				_myResults.setPositions(newR[0], newR[1], newR[2], (int)round(elapsedTime / timeStep), i);
+				_myResults.addToMomentum(m*newV[0], m*newV[1], m*newV[2], (int)round(elapsedTime / timeStep));
+			}
 		}
 	}
 

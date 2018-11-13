@@ -31,12 +31,12 @@ int main()
 	array<double, 3> p = myWorld.getResults().getMomentumVector(index);
 
 	cout << "Time 0: " << endl;
-	//cout << "   Potential energy: " << U[index] << endl;
-	//cout << "   Kinetic energy: " << K[index] << endl;
+	cout << "   Potential energy: " << U[index] << endl;
+	cout << "   Kinetic energy: " << K[index] << endl;
 	//cout << "   Temperature: " << T[index] << endl;
 	//cout << "   Position of atom 555: (" << myWorld.getAtomInAtomList(555)->getPositionX() << ", " << myWorld.getAtomInAtomList(555)->getPositionY() << ", " << myWorld.getAtomInAtomList(555)->getPositionZ() << ")" << endl;
 	//cout << "   Velocity of atom 555: (" << myWorld.getAtomInAtomList(555)->getVelocityX() << ", " << myWorld.getAtomInAtomList(555)->getVelocityY() << ", " << myWorld.getAtomInAtomList(555)->getVelocityZ() << ")" << endl;
-	cout << "   Total momentum: (" << p[0] << ", " << p[1] << ", " << p[2] << ")" << endl;
+	//cout << "   Total momentum: (" << p[0] << ", " << p[1] << ", " << p[2] << ")" << endl;
 	cout << "   Total energy: " << U[index] + K[index] << endl;
 
 	myWorld.resetAllPotentialsAndForces();
@@ -53,7 +53,7 @@ int main()
 		myWorld.calcPressure(t);
 		U = *potArray;
 		K = *kinArray;
-		p = myWorld.getResults().getMomentumVector(index);
+		//p = myWorld.getResults().getMomentumVector(index);
 		//T = *tempArray;
 		index = (int)round(t / deltaT);
 		
@@ -61,9 +61,9 @@ int main()
 		//cout << "   Position of atom 555: (" << myWorld.getAtomInAtomList(555)->getPositionX() << ", " << myWorld.getAtomInAtomList(555)->getPositionY() << ", " << myWorld.getAtomInAtomList(555)->getPositionZ() << ")" << endl;
 		//cout << "   Velocity of atom 555: (" << myWorld.getAtomInAtomList(555)->getVelocityX() << ", " << myWorld.getAtomInAtomList(555)->getVelocityY() << ", " << myWorld.getAtomInAtomList(555)->getVelocityZ() << ")" << endl;
 		
-		//cout << "   Potential energy: " << U[index] << endl;
-		//cout << "   Kinetic energy: " << K[index] << endl;
-		cout << "   Total momentum: (" << p[0] << ", " << p[1] << ", " << p[2] << ")" << endl;
+		cout << "   Potential energy: " << U[index] << endl;
+		cout << "   Kinetic energy: " << K[index] << endl;
+		//cout << "   Total momentum: (" << p[0] << ", " << p[1] << ", " << p[2] << ")" << endl;
 		cout << "   Total energy: " << U[index] + K[index] << endl;
 		//cout << "   Temperature: " << T[index] << endl;
 		
