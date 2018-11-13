@@ -70,10 +70,11 @@ void World::distributeInitialVelocities()
 	omp_set_num_threads(numberOfThreads);
 	//double sigma = sqrt(_myParameters.getBoltzmann() * _myParameters.getTemperature() / _myParameters.getChosenMaterial().getMass());
 	double variance = _myParameters.getBoltzmann() * _myParameters.getTemperature() / _myParameters.getChosenMaterial().getMass();
+	double K{ 0 }, T{ 0 };
 
 	array<double, 3> v;
 
-	#pragma omp parallel private(v) shared(variance)
+	#pragma omp parallel private(v) shared(variance) reduction(+: K)
 	{
 		#pragma omp for
 		for (int atomId = 0; atomId < (int)_myParameters.getNumberOfAtoms(); atomId++)
@@ -82,8 +83,13 @@ void World::distributeInitialVelocities()
 			_atomList.at(atomId)->setVelocityX(v[0]);
 			_atomList.at(atomId)->setVelocityY(v[1]);
 			_atomList.at(atomId)->setVelocityZ(v[2]);
+			K += _mySimulation.calcKineticEnergy(v[0], v[1], v[2]);
 		}
 	}
+
+	T = _mySimulation.calcTemperature(K, _myParameters.getBoltzmann(), _myParameters.getNumberOfAtoms());
+	_myResults.setKineticEnergy(K, 0);
+	_myResults.setTemperature(T, 0);
 }
 
 //Populate an FCC lattice with atoms.
