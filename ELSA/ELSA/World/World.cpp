@@ -62,7 +62,6 @@ void World::correctPositions(array<double, 3>& r)
 			r[2] -= floor(factorZ)*_myParameters.getLengthZ();
 		}
 	}
-
 }
 
 //Set the atoms' velocities from temperature according to Maxwell-Boltzmann distribution 
@@ -509,13 +508,8 @@ void World::calcPotentialAndForce(double elapsedTime)
 //	Calculates the force and potential per atom and stores them in the atoms. The force is directional but the potential is not.
 void World::calcPotentialAndForcePerAtom(Atom* a1, double elapsedTime)
 {
-	//Reset before the next iteration.
-
-	//_pressureRFSum = 0;
-
 	double potential{ 0 };
 	double force{ 0 };
-	//double totalPotential{ 0 };
 
 	Atom* a2;
 	array<double, 4> r;
@@ -544,12 +538,7 @@ void World::calcPotentialAndForcePerAtom(Atom* a1, double elapsedTime)
 
 		//Accumulate for internal pressure calculation
 		_pressureRFSum += r[0] * force;
-
-		//totalPotential += potential;
 	}
-	
-
-	//_myResults.setPotentialEnergy(totalPotential, (int)(elapsedTime / _myParameters.getTimeStep()));
 }
 
 //Calculate the internal pressure at a certain time
@@ -569,6 +558,7 @@ void World::calcPressure(double elapsedTime)
 void World::solveEquationsOfMotion(double elapsedTime)
 {
 	omp_set_num_threads(numberOfThreads);
+	_pressureRFSum = 0;
 
 	Atom* thisAtom;
 	array<double, 3> oldR;
@@ -579,15 +569,15 @@ void World::solveEquationsOfMotion(double elapsedTime)
 	array<double, 3> newA;
 
 	double m = _myParameters.getChosenMaterial().getMass();
+	double U{0}; //Total potential energy.
 	double K{0}; //Kinetic energy.
 	double T{0}; //Instantenous temperature
-	double px{ 0 }, py{ 0 }, pz{ 0 };
+	double px{0}, py{0}, pz{0}; //Momentum.
 	double timeStep = _myParameters.getTimeStep();
 	int index = (int)round(elapsedTime / timeStep);
-	//_myParameters.setTemperature(T);
 
 	//Go through the atom list and assign new positions and velocities using the Velocity Verlet Algorithm.
-	#pragma omp parallel private(thisAtom, oldR, oldV, oldA, newR, newV) shared(m, timeStep) reduction(+: K, px, py, pz)
+	#pragma omp parallel private(thisAtom, oldR, oldV, oldA, newR, newV) shared(m, timeStep) reduction(+: K, U, px, py, pz)
 	{
 		#pragma omp for 
 		for (int i{ 0 }; i < _atomList.size(); i++)
@@ -613,6 +603,7 @@ void World::solveEquationsOfMotion(double elapsedTime)
 			thisAtom->setVelocity(newV);
 			thisAtom->setAcceleration(newA);
 
+			U += thisAtom->getPotential();
 			K += _mySimulation.calcKineticEnergy(newV[0], newV[1], newV[2]);
 			px += m * newV[0];
 			py += m * newV[1];
@@ -620,15 +611,14 @@ void World::solveEquationsOfMotion(double elapsedTime)
 		}
 	}
 
-	_myResults.addToMomentum(px, py, pz, index);
-
 	T = _mySimulation.calcTemperature(K, _myParameters.getBoltzmann(), _myParameters.getNumberOfAtoms());
 
-
 	//Save the kinetic energy and temperature for the results presentation.
+	_myResults.setPotentialEnergy(U, index);
 	_myResults.setKineticEnergy(K, index);
-	_myResults.setTotalEnergy(index);
+	_myResults.setMomentum(px, py, pz, index);
 	_myResults.setTemperature(T, index);
+	_myResults.setTotalEnergy(index);
 
 	if (T > 0 && _myParameters.getIsThermostatOn())
 	{

@@ -21,21 +21,24 @@ int main()
 
 	double** potArray = myWorld.getResults().getPotentialEnergy();
 	double** kinArray = myWorld.getResults().getKineticEnergy();
-	double** tempArray = myWorld.getResults().getTemperature();
+	//double** tempArray = myWorld.getResults().getTemperature();
 	double* U = *potArray;
 	double* K = *kinArray;
-	double* T = *tempArray;
+	//double* T = *tempArray;
 	int index{ 0 };
 	double deltaT = myParameters.getTimeStep();
 
 	//array<double, 3> p = myWorld.getResults().getMomentumVector(index);
 
-	//cout << "Time 0: " << endl;
+	cout << "Time 0: " << endl;
 	//cout << "   Potential energy: " << U[index] << endl;
 	//cout << "   Kinetic energy: " << K[index] << endl;
 	//cout << "   Temperature: " << T[index] << endl;
-	//cout << "   Position of atom 555: (" << myWorld.getAtomInAtomList(555)->getPositionX() << ", " << myWorld.getAtomInAtomList(555)->getPositionY() << ", " << myWorld.getAtomInAtomList(555)->getPositionZ() << ")" << endl;
-	//cout << "   Velocity of atom 555: (" << myWorld.getAtomInAtomList(555)->getVelocityX() << ", " << myWorld.getAtomInAtomList(555)->getVelocityY() << ", " << myWorld.getAtomInAtomList(555)->getVelocityZ() << ")" << endl;
+	cout << "   Position of atom 555: (" << myWorld.getAtomInAtomList(555)->getPositionX() << ", " << myWorld.getAtomInAtomList(555)->getPositionY() << ", " << myWorld.getAtomInAtomList(555)->getPositionZ() << ")" << endl;
+	cout << "   Velocity of atom 555: (" << myWorld.getAtomInAtomList(555)->getVelocityX() << ", " << myWorld.getAtomInAtomList(555)->getVelocityY() << ", " << myWorld.getAtomInAtomList(555)->getVelocityZ() << ")" << endl;
+	cout << "   Acceleration of atom 555: (" << myWorld.getAtomInAtomList(555)->getAccelerationX() << ", " << myWorld.getAtomInAtomList(555)->getAccelerationY() << ", " << myWorld.getAtomInAtomList(555)->getAccelerationZ() << ")" << endl;
+	cout << "   Force on atom 555: (" << myWorld.getAtomInAtomList(555)->getForceX() << ", " << myWorld.getAtomInAtomList(555)->getForceY() << ", " << myWorld.getAtomInAtomList(555)->getForceZ() << ")" << endl;
+
 	//cout << "   Total momentum: (" << p[0] << ", " << p[1] << ", " << p[2] << ")" << endl;
 	//cout << "   Total energy: " << U[index] + K[index] << endl;
 
@@ -58,15 +61,15 @@ int main()
 		index = (int)round(t / deltaT);
 		
 		cout << "Time " << t << ": " << endl;
-		//cout << "   Position of atom 555: (" << myWorld.getAtomInAtomList(555)->getPositionX() << ", " << myWorld.getAtomInAtomList(555)->getPositionY() << ", " << myWorld.getAtomInAtomList(555)->getPositionZ() << ")" << endl;
-		//cout << "   Velocity of atom 555: (" << myWorld.getAtomInAtomList(555)->getVelocityX() << ", " << myWorld.getAtomInAtomList(555)->getVelocityY() << ", " << myWorld.getAtomInAtomList(555)->getVelocityZ() << ")" << endl;
-		//cout << "   Acceleration of atom 555: (" << myWorld.getAtomInAtomList(555)->getAccelerationX() << ", " << myWorld.getAtomInAtomList(555)->getAccelerationY() << ", " << myWorld.getAtomInAtomList(555)->getAccelerationZ() << ")" << endl;
-		//cout << "   Force on atom 555: (" << myWorld.getAtomInAtomList(555)->getForceX() << ", " << myWorld.getAtomInAtomList(555)->getForceY() << ", " << myWorld.getAtomInAtomList(555)->getForceZ() << ")" << endl;
+		cout << "   Position of atom 555: (" << myWorld.getAtomInAtomList(555)->getPositionX() << ", " << myWorld.getAtomInAtomList(555)->getPositionY() << ", " << myWorld.getAtomInAtomList(555)->getPositionZ() << ")" << endl;
+		cout << "   Velocity of atom 555: (" << myWorld.getAtomInAtomList(555)->getVelocityX() << ", " << myWorld.getAtomInAtomList(555)->getVelocityY() << ", " << myWorld.getAtomInAtomList(555)->getVelocityZ() << ")" << endl;
+		cout << "   Acceleration of atom 555: (" << myWorld.getAtomInAtomList(555)->getAccelerationX() << ", " << myWorld.getAtomInAtomList(555)->getAccelerationY() << ", " << myWorld.getAtomInAtomList(555)->getAccelerationZ() << ")" << endl;
+		cout << "   Force on atom 555: (" << myWorld.getAtomInAtomList(555)->getForceX() << ", " << myWorld.getAtomInAtomList(555)->getForceY() << ", " << myWorld.getAtomInAtomList(555)->getForceZ() << ")" << endl;
 		
-		cout << "   Potential energy: " << U[index] << endl;
-		cout << "   Kinetic energy: " << K[index] << endl;
+		//cout << "   Potential energy: " << U[index] << endl;
+		//cout << "   Kinetic energy: " << K[index] << endl;
 		//cout << "   Total momentum: (" << p[0] << ", " << p[1] << ", " << p[2] << ")" << endl;
-		cout << "   Total energy: " << U[index] + K[index] << endl;
+		//cout << "   Total energy: " << U[index] + K[index] << endl;
 		//cout << "   Temperature: " << T[index] << endl;
 		
 	}
