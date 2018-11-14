@@ -65,6 +65,10 @@ Parameters::Parameters(
 		_numberOfUnitCellsZ * _chosenMaterial.getLatticeConstant() /
 		_chosenMaterial.getCellSize());
 
+	//_numberOfCellsI = 1;
+	//_numberOfCellsJ = 1;
+	//_numberOfCellsK = 1;
+
 
 }
 

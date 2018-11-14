@@ -156,6 +156,8 @@ void World::initializeAtoms()
 		thisAtom = _atomList.at(i);
 		newA = _mySimulation.calcAcceleration(thisAtom->getForceX(), thisAtom->getForceY(), thisAtom->getForceZ());
 		thisAtom->setAcceleration(newA);
+		//thisAtom->setAcceleration({ 0.0, 0.0, 0.0 });
+		//thisAtom->setForce({ 0.0, 0.0, 0.0 });
 	}
 	/*
 	double K{0};
@@ -493,13 +495,13 @@ void World::calcPotentialAndForce(double elapsedTime)
 			a1->setPotential(a1->getPotential() + potential);
 			a2->setPotential(a2->getPotential() + potential);
 
-			a1->setForceX(a1->getForceX() + force * r[1]);
-			a1->setForceY(a1->getForceY() + force * r[2]);
-			a1->setForceZ(a1->getForceZ() + force * r[3]);
+			a1->setForceX(a1->getForceX() - force * r[1]);
+			a1->setForceY(a1->getForceY() - force * r[2]);
+			a1->setForceZ(a1->getForceZ() - force * r[3]);
 
-			a2->setForceX(a2->getForceX() - force * r[1]);
-			a2->setForceY(a2->getForceY() - force * r[2]);
-			a2->setForceZ(a2->getForceZ() - force * r[3]);
+			a2->setForceX(a2->getForceX() + force * r[1]);
+			a2->setForceY(a2->getForceY() + force * r[2]);
+			a2->setForceZ(a2->getForceZ() + force * r[3]);
 
 			//Accumulate for internal pressure calculation
 			_pressureRFSum += r[0] * force;
@@ -583,7 +585,7 @@ void World::solveEquationsOfMotion(double elapsedTime)
 	int index = (int)round(elapsedTime / timeStep);
 
 	//Go through the atom list and assign new positions and velocities using the Velocity Verlet Algorithm.
-	#pragma omp parallel private(thisAtom, oldR, oldV, oldA, newR, newV) shared(m, timeStep) reduction(+: K, U, px, py, pz)
+	#pragma omp parallel private(thisAtom, oldR, oldV, oldA, newR) shared(timeStep)
 	{
 		#pragma omp for 
 		for (int i{ 0 }; i < _atomList.size(); i++)
@@ -596,13 +598,24 @@ void World::solveEquationsOfMotion(double elapsedTime)
 			newR = _mySimulation.calcPosition(oldR, oldV, oldA, timeStep);
 			correctPositions(newR);
 			thisAtom->setPosition(newR);
+		}
+	}
 
-			#pragma omp critical
-			{
-				calcPotentialAndForcePerAtom(thisAtom, elapsedTime);
-				_myResults.setPositions(newR[0], newR[1], newR[2], index, i);
-			}
 
+	calcPotentialAndForce(elapsedTime);
+	for (int i{ 0 }; i < _atomList.size(); i++)
+	{
+		_myResults.setPositions(newR[0], newR[1], newR[2], index, i);
+	}
+
+	#pragma omp parallel private(thisAtom, oldV, oldA, newV, newA) shared(m, timeStep) reduction(+: K, U, px, py, pz)
+	{
+		#pragma omp for 
+		for (int i{ 0 }; i < _atomList.size(); i++)
+		{
+			thisAtom = _atomList.at(i);
+			oldV = { thisAtom->getVelocityX(), thisAtom->getVelocityY(), thisAtom->getVelocityZ() };
+			oldA = { thisAtom->getAccelerationX(), thisAtom->getAccelerationY(), thisAtom->getAccelerationZ() };
 			newA = _mySimulation.calcAcceleration(thisAtom->getForceX(), thisAtom->getForceY(), thisAtom->getForceZ());
 			newV = _mySimulation.calcVelocity(oldV, oldA, newA, timeStep);
 
@@ -614,6 +627,7 @@ void World::solveEquationsOfMotion(double elapsedTime)
 			px += m * newV[0];
 			py += m * newV[1];
 			pz += m * newV[2];
+
 		}
 	}
 
