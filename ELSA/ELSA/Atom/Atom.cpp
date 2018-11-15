@@ -80,8 +80,6 @@ double Atom::getPotential() const
 {
 	return _potential;
 }
-*/
-
 double Atom::getVelocityX() const
 {
 	return _velocity[0];

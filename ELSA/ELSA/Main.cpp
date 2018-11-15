@@ -45,6 +45,11 @@ int main()
 	
 	for (double t = deltaT; t < myParameters.getSimulationTime() - 0.5*deltaT; t += deltaT)
 	{
+		if (deltaT > 0)
+		{
+			myWorld.updateCells();
+			myWorld.updateNeighbourList();
+		}
 
 		myWorld.calcPotentialAndForce(t);
 		myWorld.solveEquationsOfMotion(t);

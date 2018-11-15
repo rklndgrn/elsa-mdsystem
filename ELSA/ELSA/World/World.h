@@ -33,6 +33,7 @@ private:
 	//Member functions
 	bool checkM(int, bool, unsigned int, unsigned int, unsigned int);
 
+	void andersonThermostat(double, double);
 	void correctPositions(std::array<double, 3>&);
 	void distributeInitialVelocities(double);
 	void generateAtomsAtFccLattice(double, unsigned int, unsigned int, unsigned int);
@@ -42,6 +43,8 @@ private:
 	void populateCells();
 	void setupNeighbourLists(bool);
 	void setupSystem(Parameters);
+	void velocityVerletStep1(double);
+	void velocityVerletStep2(double);
 
 public:
 	World() = default;

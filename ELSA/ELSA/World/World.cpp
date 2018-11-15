@@ -5,6 +5,34 @@ using namespace std;
 ofstream myFileR, myFileF;
 
 /* PRIVATE */
+void World::andersonThermostat(double elapsedTime, double T)
+{
+	Atom* thisAtom;
+	array<double, 3> newV;
+
+	random_device rd;
+	mt19937 generator(rd());
+	uniform_real_distribution<double> distribution(0, 1);
+	double randomValue;
+
+	#pragma omp parallel private(newV, randomValue, thisAtom) shared(distribution, generator)
+	{
+		//Anderson thermostat.
+		#pragma omp for schedule(static)
+		for (int i{ 0 }; i < _atomList.size(); i++)
+		{
+			thisAtom = _atomList.at(i);
+			randomValue = distribution(generator);
+
+			if (randomValue < _myParameters.getCollisionFrequency()*elapsedTime)
+			{
+				newV = _mySimulation.generateGaussianVelocity(T);
+				thisAtom->setVelocity(newV);
+			}
+		}
+	}
+}
+
 //Function for checking whether the while loop in the setupNeighbourLists function should execute.
 //Checks if we are to skip adding neighbour atoms in certain cells due to the simulation being in 2D.
 bool World::checkM(int m, bool is2D, unsigned int maxK, unsigned int lowerK, unsigned int upperK)
@@ -412,6 +440,91 @@ void World::setupSystem(Parameters p)
 	initializeAtoms();
 }
 
+void World::velocityVerletStep1(double elapsedTime)
+{
+	omp_set_num_threads(numberOfThreads);
+	Atom* thisAtom;
+	array<double, 3> oldR, oldV, oldA, newR;
+	double timeStep = _myParameters.getTimeStep();
+	int index = (int)round(elapsedTime / timeStep);
+	#pragma omp parallel private(thisAtom, oldR, oldV, oldA, newR) shared(timeStep)
+	{
+		#pragma omp for 
+		for (int i{ 0 }; i < _atomList.size(); i++)
+		{
+			thisAtom = _atomList.at(i);
+			oldR = { thisAtom->getPositionX(), thisAtom->getPositionY(), thisAtom->getPositionZ() };
+			oldV = { thisAtom->getVelocityX(), thisAtom->getVelocityY(), thisAtom->getVelocityZ() };
+			oldA = { thisAtom->getAccelerationX(), thisAtom->getAccelerationY(), thisAtom->getAccelerationZ() };
+
+			newR = _mySimulation.calcPosition(oldR, oldV, oldA, timeStep);
+			correctPositions(newR);
+			thisAtom->setPosition(newR);
+		}
+	}
+
+	for (int i{ 0 }; i < _atomList.size(); i++)
+	{
+		thisAtom = _atomList.at(i);
+		_myResults.setPositions(thisAtom->getPositionX(), thisAtom->getPositionY(), thisAtom->getPositionZ(), index, i);
+	}
+}
+
+void World::velocityVerletStep2(double elapsedTime)
+{
+	omp_set_num_threads(numberOfThreads);
+
+	Atom* thisAtom;
+	array<double, 3> oldV, oldA, newV, newA;
+	double m = _myParameters.getChosenMaterial().getMass();
+	double U{ 0 }; //Total potential energy.
+	double K{ 0 }; //Kinetic energy.
+	double T{ 0 }; //Instantenous temperature
+	double px{ 0 }, py{ 0 }, pz{ 0 }; //Momentum.
+
+	double timeStep = _myParameters.getTimeStep();
+	int index = (int)round(elapsedTime / timeStep);
+
+	#pragma omp parallel private(thisAtom, oldV, oldA, newV, newA) shared(m, timeStep) reduction(+: K, U, px, py, pz)
+	{
+	#pragma omp for 
+		for (int i{ 0 }; i < _atomList.size(); i++)
+		{
+			thisAtom = _atomList.at(i);
+			oldV = { thisAtom->getVelocityX(), thisAtom->getVelocityY(), thisAtom->getVelocityZ() };
+			oldA = { thisAtom->getAccelerationX(), thisAtom->getAccelerationY(), thisAtom->getAccelerationZ() };
+			newA = _mySimulation.calcAcceleration(thisAtom->getForceX(), thisAtom->getForceY(), thisAtom->getForceZ());
+			newV = _mySimulation.calcVelocity(oldV, oldA, newA, timeStep);
+
+			thisAtom->setVelocity(newV);
+			thisAtom->setAcceleration(newA);
+
+			U += thisAtom->getPotential();
+			K += _mySimulation.calcKineticEnergy(newV[0], newV[1], newV[2]);
+			px += m * newV[0];
+			py += m * newV[1];
+			pz += m * newV[2];
+
+		}
+	}
+
+	T = _mySimulation.calcTemperature(K, _myParameters.getBoltzmann(), _myParameters.getNumberOfAtoms());
+
+	//Save the kinetic energy and temperature for the results presentation.
+	_myResults.setPotentialEnergy(U, index);
+	_myResults.setKineticEnergy(K, index);
+	_myResults.setMomentum(px, py, pz, index);
+	_myResults.setTemperature(T, index);
+	_myResults.setTotalEnergy(index);
+
+
+
+	if (T > 0 && _myParameters.getIsThermostatOn())
+	{
+		andersonThermostat(elapsedTime, T);
+	}
+}
+
 /* PUBLIC */
 //Constructor.
 World::World(Parameters p)
@@ -533,96 +646,15 @@ void World::solveEquationsOfMotion(double elapsedTime)
 	array<double, 3> newV;
 	array<double, 3> newA;
 
-	double m = _myParameters.getChosenMaterial().getMass();
-	double U{0}; //Total potential energy.
-	double K{0}; //Kinetic energy.
-	double T{0}; //Instantenous temperature
-	double px{0}, py{0}, pz{0}; //Momentum.
 	double timeStep = _myParameters.getTimeStep();
 	int index = (int)round(elapsedTime / timeStep);
 
 	//Go through the atom list and assign new positions and velocities using the Velocity Verlet Algorithm.
-	#pragma omp parallel private(thisAtom, oldR, oldV, oldA, newR) shared(timeStep)
-	{
-		#pragma omp for 
-		for (int i{ 0 }; i < _atomList.size(); i++)
-		{
-			thisAtom = _atomList.at(i);
-			oldR = { thisAtom->getPositionX(), thisAtom->getPositionY(), thisAtom->getPositionZ() };
-			oldV = { thisAtom->getVelocityX(), thisAtom->getVelocityY(), thisAtom->getVelocityZ() };
-			oldA = { thisAtom->getAccelerationX(), thisAtom->getAccelerationY(), thisAtom->getAccelerationZ() };
+	velocityVerletStep1(elapsedTime);
 
-			newR = _mySimulation.calcPosition(oldR, oldV, oldA, timeStep);
-			correctPositions(newR);
-			thisAtom->setPosition(newR);
-		}
-	}
-
-	updateCells();
-	updateNeighbourList();
 	calcPotentialAndForce(elapsedTime);
-	for (int i{ 0 }; i < _atomList.size(); i++)
-	{
-		thisAtom = _atomList.at(i);
-		_myResults.setPositions(thisAtom->getPositionX(), thisAtom->getPositionY(), thisAtom->getPositionZ(), index, i);
-	}
 
-	#pragma omp parallel private(thisAtom, oldV, oldA, newV, newA) shared(m, timeStep) reduction(+: K, U, px, py, pz)
-	{
-		#pragma omp for 
-		for (int i{ 0 }; i < _atomList.size(); i++)
-		{
-			thisAtom = _atomList.at(i);
-			oldV = { thisAtom->getVelocityX(), thisAtom->getVelocityY(), thisAtom->getVelocityZ() };
-			oldA = { thisAtom->getAccelerationX(), thisAtom->getAccelerationY(), thisAtom->getAccelerationZ() };
-			newA = _mySimulation.calcAcceleration(thisAtom->getForceX(), thisAtom->getForceY(), thisAtom->getForceZ());
-			newV = _mySimulation.calcVelocity(oldV, oldA, newA, timeStep);
-
-			thisAtom->setVelocity(newV);
-			thisAtom->setAcceleration(newA);
-
-			U += thisAtom->getPotential();
-			K += _mySimulation.calcKineticEnergy(newV[0], newV[1], newV[2]);
-			px += m * newV[0];
-			py += m * newV[1];
-			pz += m * newV[2];
-
-		}
-	}
-
-	T = _mySimulation.calcTemperature(K, _myParameters.getBoltzmann(), _myParameters.getNumberOfAtoms());
-
-	//Save the kinetic energy and temperature for the results presentation.
-	_myResults.setPotentialEnergy(U, index);
-	_myResults.setKineticEnergy(K, index);
-	_myResults.setMomentum(px, py, pz, index);
-	_myResults.setTemperature(T, index);
-	_myResults.setTotalEnergy(index);
-
-	if (T > 0 && _myParameters.getIsThermostatOn())
-	{
-		random_device rd;
-		mt19937 generator(rd());
-		uniform_real_distribution<double> distribution(0, 1);
-		double randomValue;
-
-		#pragma omp parallel private(newV, randomValue, thisAtom) shared(distribution, generator)
-		{
-			//Anderson thermostat.
-			#pragma omp for schedule(static)
-			for (int i{ 0 }; i < _atomList.size(); i++)
-			{
-				thisAtom = _atomList.at(i);
-				randomValue = distribution(generator);
-
-				if (randomValue < _myParameters.getCollisionFrequency()*elapsedTime)
-				{
-					newV = _mySimulation.generateGaussianVelocity(T);
-					thisAtom->setVelocity(newV);
-				}
-			}
-		}
-	}
+	velocityVerletStep2(elapsedTime);
 }
 
 void World::resetAllPotentialsAndForces()
