@@ -21,7 +21,7 @@ double Simulation::calcDebyeTemperature(double hBar, double T, double m, double 
 //calculated by the gradient of the Lennard-Jones potential
 double Simulation::calcForce(double dist) const
 {
-	return 24 * _mat.getEpsilon() / _mat.getSigma() * 
+	return 24 * _mat.getEpsilon() / _mat.getSigma() *
 		(2 * pow((_mat.getSigma() / dist), 13) -
 			pow((_mat.getSigma() / dist), 7));
 }
@@ -40,7 +40,7 @@ double Simulation::calcLJPotential(double dist) const
 	return 4 * _mat.getEpsilon() *
 		(pow((_mat.getSigma() / dist), 12) -
 		pow((_mat.getSigma() / dist), 6));
-};
+}
 
 //Calculate the average deviation from the atoms' initial positions.
 double Simulation::calcMeanSquareDisplacement(double** currentPositionArray, double** initPositionArray, unsigned int numberOfAtoms)
@@ -123,12 +123,15 @@ array<double, 3> Simulation::calcAcceleration(double fx, double fy, double fz)
 	return a;
 }
 
-//Calc euclidean distance with respect to periodic boundary conditions
-//element 0: total distance; element 1, 2, 3: normalized x-,y-,z-components
+//Calc Euclidean distance with respect to periodic boundary conditions
+//element 0: total distance; element 1, 2, 3: normalized x-,y-,z-components.
 array<double, 4> Simulation::calcDistance(Atom* a1, Atom* a2, double lengthX, double lengthY, double lengthZ, bool is2D) const
 {
 	double rx, ry, rz, r;
 	rx = a1->getPositionX() - a2->getPositionX();
+	ry = a1->getPositionY() - a2->getPositionY();
+	rz = a1->getPositionZ() - a2->getPositionZ();
+
 	if (rx > lengthX / 2.0)
 	{
 		rx -= lengthX;
@@ -137,7 +140,7 @@ array<double, 4> Simulation::calcDistance(Atom* a1, Atom* a2, double lengthX, do
 	{
 		rx += lengthX;
 	}
-	ry = a1->getPositionY() - a2->getPositionY();
+
 	if (ry > lengthY / 2.0)
 	{
 		ry -= lengthY;
@@ -146,7 +149,7 @@ array<double, 4> Simulation::calcDistance(Atom* a1, Atom* a2, double lengthX, do
 	{
 		ry += lengthY;
 	}
-	rz = a1->getPositionZ() - a2->getPositionZ();
+
 	if (!is2D)
 	{
 		if (rz > lengthZ / 2.0)
@@ -158,6 +161,7 @@ array<double, 4> Simulation::calcDistance(Atom* a1, Atom* a2, double lengthX, do
 			rz += lengthZ;
 		}
 	}
+
 	r = sqrt(pow(rx, 2) + pow(ry, 2) + pow(rz, 2));
 	rx = rx / r;
 	ry = ry / r;
@@ -174,8 +178,6 @@ array<double, 3> Simulation::calcPosition(std::array<double, 3> r, std::array<do
 	double rY = r[1] + timeStep * v[1] + 0.5*pow(timeStep, 2)*a[1];
 	double rZ = r[2] + timeStep * v[2] + 0.5*pow(timeStep, 2)*a[2];
 
-	
-
 	array<double, 3> newR = { rX, rY, rZ };
 	return newR;
 }
@@ -183,13 +185,9 @@ array<double, 3> Simulation::calcPosition(std::array<double, 3> r, std::array<do
 //Function to calculate the velocity using the Velocity Verlet Algorithm.
 array<double, 3> Simulation::calcVelocity(std::array<double, 3> v, std::array<double, 3> aOld, std::array<double, 3> aNew, double timeStep)
 {
-	double halfStepVX = v[0] + 0.5*timeStep*aOld[0];
-	double halfStepVY = v[1] + 0.5*timeStep*aOld[1];
-	double halfStepVZ = v[2] + 0.5*timeStep*aOld[2];
-
-	double newVX = halfStepVX + 0.5*timeStep*aNew[0];
-	double newVY = halfStepVY + 0.5*timeStep*aNew[1];
-	double newVZ = halfStepVZ + 0.5*timeStep*aNew[2];
+	double newVX = v[0] + 0.5*timeStep*(aOld[0] + aNew[0]);
+	double newVY = v[1] + 0.5*timeStep*(aOld[1] + aNew[1]);
+	double newVZ = v[2] + 0.5*timeStep*(aOld[2] + aNew[2]);
 
 	array<double, 3> newV = { newVX, newVY, newVZ };
 

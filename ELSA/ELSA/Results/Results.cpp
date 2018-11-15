@@ -18,6 +18,15 @@ Results::Results(double simulationTime, double timeStep, unsigned int numberOfPa
 	_temperature = new double[_arrayLength];
 	_totalEnergy = new double[_arrayLength];
 
+	_momentum = new double*[_arrayLength];
+	for (unsigned int i = 0; i < _arrayLength; i++)
+	{
+		_momentum[i] = new double[3];
+		_momentum[i][0] = 0;
+		_momentum[i][1] = 0;
+		_momentum[i][2] = 0;
+	}
+
 	//Create a 3D array for positions for each atom over time.
 	_positions = new double**[_arrayLength];
 	for (unsigned int i = 0; i < _arrayLength; i++)
@@ -42,6 +51,23 @@ void Results::printPositions()
 		}
 		cout << endl;
 	}
+}
+
+array<double, 3> Results::getMomentumVector(int index)
+{
+	array<double, 3> p;
+	p[0] = _momentum[index][0];
+	p[1] = _momentum[index][1];
+	p[2] = _momentum[index][2];
+
+	return p;
+}
+
+void Results::addToMomentum(double px, double py, double pz, int t)
+{
+	_momentum[t][0] += px;
+	_momentum[t][1] += py;
+	_momentum[t][2] += pz;
 }
 
 //getters
@@ -73,6 +99,11 @@ double** Results::getKineticEnergy()
 double** Results::getMeanSquareDisplacement()
 {
 	return &_meanSquareDisplacement;
+}
+
+double*** Results::getMomentum()
+{
+	return &_momentum;
 }
 
 double**** Results::getPositions()
@@ -131,6 +162,14 @@ void Results::setMeanSquareDisplacement(double value, int index)
 	_meanSquareDisplacement[index] = value;
 }
 
+
+void Results::setMomentum(double px, double py, double pz, int t)
+{
+	_momentum[t][0] = px;
+	_momentum[t][1] = py;
+	_momentum[t][2] = pz;
+}
+
 void Results::setPositions(double x, double y, double z, int t, int n)
 {
 	_positions[t][n][0] = x;
@@ -153,7 +192,7 @@ void Results::setTemperature(double value, int index)
 	_temperature[index] = value;
 }
 
-void Results::setTotalEnergy(double value, int index)
+void Results::setTotalEnergy(int index)
 {
-	_totalEnergy[index] = value;
+	_totalEnergy[index] = _potentialEnergy[index] + _kineticEnergy[index];
 }

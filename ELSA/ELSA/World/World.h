@@ -8,6 +8,7 @@
 #include "../Simulation/Simulation.h"
 
 #include <cmath>
+#include <fstream>
 #include <iostream>
 #include <omp.h>
 #include <random>
@@ -32,8 +33,9 @@ private:
 	//Member functions
 	bool checkM(int, bool, unsigned int, unsigned int, unsigned int);
 
+	void andersonThermostat(double, double);
 	void correctPositions(std::array<double, 3>&);
-	void distributeInitialVelocities();
+	void distributeInitialVelocities(double);
 	void generateAtomsAtFccLattice(double, unsigned int, unsigned int, unsigned int);
 	void generateAtomsAtScLattice(double, unsigned int, unsigned int, unsigned int);
 	void generateCells();
@@ -41,6 +43,8 @@ private:
 	void populateCells();
 	void setupNeighbourLists(bool);
 	void setupSystem(Parameters);
+	void velocityVerletStep1(double);
+	void velocityVerletStep2(double);
 
 public:
 	World() = default;
@@ -58,8 +62,8 @@ public:
 	void addAtomToAtomList(Atom*);
 	void addCellToCellList(Cell*);
 	void calcPotentialAndForce(double);
-	void calcPotentialEnergy(double);
 	void calcPressure(double);
+	void resetAllPotentialsAndForces();
 	void solveEquationsOfMotion(double);
 	void updateCells();
 	void updateNeighbourList();

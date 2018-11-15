@@ -70,7 +70,7 @@ Parameters::Parameters(
 
 
 
-//getters
+//Getters
 unsigned int Parameters::getNumberOfAtoms() const
 {
 	return _numberOfAtoms;
@@ -162,7 +162,7 @@ Material Parameters::getChosenMaterial() const
 }
 
 
-//setters
+//Setters.
 
 void Parameters::setChosenMaterial(Material mat)
 {

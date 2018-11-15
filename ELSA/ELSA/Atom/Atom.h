@@ -15,7 +15,6 @@ private:
 	std::array<double, 3> _acceleration = { 0, 0, 0 };
 	std::array<double, 3> _force{};
 	std::array<double, 3> _position = { 0, 0, 0 };
-	std::array<double, 3> _previousAcceleration = { 0, 0, 0 };
 	std::array<double, 3> _velocity = { 0, 0, 0 };
 
 	std::array<unsigned int, 3> _cellIndex = { 0, 0, 0 };
@@ -43,9 +42,6 @@ public:
 	double getPositionY() const;
 	double getPositionZ() const;
 	double getPotential() const;
-	double getPreviousAccelerationX() const;
-	double getPreviousAccelerationY() const;
-	double getPreviousAccelerationZ() const;
 	double getVelocityX() const;
 	double getVelocityY() const;
 	double getVelocityZ() const;
