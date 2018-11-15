@@ -2,8 +2,6 @@
 
 using namespace std;
 
-ofstream myFileR, myFileF;
-
 /* PRIVATE */
 void World::andersonThermostat(double elapsedTime, double T)
 {
@@ -411,9 +409,6 @@ void World::setupNeighbourLists(bool is2D)
 //Initialize the MD software by setting up the system and creating atoms, cells and neighbour lists.
 void World::setupSystem(Parameters p)
 {
-	myFileR.open("BengtR.txt");
-	myFileF.open("BengtF.txt");
-
 	_myParameters = p;
 	_myResults = Results{ p.getSimulationTime(), p.getTimeStep(), p.getNumberOfAtoms() };
 	_mySimulation = Simulation(p.getChosenMaterial());
@@ -593,8 +588,6 @@ void World::calcPotentialAndForce(double elapsedTime)
 			// Returns the distance as a homogeneous vector
 			r = _mySimulation.calcDistance(a1, a2, _myParameters.getLengthX(), _myParameters.getLengthY(), _myParameters.getLengthZ(), _myParameters.getIs2D());
 			force = _mySimulation.calcForce(r[0]);
-			myFileR << r[0] << " ";
-			myFileF << force << " ";
 
 			potential = _mySimulation.calcLJPotential(r[0]);
 

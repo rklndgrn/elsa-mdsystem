@@ -8,8 +8,6 @@
 #include "../Simulation/Simulation.h"
 
 #include <cmath>
-#include <fstream>
-#include <iostream>
 #include <omp.h>
 #include <random>
 #include <vector>
