@@ -35,7 +35,7 @@ public:
 	void addToMomentum(double, double, double, int);
 	void printPositions();
 
-	//getters
+	//Getters.
 	double** getCohesiveEnergy();
 	double** getDebyeTemperature();
 	double** getDiffusionConstant();
@@ -49,7 +49,7 @@ public:
 	double** getTemperature();
 	double** getTotalEnergy();
 
-	//setters
+	//Setters.
 	void setCohesiveEnergy(double, int);
 	void setDebyeTemperature(double, int);
 	void setDiffusionConstant(double, int);

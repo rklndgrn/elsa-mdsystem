@@ -21,20 +21,9 @@ double Simulation::calcDebyeTemperature(double hBar, double T, double m, double 
 //calculated by the gradient of the Lennard-Jones potential
 double Simulation::calcForce(double dist) const
 {
-	double r = dist;
-	/*
-	if (dist < 2.8e-10)
-	{
-		r = 2.8e-10;
-	}
-	else
-	{
-		r = dist;
-	}
-	*/
 	return 24 * _mat.getEpsilon() / _mat.getSigma() *
-		(2 * pow((_mat.getSigma() / r), 13) -
-			pow((_mat.getSigma() / r), 7));
+		(2 * pow((_mat.getSigma() / dist), 13) -
+			pow((_mat.getSigma() / dist), 7));
 }
 
 //Get kinetic energy for one atom
@@ -48,20 +37,9 @@ double Simulation::calcKineticEnergy(double vx, double vy, double vz)
 //Calculate potential contribution from an atom pair with Lennard-Jones potential
 double Simulation::calcLJPotential(double dist) const
 {
-	double r = dist;
-	/*
-	if (dist < 2.8e-10)
-	{
-		r = 2.8e-10;
-	}
-	else
-	{
-		r = dist;
-	}
-	*/
 	return 4 * _mat.getEpsilon() *
-		(pow((_mat.getSigma() / r), 12) -
-		pow((_mat.getSigma() / r), 6));
+		(pow((_mat.getSigma() / dist), 12) -
+		pow((_mat.getSigma() / dist), 6));
 }
 
 //Calculate the average deviation from the atoms' initial positions.

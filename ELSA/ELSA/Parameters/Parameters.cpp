@@ -65,16 +65,12 @@ Parameters::Parameters(
 		_numberOfUnitCellsZ * _chosenMaterial.getLatticeConstant() /
 		_chosenMaterial.getCellSize());
 
-	//_numberOfCellsI = 1;
-	//_numberOfCellsJ = 1;
-	//_numberOfCellsK = 1;
-
 
 }
 
 
 
-//getters
+//Getters
 unsigned int Parameters::getNumberOfAtoms() const
 {
 	return _numberOfAtoms;
@@ -166,7 +162,7 @@ Material Parameters::getChosenMaterial() const
 }
 
 
-//setters
+//Setters.
 
 void Parameters::setChosenMaterial(Material mat)
 {

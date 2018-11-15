@@ -80,23 +80,6 @@ double Atom::getPotential() const
 {
 	return _potential;
 }
-
-//Mistakes of a confused youth.
-/*
-double Atom::getPreviousAccelerationX() const
-{
-	return _previousAcceleration[0];
-}
-
-double Atom::getPreviousAccelerationY() const
-{
-	return  _previousAcceleration[1];
-}
-
-double Atom::getPreviousAccelerationZ() const
-{
-	return  _previousAcceleration[2];
-}
 */
 
 double Atom::getVelocityX() const
@@ -130,19 +113,16 @@ vector<Atom*> Atom::getNeighbourList() const
 
 void Atom::setAccelerationX(double a)
 {
-	//_previousAcceleration[0] = _acceleration[0];
 	_acceleration[0] = a;
 }
 
 void Atom::setAccelerationY(double a)
 {
-	//_previousAcceleration[1] = _acceleration[1];
 	_acceleration[1] = a;
 }
 
 void Atom::setAccelerationZ(double a)
 {
-	//_previousAcceleration[2] = _acceleration[2];
 	_acceleration[2] = a;
 }
 

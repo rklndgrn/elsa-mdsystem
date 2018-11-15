@@ -21,7 +21,7 @@ void Cell::clearAtomsInCellList()
 	_atomsInCellList.erase(_atomsInCellList.begin(), _atomsInCellList.end());
 }
 
-//getters
+//Getters.
 array<unsigned int,3> Cell::getCellID() const
 {
 	return _cellID;
@@ -34,7 +34,7 @@ vector<Atom*> Cell::getAtomsInCellList()
 }
 
 
-//setters
+//Setters.
 void Cell::setCellID(unsigned int i,unsigned int j,unsigned int k)
 {
 	_cellID[0] = i;

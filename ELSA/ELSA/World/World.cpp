@@ -76,12 +76,6 @@ void World::distributeInitialVelocities(double desiredTemperature)
 
 	array<double, 3> v;
 	double totalVelocityX{ 0 }, totalVelocityY{ 0 }, totalVelocityZ{ 0 };
-	//double v_norm{0};
-	//double desiredVelocity = sqrt(3 * _myParameters.getBoltzmann() * desiredTemperature / _myParameters.getChosenMaterial().getMass());
-	//random_device rd;
-	//mt19937 generator(rd());
-	//uniform_distribution<double> distribution(0, sqrt(variance));
-	//uniform_real_distribution<double> distribution(-1, 1);
 
 	#pragma omp parallel private(v) shared(variance) reduction(+: K, totalVelocityX, totalVelocityY, totalVelocityZ)
 	{
@@ -89,13 +83,6 @@ void World::distributeInitialVelocities(double desiredTemperature)
 		for (int atomId = 0; atomId < (int)_myParameters.getNumberOfAtoms() - 1; atomId++)
 		{
 			v = _mySimulation.generateGaussianVelocity(variance);
-			//v[0] = distribution(generator);
-			//v[1] = distribution(generator);
-			//v[2] = distribution(generator);
-			//v_norm = sqrt(pow(v[0], 2) + pow(v[1], 2) + pow(v[2], 2));
-			//v[0] = desiredVelocity * v[0]/v_norm;
-			//v[1] = desiredVelocity * v[1]/v_norm;
-			//v[2] = desiredVelocity * v[2]/v_norm;
 			_atomList.at(atomId)->setVelocityX(v[0]);
 			_atomList.at(atomId)->setVelocityY(v[1]);
 			_atomList.at(atomId)->setVelocityZ(v[2]);
@@ -181,29 +168,7 @@ void World::initializeAtoms()
 		thisAtom = _atomList.at(i);
 		newA = _mySimulation.calcAcceleration(thisAtom->getForceX(), thisAtom->getForceY(), thisAtom->getForceZ());
 		thisAtom->setAcceleration(newA);
-		//thisAtom->setAcceleration({ 0.0, 0.0, 0.0 });
-		//thisAtom->setForce({ 0.0, 0.0, 0.0 });
 	}
-	/*
-	double K{0};
-	Atom* thisAtom;
-	#pragma omp parallel private(thisAtom) reduction (+: K)
-	{
-		#pragma omp for
-		for (int i = 0; i < (int) _myParameters.getNumberOfAtoms(); i++)
-		{
-			thisAtom = getAtomInAtomList(i);
-
-			K += _mySimulation.calcKineticEnergy(thisAtom->getVelocityX(), thisAtom->getVelocityY(), 
-												thisAtom->getVelocityZ());
-		}
-	}
-	double T = _mySimulation.calcTemperature(K, _myParameters.getBoltzmann(), _myParameters.getNumberOfAtoms());
-	_myResults.setKineticEnergy(K, 0);
-	_myResults.setTemperature(T, 0);
-	*/
-	//solveEquationsOfMotion(0);
-	//calcPressure(0);
 }
 
 //Creates cells for faster neighbourlist setup

@@ -50,7 +50,7 @@ public:
 		bool,
 		Material);
 
-	//getters
+	//Getters.
 	unsigned int getNumberOfAtoms() const;
 	unsigned int getNumberOfCellsI() const;
 	unsigned int getNumberOfCellsJ() const;
@@ -73,7 +73,7 @@ public:
 
 	Material getChosenMaterial() const;
 
-	//setters
+	//Setters.
 	void setChosenMaterial(Material);
 	void setCollisionFrequency(double);
 	void setIsThermostatOn(bool);
