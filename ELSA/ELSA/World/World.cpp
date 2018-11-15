@@ -2,6 +2,8 @@
 
 using namespace std;
 
+ofstream myFileR, myFileF;
+
 /* PRIVATE */
 //Function for checking whether the while loop in the setupNeighbourLists function should execute.
 //Checks if we are to skip adding neighbour atoms in certain cells due to the simulation being in 2D.
@@ -73,6 +75,7 @@ void World::distributeInitialVelocities(double desiredTemperature)
 	double K{ 0 }, T{ 0 };
 
 	array<double, 3> v;
+	double totalVelocityX{ 0 }, totalVelocityY{ 0 }, totalVelocityZ{ 0 };
 	//double v_norm{0};
 	//double desiredVelocity = sqrt(3 * _myParameters.getBoltzmann() * desiredTemperature / _myParameters.getChosenMaterial().getMass());
 	//random_device rd;
@@ -80,10 +83,10 @@ void World::distributeInitialVelocities(double desiredTemperature)
 	//uniform_distribution<double> distribution(0, sqrt(variance));
 	//uniform_real_distribution<double> distribution(-1, 1);
 
-	#pragma omp parallel private(v) shared(variance) reduction(+: K)
+	#pragma omp parallel private(v) shared(variance) reduction(+: K, totalVelocityX, totalVelocityY, totalVelocityZ)
 	{
 		#pragma omp for
-		for (int atomId = 0; atomId < (int)_myParameters.getNumberOfAtoms(); atomId++)
+		for (int atomId = 0; atomId < (int)_myParameters.getNumberOfAtoms() - 1; atomId++)
 		{
 			v = _mySimulation.generateGaussianVelocity(variance);
 			//v[0] = distribution(generator);
@@ -97,8 +100,17 @@ void World::distributeInitialVelocities(double desiredTemperature)
 			_atomList.at(atomId)->setVelocityY(v[1]);
 			_atomList.at(atomId)->setVelocityZ(v[2]);
 			K += _mySimulation.calcKineticEnergy(v[0], v[1], v[2]);
+			totalVelocityX += v[0];
+			totalVelocityY += v[1];
+			totalVelocityZ += v[2];
 		}
 	}
+
+	Atom* lastAtom = _atomList.at(_myParameters.getNumberOfAtoms() - 1);
+	lastAtom->setVelocityX(-totalVelocityX);
+	lastAtom->setVelocityY(-totalVelocityY);
+	lastAtom->setVelocityZ(-totalVelocityZ);
+	K += _mySimulation.calcKineticEnergy(-totalVelocityX, -totalVelocityY, -totalVelocityZ);
 
 	T = _mySimulation.calcTemperature(K, _myParameters.getBoltzmann(), _myParameters.getNumberOfAtoms());
 	_myResults.setKineticEnergy(K, 0);
@@ -406,6 +418,9 @@ void World::setupNeighbourLists(bool is2D)
 //Initialize the MD software by setting up the system and creating atoms, cells and neighbour lists.
 void World::setupSystem(Parameters p)
 {
+	myFileR.open("BengtR.txt");
+	myFileF.open("BengtF.txt");
+
 	_myParameters = p;
 	_myResults = Results{ p.getSimulationTime(), p.getTimeStep(), p.getNumberOfAtoms() };
 	_mySimulation = Simulation(p.getChosenMaterial());
@@ -500,19 +515,21 @@ void World::calcPotentialAndForce(double elapsedTime)
 			// Returns the distance as a homogeneous vector
 			r = _mySimulation.calcDistance(a1, a2, _myParameters.getLengthX(), _myParameters.getLengthY(), _myParameters.getLengthZ(), _myParameters.getIs2D());
 			force = _mySimulation.calcForce(r[0]);
+			myFileR << r[0] << " ";
+			myFileF << force << " ";
 
 			potential = _mySimulation.calcLJPotential(r[0]);
 
 			a1->setPotential(a1->getPotential() + potential);
 			a2->setPotential(a2->getPotential() + potential);
 
-			a1->setForceX(a1->getForceX() - force * r[1]);
-			a1->setForceY(a1->getForceY() - force * r[2]);
-			a1->setForceZ(a1->getForceZ() - force * r[3]);
+			a1->setForceX(a1->getForceX() + force * r[1]);
+			a1->setForceY(a1->getForceY() + force * r[2]);
+			a1->setForceZ(a1->getForceZ() + force * r[3]);
 
-			a2->setForceX(a2->getForceX() + force * r[1]);
-			a2->setForceY(a2->getForceY() + force * r[2]);
-			a2->setForceZ(a2->getForceZ() + force * r[3]);
+			a2->setForceX(a2->getForceX() - force * r[1]);
+			a2->setForceY(a2->getForceY() - force * r[2]);
+			a2->setForceZ(a2->getForceZ() - force * r[3]);
 
 			//Accumulate for internal pressure calculation
 			_pressureRFSum += r[0] * force;
@@ -576,6 +593,8 @@ void World::solveEquationsOfMotion(double elapsedTime)
 		}
 	}
 
+	updateCells();
+	updateNeighbourList();
 	calcPotentialAndForce(elapsedTime);
 	for (int i{ 0 }; i < _atomList.size(); i++)
 	{
