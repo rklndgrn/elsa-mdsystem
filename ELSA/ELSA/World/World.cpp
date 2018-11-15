@@ -65,7 +65,7 @@ void World::correctPositions(array<double, 3>& r)
 }
 
 //Set the atoms' velocities from temperature according to Maxwell-Boltzmann distribution 
-void World::distributeInitialVelocities()
+void World::distributeInitialVelocities(double desiredTemperature)
 {
 	omp_set_num_threads(numberOfThreads);
 	//double sigma = sqrt(_myParameters.getBoltzmann() * _myParameters.getTemperature() / _myParameters.getChosenMaterial().getMass());
@@ -73,6 +73,12 @@ void World::distributeInitialVelocities()
 	double K{ 0 }, T{ 0 };
 
 	array<double, 3> v;
+	//double v_norm{0};
+	//double desiredVelocity = sqrt(3 * _myParameters.getBoltzmann() * desiredTemperature / _myParameters.getChosenMaterial().getMass());
+	//random_device rd;
+	//mt19937 generator(rd());
+	//uniform_distribution<double> distribution(0, sqrt(variance));
+	//uniform_real_distribution<double> distribution(-1, 1);
 
 	#pragma omp parallel private(v) shared(variance) reduction(+: K)
 	{
@@ -80,6 +86,13 @@ void World::distributeInitialVelocities()
 		for (int atomId = 0; atomId < (int)_myParameters.getNumberOfAtoms(); atomId++)
 		{
 			v = _mySimulation.generateGaussianVelocity(variance);
+			//v[0] = distribution(generator);
+			//v[1] = distribution(generator);
+			//v[2] = distribution(generator);
+			//v_norm = sqrt(pow(v[0], 2) + pow(v[1], 2) + pow(v[2], 2));
+			//v[0] = desiredVelocity * v[0]/v_norm;
+			//v[1] = desiredVelocity * v[1]/v_norm;
+			//v[2] = desiredVelocity * v[2]/v_norm;
 			_atomList.at(atomId)->setVelocityX(v[0]);
 			_atomList.at(atomId)->setVelocityY(v[1]);
 			_atomList.at(atomId)->setVelocityZ(v[2]);
@@ -147,7 +160,7 @@ void World::generateAtomsAtScLattice(double latticeConstant, unsigned int nOfUni
 void World::initializeAtoms()
 {
 	//omp_set_num_threads(numberOfThreads);
-	distributeInitialVelocities();
+	distributeInitialVelocities(_myParameters.getTemperature());
 	calcPotentialAndForce(0);
 	Atom* thisAtom;
 	array<double, 3> newA;
@@ -471,9 +484,7 @@ void World::calcPotentialAndForce(double elapsedTime)
 	resetAllPotentialsAndForces();
 	_pressureRFSum = 0;
 
-	double potential{0};
-	double force{0};
-	double totalPotential{0};
+	double potential{0},  force{0}, totalPotential{0};
 	Atom* a1;
 	Atom* a2;
 	array<double, 4> r; 
@@ -511,42 +522,6 @@ void World::calcPotentialAndForce(double elapsedTime)
 	}
 
 	_myResults.setPotentialEnergy(totalPotential, (int)(elapsedTime / _myParameters.getTimeStep()));
-}
-
-//	Calculates the force and potential per atom and stores them in the atoms. The force is directional but the potential is not.
-void World::calcPotentialAndForcePerAtom(Atom* a1, double elapsedTime)
-{
-	double potential{ 0 };
-	double force{ 0 };
-
-	Atom* a2;
-	array<double, 4> r;
-
-	// For all atoms sufficiently close to a1.
-	for (int j{ 0 }; j < a1->getNeighbourList().size(); j++)
-	{
-		a2 = a1->getNeighbourList().at(j);
-
-		// Returns the distance as a homogeneous vector
-		r = _mySimulation.calcDistance(a1, a2, _myParameters.getLengthX(), _myParameters.getLengthY(), _myParameters.getLengthZ(), _myParameters.getIs2D());
-		force = _mySimulation.calcForce(r[0]);
-
-		potential = _mySimulation.calcLJPotential(r[0]);
-
-		a1->setPotential(a1->getPotential() + potential);
-		a2->setPotential(a2->getPotential() + potential);
-
-		a1->setForceX(a1->getForceX() + force * r[1]);
-		a1->setForceY(a1->getForceY() + force * r[2]);
-		a1->setForceZ(a1->getForceZ() + force * r[3]);
-
-		a2->setForceX(a2->getForceX() - force * r[1]);
-		a2->setForceY(a2->getForceY() - force * r[2]);
-		a2->setForceZ(a2->getForceZ() - force * r[3]);
-
-		//Accumulate for internal pressure calculation
-		_pressureRFSum += r[0] * force;
-	}
 }
 
 //Calculate the internal pressure at a certain time
@@ -601,11 +576,11 @@ void World::solveEquationsOfMotion(double elapsedTime)
 		}
 	}
 
-
 	calcPotentialAndForce(elapsedTime);
 	for (int i{ 0 }; i < _atomList.size(); i++)
 	{
-		_myResults.setPositions(newR[0], newR[1], newR[2], index, i);
+		thisAtom = _atomList.at(i);
+		_myResults.setPositions(thisAtom->getPositionX(), thisAtom->getPositionY(), thisAtom->getPositionZ(), index, i);
 	}
 
 	#pragma omp parallel private(thisAtom, oldV, oldA, newV, newA) shared(m, timeStep) reduction(+: K, U, px, py, pz)

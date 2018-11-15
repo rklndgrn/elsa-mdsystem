@@ -33,7 +33,7 @@ private:
 	bool checkM(int, bool, unsigned int, unsigned int, unsigned int);
 
 	void correctPositions(std::array<double, 3>&);
-	void distributeInitialVelocities();
+	void distributeInitialVelocities(double);
 	void generateAtomsAtFccLattice(double, unsigned int, unsigned int, unsigned int);
 	void generateAtomsAtScLattice(double, unsigned int, unsigned int, unsigned int);
 	void generateCells();
@@ -58,7 +58,6 @@ public:
 	void addAtomToAtomList(Atom*);
 	void addCellToCellList(Cell*);
 	void calcPotentialAndForce(double);
-	void calcPotentialAndForcePerAtom(Atom*, double);
 	void calcPressure(double);
 	void resetAllPotentialsAndForces();
 	void solveEquationsOfMotion(double);

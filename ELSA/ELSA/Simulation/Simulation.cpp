@@ -40,7 +40,7 @@ double Simulation::calcLJPotential(double dist) const
 	return 4 * _mat.getEpsilon() *
 		(pow((_mat.getSigma() / dist), 12) -
 		pow((_mat.getSigma() / dist), 6));
-};
+}
 
 //Calculate the average deviation from the atoms' initial positions.
 double Simulation::calcMeanSquareDisplacement(double** currentPositionArray, double** initPositionArray, unsigned int numberOfAtoms)
@@ -129,6 +129,9 @@ array<double, 4> Simulation::calcDistance(Atom* a1, Atom* a2, double lengthX, do
 {
 	double rx, ry, rz, r;
 	rx = a1->getPositionX() - a2->getPositionX();
+	ry = a1->getPositionY() - a2->getPositionY();
+	rz = a1->getPositionZ() - a2->getPositionZ();
+
 	if (rx > lengthX / 2.0)
 	{
 		rx -= lengthX;
@@ -138,7 +141,6 @@ array<double, 4> Simulation::calcDistance(Atom* a1, Atom* a2, double lengthX, do
 		rx += lengthX;
 	}
 
-	ry = a1->getPositionY() - a2->getPositionY();
 	if (ry > lengthY / 2.0)
 	{
 		ry -= lengthY;
@@ -148,7 +150,6 @@ array<double, 4> Simulation::calcDistance(Atom* a1, Atom* a2, double lengthX, do
 		ry += lengthY;
 	}
 
-	rz = a1->getPositionZ() - a2->getPositionZ();
 	if (!is2D)
 	{
 		if (rz > lengthZ / 2.0)
