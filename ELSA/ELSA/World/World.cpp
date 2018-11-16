@@ -249,6 +249,18 @@ void World::populateCells()
 			j = (unsigned int)floor(a->getPositionY() / cellSize);
 			k = (unsigned int)floor(a->getPositionZ() / cellSize);
 
+			if (_myParameters.getIs2D())
+			{
+				if (k >= _myParameters.getNumberOfCellsK())
+				{
+					k = (unsigned int)_myParameters.getNumberOfCellsK() - 1;
+				}
+				else if (k < 0)
+				{
+					k = 0;
+				}
+			}
+
 
 			#pragma omp critical
 			{

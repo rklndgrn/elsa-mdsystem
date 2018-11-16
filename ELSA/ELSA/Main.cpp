@@ -12,8 +12,8 @@ using namespace std;
 
 int main()
 {
-	Material anotherMaterial("fcc", 408.53e-12, 0.34*(1.6021766208E-19), 2.65e-10, 1.5*408.53e-12, 39.948*(1.660539040e-27));
-	Parameters myParameters(1e-14, 200e-14, 5, 5, 5, 10, 10, false, false, anotherMaterial);
+	Material anotherMaterial("fcc", 408.53e-12, 0.34*(1.6021766208E-19), 2.65e-10, 2.5*408.53e-12, 39.948*(1.660539040e-27));
+	Parameters myParameters(1e-15, 100e-14, 5, 5, 5, 10, 10, false, true, anotherMaterial);
 	World myWorld(myParameters);
 
 	double** potArray = myWorld.getResults().getPotentialEnergy();
@@ -29,20 +29,22 @@ int main()
 
 	
 	//ofstream myFilePos;
-	ofstream myTempFile, myEnergyFile;
+	ofstream myTempFile, myEnergyFile, myPosFile;
 	myTempFile.open("temperatur.txt");
 	myEnergyFile.open("energi.txt");
-	//myFilePos.open("BengtPos.txt");
+	myPosFile.open("positions.txt");
 	
-
+	Atom* a = myWorld.getAtomInAtomList(0);
 
 	cout << "Time 0: " << endl;
 	//cout << "   Potential energy: " << U[index] << endl;
 	//cout << "   Kinetic energy: " << K[index] << endl;
 	cout << "   Total energy: " << U[index] + K[index] << endl;
 	cout << "   Temperature: " << T[index] << endl;
+	//cout << "   Position for atom 0: " << a->getPositionX() << " " << a->getPositionY() << " " << a->getPositionZ() << endl << endl;;
 	myTempFile << T[index] << " ";
 	myEnergyFile << U[index] << " ";
+	myPosFile << a->getPositionX() << " " << a->getPositionY() << " " << a->getPositionZ() << " ";
 	
 	
 	//Atom* a = myWorld.getAtomInAtomList(62);
@@ -74,14 +76,17 @@ int main()
 		//cout << "   Potential energy: " << U[index] << endl;
 		//cout << "   Kinetic energy: " << K[index] << endl;
 		cout << "   Total energy: " << U[index] + K[index] << endl;
-		cout << "   Temperature: " << T[index] << endl << endl;
+		cout << "   Temperature: " << T[index] << endl;
+		//cout << "   Position for atom 0: " << a->getPositionX() << " " << a->getPositionY() << " " << a->getPositionZ() << endl << endl;;
 		myTempFile << T[index] << " ";
 		myEnergyFile << U[index] << " ";
+		myPosFile << a->getPositionX() << " " << a->getPositionY() << " " << a->getPositionZ() << " ";
 	}
 	
 	//myFilePos.close();
 	myTempFile.close();
 	myEnergyFile.close();
+	myPosFile.close();
 	//cout << "Hello there!" << endl;
 
 	char exit;
