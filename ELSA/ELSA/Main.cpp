@@ -12,8 +12,8 @@ using namespace std;
 
 int main()
 {
-	Material anotherMaterial("fcc", 408.53e-12, 0.34*(1.6021766208E-19), 2.65e-10, 2.5*408.53e-12, 39.948*(1.660539040e-27));
-	Parameters myParameters(1e-15, 100e-14, 5, 5, 5, 10, 10, false, true, anotherMaterial);
+	Material anotherMaterial("fcc", 408.53e-12, 0.34*(1.6021766208E-19), 2.65e-10, 4*408.53e-12, 39.948*(1.660539040e-27));
+	Parameters myParameters(1e-15, 1e-14, 10, 10, 10, 10, 10, false, true, anotherMaterial);
 	World myWorld(myParameters);
 
 	double** potArray = myWorld.getResults().getPotentialEnergy();

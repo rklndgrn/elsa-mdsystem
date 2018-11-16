@@ -296,8 +296,9 @@ void World::setupNeighbourLists(bool is2D)
 	unsigned int lowerNeighbourK, upperNeighbourK;
 	//Array containing all neighbouring cells' indices.
 	array<array<unsigned int, 3>, 27> index;
+	Atom* neighbourAtom;
 
-	#pragma omp parallel shared(index, cutOffDistance, i, j, k, lowerNeighbourI, lowerNeighbourJ, lowerNeighbourK, upperNeighbourI, upperNeighbourJ, upperNeighbourK, lengthX, lengthY, lengthZ, maxI, maxJ, maxK) private(atomDistance)
+	#pragma omp parallel shared(index, cutOffDistance, i, j, k, lowerNeighbourI, lowerNeighbourJ, lowerNeighbourK, upperNeighbourI, upperNeighbourJ, upperNeighbourK, lengthX, lengthY, lengthZ, maxI, maxJ, maxK) private(atomDistance, neighbourAtom)
 	{
 		for (unsigned int atomId = 0; atomId < _myParameters.getNumberOfAtoms(); atomId++)
 		{
@@ -406,9 +407,10 @@ void World::setupNeighbourLists(bool is2D)
 						//the neighbour's index is larger than its own.
 						if (atomDistance < cutOffDistance && atomId < getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n)->getID())
 						{
+							neighbourAtom = getAtomInAtomList(atomId);
 							#pragma omp critical
 							{
-								getAtomInAtomList(atomId)->addToNeighbourList(getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n));
+								neighbourAtom->addToNeighbourList(getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n));
 							}
 						}
 					}
