@@ -31,7 +31,13 @@ private:
 	//Member functions
 	bool checkM(int, bool, unsigned int, unsigned int, unsigned int);
 
+	double getWorldVolume() const;
+
+	void addAtomToAtomList(Atom*);
+	void addCellToCellList(Cell*);
 	void andersonThermostat(double, double);
+	void calcPotentialAndForce(double);
+	void calcPressure(double);
 	void correctPositions(std::array<double, 3>&);
 	void distributeInitialVelocities(double);
 	void generateAtomsAtFccLattice(double, unsigned int, unsigned int, unsigned int);
@@ -39,8 +45,12 @@ private:
 	void generateCells();
 	void initializeAtoms();
 	void populateCells();
+	void resetAllPotentialsAndForces();
 	void setupNeighbourLists(bool);
 	void setupSystem(Parameters);
+	void solveEquationsOfMotion(double);
+	void updateMSDAndDebyeTemperature(double, double);
+	void updateSelfDiffusionConstantAndSpecificHeat(double);
 	void velocityVerletStep1(double);
 	void velocityVerletStep2(double);
 
@@ -55,14 +65,7 @@ public:
 
 	Cell* getCellInCellList(unsigned int, unsigned int, unsigned int);
 
-	double getWorldVolume() const;
-
-	void addAtomToAtomList(Atom*);
-	void addCellToCellList(Cell*);
-	void calcPotentialAndForce(double);
-	void calcPressure(double);
-	void resetAllPotentialsAndForces();
-	void solveEquationsOfMotion(double);
+	void performSimulation(double);
 	void updateCells();
 	void updateNeighbourList();
 

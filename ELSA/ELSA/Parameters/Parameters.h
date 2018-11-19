@@ -26,6 +26,7 @@ private:
 	double _lengthX;
 	double _lengthY;
 	double _lengthZ;
+	double _normalizedPlanck{ 1.05457180013e-34 };
 	double _simulationTime;
 	double _temperature;
 	double _timeStep;
@@ -64,6 +65,7 @@ public:
 	double getLengthX() const;
 	double getLengthY() const;
 	double getLengthZ() const;
+	double getNormalizedPlanck() const;
 	double getSimulationTime() const;
 	double getTemperature() const;
 	double getTimeStep() const;

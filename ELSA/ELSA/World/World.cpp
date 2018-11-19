@@ -449,6 +449,33 @@ void World::setupSystem(Parameters p)
 	initializeAtoms();
 }
 
+void World::updateMSDAndDebyeTemperature(double elapsedTime, double T)
+{
+	double**** positionsArray = _myResults.getPositions();
+	double*** positions = *positionsArray;
+	int index = (int)round(elapsedTime / _myParameters.getTimeStep());
+
+	double MSD = _mySimulation.calcMeanSquareDisplacement(positions[index], positions[0], _myParameters.getNumberOfAtoms());
+	double debyeTemperature = _mySimulation.calcDebyeTemperature(_myParameters.getNormalizedPlanck(), T, 
+																_myParameters.getChosenMaterial().getMass(), 
+																_myParameters.getBoltzmann(), MSD);
+
+	_myResults.setMeanSquareDisplacement(MSD, index);
+	_myResults.setDebyeTemperature(debyeTemperature, index);
+}
+
+void World::updateSelfDiffusionConstantAndSpecificHeat(double elapsedTime)
+{
+	int index = (int)round(elapsedTime / _myParameters.getTimeStep());
+	int N = _myParameters.getNumberOfAtoms();
+	double selfDiffusionConstant = _mySimulation.calcSelfDiffusionCoefficient(*(_myResults.getPositions()), 0, elapsedTime, N);
+	_myResults.setDiffusionConstant(selfDiffusionConstant, index);
+
+	double specificHeat = _mySimulation.calcSpecificHeat(N, _myParameters.getBoltzmann(), index, *(_myResults.getTemperature()));
+	_myResults.setSpecificHeat(specificHeat, index);
+}
+
+
 void World::velocityVerletStep1(double elapsedTime)
 {
 	omp_set_num_threads(numberOfThreads);
@@ -479,6 +506,7 @@ void World::velocityVerletStep1(double elapsedTime)
 	}
 }
 
+//The second step of the velocity verlet algorithm, where the new velocities and accelerations are found.
 void World::velocityVerletStep2(double elapsedTime)
 {
 	omp_set_num_threads(numberOfThreads);
@@ -519,14 +547,14 @@ void World::velocityVerletStep2(double elapsedTime)
 
 	T = _mySimulation.calcTemperature(K, _myParameters.getBoltzmann(), _myParameters.getNumberOfAtoms());
 
-	//Save the kinetic energy and temperature for the results presentation.
+	//Save the energies, temperature and momentum (?) for the results presentation.
 	_myResults.setPotentialEnergy(U, index);
 	_myResults.setKineticEnergy(K, index);
 	_myResults.setMomentum(px, py, pz, index);
 	_myResults.setTemperature(T, index);
 	_myResults.setTotalEnergy(index);
 
-
+	updateMSDAndDebyeTemperature(elapsedTime, T);
 
 	if (T > 0 && _myParameters.getIsThermostatOn())
 	{
@@ -590,8 +618,10 @@ void World::calcPotentialAndForce(double elapsedTime)
 	Atom* a1;
 	Atom* a2;
 	array<double, 4> r; 
+	int index = (int)(elapsedTime / _myParameters.getTimeStep());
+	int N = _myParameters.getNumberOfAtoms();
 
-	for (int i{ 0 }; i < (int) _myParameters.getNumberOfAtoms() - 1; i++)
+	for (int i{ 0 }; i < (int) N - 1; i++)
 	{
 		a1 = _atomList.at(i);
 		// For all atoms sufficiently close to a1.
@@ -623,7 +653,8 @@ void World::calcPotentialAndForce(double elapsedTime)
 		}
 	}
 
-	_myResults.setPotentialEnergy(totalPotential, (int)(elapsedTime / _myParameters.getTimeStep()));
+	_myResults.setPotentialEnergy(totalPotential, index);
+	_myResults.setCohesiveEnergy(_mySimulation.calcCohesiveEnergy(potential, N), index);
 }
 
 //Calculate the internal pressure at a certain time
@@ -637,6 +668,32 @@ void World::calcPressure(double elapsedTime)
 	double pressure = (N*_myParameters.getBoltzmann()*T / V) + meanRF / (6 * V);
 
 	_myResults.setInternalPressure(pressure, timeSteps);
+}
+
+void World::performSimulation(double elapsedTime)
+{
+	calcPotentialAndForce(elapsedTime);
+	solveEquationsOfMotion(elapsedTime);
+	calcPressure(elapsedTime);
+	updateSelfDiffusionConstantAndSpecificHeat(elapsedTime);
+}
+
+void World::resetAllPotentialsAndForces()
+{
+	omp_set_num_threads(numberOfThreads);
+	Atom* a;
+	#pragma omp parallel private(a)
+	{
+		#pragma omp for schedule(static)
+		for (int i{ 0 }; i < _atomList.size(); i++)
+		{
+			a = getAtomInAtomList(i);
+			a->setPotential(0);
+			a->setForceX(0);
+			a->setForceY(0);
+			a->setForceZ(0);
+		}
+	}
 }
 
 //Function to solve the equations of motion. Finds new velocities and positions of atoms and calculates their kinetic energy and temperature.
@@ -662,24 +719,6 @@ void World::solveEquationsOfMotion(double elapsedTime)
 	calcPotentialAndForce(elapsedTime);
 
 	velocityVerletStep2(elapsedTime);
-}
-
-void World::resetAllPotentialsAndForces()
-{
-	omp_set_num_threads(numberOfThreads);
-	Atom* a;
-	#pragma omp parallel private(a)
-	{
-		#pragma omp for schedule(static)
-		for (int i{ 0 }; i < _atomList.size(); i++)
-		{
-			a = getAtomInAtomList(i);
-			a->setPotential(0);
-			a->setForceX(0);
-			a->setForceY(0);
-			a->setForceZ(0);
-		}
-	}
 }
 
 void World::updateCells()

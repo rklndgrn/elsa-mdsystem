@@ -131,6 +131,11 @@ double Parameters::getLengthZ() const
 	return _lengthZ;
 }
 
+double Parameters::getNormalizedPlanck() const
+{
+	return _normalizedPlanck;
+}
+
 double Parameters::getSimulationTime() const
 {
 	return _simulationTime;
