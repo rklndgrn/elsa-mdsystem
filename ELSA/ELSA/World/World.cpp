@@ -3,6 +3,20 @@
 using namespace std;
 
 /* PRIVATE */
+//Append atom to the atom list
+void World::addAtomToAtomList(Atom* a)
+{
+	_atomList.push_back(a);
+}
+
+//Append cell to the cell list
+void World::addCellToCellList(Cell* c)
+{
+	_cellList.push_back(c);
+}
+
+//Help function to step 2 of the Velocity Verlet algorithm.
+//Distributes new Gaussian velocities with a probability based on the collision frequency.
 void World::andersonThermostat(double elapsedTime, double T)
 {
 	Atom* thisAtom;
@@ -29,6 +43,70 @@ void World::andersonThermostat(double elapsedTime, double T)
 			}
 		}
 	}
+}
+
+//	Calculates the force and potential and stores them in the atoms. The force is directional but the potential is not.
+void World::calcPotentialAndForce(double elapsedTime)
+{
+	//Reset before the next iteration.
+	resetAllPotentialsAndForces();
+	_pressureRFSum = 0;
+
+	double potential{ 0 }, force{ 0 }, totalPotential{ 0 };
+	Atom* a1;
+	Atom* a2;
+	array<double, 4> r;
+	int index = (int)(elapsedTime / _myParameters.getTimeStep());
+	int N = _myParameters.getNumberOfAtoms();
+
+	for (int i{ 0 }; i < (int)N - 1; i++)
+	{
+		a1 = _atomList.at(i);
+		// For all atoms sufficiently close to a1.
+		for (int j{ 0 }; j < a1->getNeighbourList().size(); j++)
+		{
+			a2 = a1->getNeighbourList().at(j);
+
+			// Returns the distance as a homogeneous vector
+			r = _mySimulation.calcDistance(a1, a2, _myParameters.getLengthX(), _myParameters.getLengthY(), _myParameters.getLengthZ(), _myParameters.getIs2D());
+
+			
+			force = _mySimulation.calcForce(r[0]);
+			potential = _mySimulation.calcLJPotential(r[0]);
+			
+			a1->setPotential(a1->getPotential() + potential);
+			a2->setPotential(a2->getPotential() + potential);
+
+			a1->setForceX(a1->getForceX() + force * r[1]);
+			a1->setForceY(a1->getForceY() + force * r[2]);
+			a1->setForceZ(a1->getForceZ() + force * r[3]);
+
+			a2->setForceX(a2->getForceX() - force * r[1]);
+			a2->setForceY(a2->getForceY() - force * r[2]);
+			a2->setForceZ(a2->getForceZ() - force * r[3]);
+
+			//Accumulate for internal pressure calculation
+			_pressureRFSum += r[0] * force;
+
+			totalPotential += potential;
+		}
+	}
+
+	_myResults.setPotentialEnergy(totalPotential, index);
+	_myResults.setCohesiveEnergy(_mySimulation.calcCohesiveEnergy(potential, N), index);
+}
+
+//Calculate the internal pressure at a certain time
+void World::calcPressure(double elapsedTime)
+{
+	int timeSteps = (int)round(elapsedTime / _myParameters.getTimeStep());
+	int N = _myParameters.getNumberOfAtoms();
+	double V = getWorldVolume();
+	double T = (*_myResults.getTemperature())[timeSteps];
+	double meanRF = _pressureRFSum / (timeSteps);
+	double pressure = (N*_myParameters.getBoltzmann()*T / V) + meanRF / (6 * V);
+
+	_myResults.setInternalPressure(pressure, timeSteps);
 }
 
 //Function for checking whether the while loop in the setupNeighbourLists function should execute.
@@ -195,6 +273,8 @@ void World::initializeAtoms()
 		newA = _mySimulation.calcAcceleration(thisAtom->getForceX(), thisAtom->getForceY(), thisAtom->getForceZ());
 		thisAtom->setAcceleration(newA);
 	}
+
+	_myResults.setTotalEnergy(0);
 }
 
 //Creates cells for faster neighbourlist setup
@@ -261,12 +341,31 @@ void World::populateCells()
 				}
 			}
 
-
 			#pragma omp critical
 			{
 				getCellInCellList(i, j, k)->addAtomToCellList(a);
-				a->setCellIndex(i, j, k);
 			}
+			a->setCellIndex(i, j, k);
+		}
+	}
+}
+
+
+
+void World::resetAllPotentialsAndForces()
+{
+	omp_set_num_threads(numberOfThreads);
+	Atom* a;
+#pragma omp parallel private(a)
+	{
+#pragma omp for schedule(static)
+		for (int i{ 0 }; i < _atomList.size(); i++)
+		{
+			a = getAtomInAtomList(i);
+			a->setPotential(0);
+			a->setForceX(0);
+			a->setForceY(0);
+			a->setForceZ(0);
 		}
 	}
 }
@@ -398,13 +497,13 @@ void World::setupNeighbourLists(bool is2D)
 				if (checkM(m, is2D, maxK, lowerNeighbourK, upperNeighbourK))
 				{
 					//cout << "Thread " << omp_get_thread_num() << " takes loop number " << m << "!" << endl;
-					for (unsigned int n{ 0 }; n < getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().size(); n++)
+					for (int n{ 0 }; (int) n < getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().size(); n++)
 					{
 						atomDistance = _mySimulation.calcDistance(getAtomInAtomList(atomId),
 							getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n),
 							lengthX, lengthY, lengthZ, is2D)[0];
-						//Add neighbour to a certain atom if distance < cut-off and
-						//the neighbour's index is larger than its own.
+
+						//Add neighbour to a certain atom if distance < cut-off and the neighbour's index is larger than its own.
 						if (atomDistance < cutOffDistance && atomId < getCellInCellList(index.at(m)[0], index.at(m)[1], index.at(m)[2])->getAtomsInCellList().at(n)->getID())
 						{
 							neighbourAtom = getAtomInAtomList(atomId);
@@ -418,6 +517,31 @@ void World::setupNeighbourLists(bool is2D)
 			}
 		}
 	}
+}
+
+//Function to solve the equations of motion. Finds new velocities and positions of atoms and calculates their kinetic energy and temperature.
+void World::solveEquationsOfMotion(double elapsedTime)
+{
+	omp_set_num_threads(numberOfThreads);
+	_pressureRFSum = 0;
+
+	Atom* thisAtom;
+	array<double, 3> oldR;
+	array<double, 3> oldV;
+	array<double, 3> oldA;
+	array<double, 3> newR;
+	array<double, 3> newV;
+	array<double, 3> newA;
+
+	double timeStep = _myParameters.getTimeStep();
+	int index = (int)round(elapsedTime / timeStep);
+
+	//Go through the atom list and assign new positions and velocities using the Velocity Verlet Algorithm.
+	velocityVerletStep1(elapsedTime);
+
+	calcPotentialAndForce(elapsedTime);
+
+	velocityVerletStep2(elapsedTime);
 }
 
 //Initialize the MD software by setting up the system and creating atoms, cells and neighbour lists.
@@ -595,130 +719,20 @@ double World::getWorldVolume() const
 	return numberOfUnitCells*pow(_myParameters.getChosenMaterial().getLatticeConstant(), 3);
 }
 
-//Append atom to the atom list
-void World::addAtomToAtomList(Atom* a)
+//Main function to perform simulations.
+void World::performSimulation(double elapsedTime, int iterationsBetweenCellUpdate)
 {
-	_atomList.push_back(a);
-}
-
-//Append cell to the cell list
-void World::addCellToCellList(Cell* c)
-{
-	_cellList.push_back(c);
-}
-
-//	Calculates the force and potential and stores them in the atoms. The force is directional but the potential is not.
-void World::calcPotentialAndForce(double elapsedTime)
-{
-	//Reset before the next iteration.
-	resetAllPotentialsAndForces();
-	_pressureRFSum = 0;
-
-	double potential{0},  force{0}, totalPotential{0};
-	Atom* a1;
-	Atom* a2;
-	array<double, 4> r; 
-	int index = (int)(elapsedTime / _myParameters.getTimeStep());
-	int N = _myParameters.getNumberOfAtoms();
-
-	for (int i{ 0 }; i < (int) N - 1; i++)
+	int index = (int)round(elapsedTime / _myParameters.getTimeStep());
+	if (index % iterationsBetweenCellUpdate == 0)
 	{
-		a1 = _atomList.at(i);
-		// For all atoms sufficiently close to a1.
-		for (int j{ 0 }; j < a1->getNeighbourList().size(); j++)
-		{
-			a2 = a1->getNeighbourList().at(j);
-
-			// Returns the distance as a homogeneous vector
-			r = _mySimulation.calcDistance(a1, a2, _myParameters.getLengthX(), _myParameters.getLengthY(), _myParameters.getLengthZ(), _myParameters.getIs2D());
-			force = _mySimulation.calcForce(r[0]);
-
-			potential = _mySimulation.calcLJPotential(r[0]);
-
-			a1->setPotential(a1->getPotential() + potential);
-			a2->setPotential(a2->getPotential() + potential);
-
-			a1->setForceX(a1->getForceX() + force * r[1]);
-			a1->setForceY(a1->getForceY() + force * r[2]);
-			a1->setForceZ(a1->getForceZ() + force * r[3]);
-
-			a2->setForceX(a2->getForceX() - force * r[1]);
-			a2->setForceY(a2->getForceY() - force * r[2]);
-			a2->setForceZ(a2->getForceZ() - force * r[3]);
-
-			//Accumulate for internal pressure calculation
-			_pressureRFSum += r[0] * force;
-
-			totalPotential += potential;
-		}
+		updateCells();
+		updateNeighbourList();
 	}
 
-	_myResults.setPotentialEnergy(totalPotential, index);
-	_myResults.setCohesiveEnergy(_mySimulation.calcCohesiveEnergy(potential, N), index);
-}
-
-//Calculate the internal pressure at a certain time
-void World::calcPressure(double elapsedTime)
-{
-	int timeSteps = (int)round(elapsedTime / _myParameters.getTimeStep());
-	int N = _myParameters.getNumberOfAtoms();
-	double V = getWorldVolume();
-	double T = (*_myResults.getTemperature())[timeSteps];
-	double meanRF = _pressureRFSum / (timeSteps);
-	double pressure = (N*_myParameters.getBoltzmann()*T / V) + meanRF / (6 * V);
-
-	_myResults.setInternalPressure(pressure, timeSteps);
-}
-
-void World::performSimulation(double elapsedTime)
-{
 	calcPotentialAndForce(elapsedTime);
 	solveEquationsOfMotion(elapsedTime);
 	calcPressure(elapsedTime);
 	updateSelfDiffusionConstantAndSpecificHeat(elapsedTime);
-}
-
-void World::resetAllPotentialsAndForces()
-{
-	omp_set_num_threads(numberOfThreads);
-	Atom* a;
-	#pragma omp parallel private(a)
-	{
-		#pragma omp for schedule(static)
-		for (int i{ 0 }; i < _atomList.size(); i++)
-		{
-			a = getAtomInAtomList(i);
-			a->setPotential(0);
-			a->setForceX(0);
-			a->setForceY(0);
-			a->setForceZ(0);
-		}
-	}
-}
-
-//Function to solve the equations of motion. Finds new velocities and positions of atoms and calculates their kinetic energy and temperature.
-void World::solveEquationsOfMotion(double elapsedTime)
-{
-	omp_set_num_threads(numberOfThreads);
-	_pressureRFSum = 0;
-
-	Atom* thisAtom;
-	array<double, 3> oldR;
-	array<double, 3> oldV;
-	array<double, 3> oldA;
-	array<double, 3> newR;
-	array<double, 3> newV;
-	array<double, 3> newA;
-
-	double timeStep = _myParameters.getTimeStep();
-	int index = (int)round(elapsedTime / timeStep);
-
-	//Go through the atom list and assign new positions and velocities using the Velocity Verlet Algorithm.
-	velocityVerletStep1(elapsedTime);
-
-	calcPotentialAndForce(elapsedTime);
-
-	velocityVerletStep2(elapsedTime);
 }
 
 void World::updateCells()
@@ -741,4 +755,5 @@ void World::updateNeighbourList()
 	}
 
 	setupNeighbourLists(_myParameters.getIs2D());
+	_myParameters.getIs2D();
 }
