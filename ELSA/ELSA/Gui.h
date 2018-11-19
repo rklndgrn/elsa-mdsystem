@@ -9,8 +9,8 @@
 
 #include "imgui-master\imgui.h"
 #include "imgui-master\imgui_internal.h"
-#include "imgui-master\examples\imgui_impl_glfw.h"
-#include "imgui-master\examples\imgui_impl_opengl3.h"
+#include "imgui-master\imgui_impl_glfw.h"
+#include "imgui-master\imgui_impl_opengl3.h"
 //#include "imgui-master\imgui_plot.h"
 
 #pragma once
