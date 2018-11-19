@@ -132,9 +132,9 @@ double** Results::getTotalEnergy()
 }
 
 //setters
-void Results::setCohesiveEnergy(double value, int index)
+void Results::setCohesiveEnergy(int index)
 {
-	_cohesiveEnergy[index] = value;
+	_cohesiveEnergy[index] = _potentialEnergy[index]/_numberOfAtoms;
 }
 
 void Results::setDebyeTemperature(double value, int index)

@@ -12,25 +12,35 @@ using namespace std;
 
 int main()
 {
-	Material anotherMaterial("fcc", 408.53e-12, 0.34*(1.6021766208E-19), 2.65e-10, 1.75*408.53e-12, 39.948*(1.660539040e-27));
-	Parameters myParameters(1e-15, 10e-14, 10, 10, 10, 10, 2e13, false, false, anotherMaterial);
+	Material anotherMaterial("fcc", 408.53e-12, 0.34*(1.6021766208E-19), 2.65e-10, 2.5*408.53e-12, 39.948*(1.660539040e-27));
+	Parameters myParameters(1e-15, 100e-15, 10, 10, 10, 100, 2e13, false, false, anotherMaterial);
 	World myWorld(myParameters);
 
 	double** energyArray = myWorld.getResults().getTotalEnergy();
 	double** tempArray = myWorld.getResults().getTemperature();
 	double** cohArr = myWorld.getResults().getCohesiveEnergy();
+	double** msdArr = myWorld.getResults().getMeanSquareDisplacement();
+	double** debArr = myWorld.getResults().getDebyeTemperature();
+	double**** posArr = myWorld.getResults().getPositions();
 	double* E = *energyArray;
 	double* T = *tempArray;
 	double* cE = *cohArr;
+	double* dT = *debArr;
+	double* msd = *msdArr;
+	double*** pos = *posArr;
 	int index{ 0 };
 	double simulationTime = myParameters.getSimulationTime();
 	double deltaT = myParameters.getTimeStep();
+	const int numberOfTimeSteps = (int)round(simulationTime / deltaT);
 	Atom* a = myWorld.getAtomInAtomList(0);
 
 	cout << "Time 0: " << endl;
 	cout << "   Total energy: " << E[index] << endl;
 	cout << "   Temperature: " << T[index] << endl;
-	
+	cout << "   MSD: " << msd[index] << endl;
+	cout << "   Debye Temperature: " << dT[index] << endl;
+	cout << "   Position from atom: " << a->getPositionX() << " " << a->getPositionY() << " " << a->getPositionZ() << " " << endl;
+	cout << "   Position from list: " << pos[0][0][0] << " " << pos[0][0][1] << " " << pos[0][0][2] << endl;
 
 	
 	for (double t = deltaT; t < simulationTime - 0.5*deltaT; t += deltaT)
@@ -43,11 +53,14 @@ int main()
 		cout << "Time " << t << ": " << endl;
 		cout << "   Total energy: " << E[index] << endl;
 		cout << "   Temperature: " << T[index] << endl;
+		cout << "   MSD: " << msd[index] << endl;
+		cout << "   Debye Temperature: " << dT[index]<< endl;
+		cout << "   Position from atom: " << a->getPositionX() << " " << a->getPositionY() << " " << a->getPositionZ() << " " << endl;
+		cout << "   Position from list: " << pos[index][0][0] << " " << pos[index][0][1] << " " << pos[index][0][2] << endl;
+
+
+
 	}
-
-	double cohesiveEnergy = cE[99];
-
-	cout << "Cohesive energy: " << cohesiveEnergy << " eV!" << endl;
 
 	char exit;
 

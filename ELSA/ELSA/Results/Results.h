@@ -50,7 +50,7 @@ public:
 	double** getTotalEnergy();
 
 	//Setters.
-	void setCohesiveEnergy(double, int);
+	void setCohesiveEnergy(int);
 	void setDebyeTemperature(double, int);
 	void setDiffusionConstant(double, int);
 	void setInternalPressure(double, int);

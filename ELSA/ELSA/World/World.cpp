@@ -93,7 +93,7 @@ void World::calcPotentialAndForce(double elapsedTime)
 	}
 
 	_myResults.setPotentialEnergy(totalPotential, index);
-	_myResults.setCohesiveEnergy(_mySimulation.calcCohesiveEnergy(potential, N), index);
+	_myResults.setCohesiveEnergy(index);
 }
 
 //Calculate the internal pressure at a certain time
@@ -275,6 +275,8 @@ void World::initializeAtoms()
 	}
 
 	_myResults.setTotalEnergy(0);
+
+	updateMSDAndDebyeTemperature(0, _myParameters.getTemperature());
 }
 
 //Creates cells for faster neighbourlist setup
@@ -522,20 +524,6 @@ void World::setupNeighbourLists(bool is2D)
 //Function to solve the equations of motion. Finds new velocities and positions of atoms and calculates their kinetic energy and temperature.
 void World::solveEquationsOfMotion(double elapsedTime)
 {
-	omp_set_num_threads(numberOfThreads);
-	_pressureRFSum = 0;
-
-	Atom* thisAtom;
-	array<double, 3> oldR;
-	array<double, 3> oldV;
-	array<double, 3> oldA;
-	array<double, 3> newR;
-	array<double, 3> newV;
-	array<double, 3> newA;
-
-	double timeStep = _myParameters.getTimeStep();
-	int index = (int)round(elapsedTime / timeStep);
-
 	//Go through the atom list and assign new positions and velocities using the Velocity Verlet Algorithm.
 	velocityVerletStep1(elapsedTime);
 
@@ -579,7 +567,12 @@ void World::updateMSDAndDebyeTemperature(double elapsedTime, double T)
 	double*** positions = *positionsArray;
 	int index = (int)round(elapsedTime / _myParameters.getTimeStep());
 
-	double MSD = _mySimulation.calcMeanSquareDisplacement(positions[index], positions[0], _myParameters.getNumberOfAtoms());
+	double MSD = _mySimulation.calcMeanSquareDisplacement(positions[index], positions[0], 
+														_myParameters.getNumberOfAtoms(),
+														_myParameters.getLengthX(), 
+														_myParameters.getLengthY(), 
+														_myParameters.getLengthZ(),
+														_myParameters.getIs2D());
 	double debyeTemperature = _mySimulation.calcDebyeTemperature(_myParameters.getNormalizedPlanck(), T, 
 																_myParameters.getChosenMaterial().getMass(), 
 																_myParameters.getBoltzmann(), MSD);
@@ -592,7 +585,11 @@ void World::updateSelfDiffusionConstantAndSpecificHeat(double elapsedTime)
 {
 	int index = (int)round(elapsedTime / _myParameters.getTimeStep());
 	int N = _myParameters.getNumberOfAtoms();
-	double selfDiffusionConstant = _mySimulation.calcSelfDiffusionCoefficient(*(_myResults.getPositions()), 0, elapsedTime, N);
+	double selfDiffusionConstant = _mySimulation.calcSelfDiffusionCoefficient(*(_myResults.getPositions()), 0, elapsedTime, N,
+																				_myParameters.getLengthX(),
+																				_myParameters.getLengthY(),
+																				_myParameters.getLengthZ(),
+																				_myParameters.getIs2D());
 	_myResults.setDiffusionConstant(selfDiffusionConstant, index);
 
 	double specificHeat = _mySimulation.calcSpecificHeat(N, _myParameters.getBoltzmann(), index, *(_myResults.getTemperature()));
