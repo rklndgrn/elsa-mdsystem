@@ -13,7 +13,7 @@ using namespace std;
 int main()
 {
 	Material anotherMaterial("fcc", 408.53e-12, 0.34*(1.6021766208E-19), 2.65e-10, 1.75*408.53e-12, 39.948*(1.660539040e-27));
-	Parameters myParameters(1e-15, 100e-15, 10, 10, 10, 298, 2e14, true, false, anotherMaterial);
+	Parameters myParameters(1e-15, 100e-15, 10, 10, 10, 298, 0.5, true, false, anotherMaterial);
 	World myWorld(myParameters);
 
 	double** energyArray = myWorld.getResults().getTotalEnergy();
@@ -53,6 +53,7 @@ int main()
 		//cout << "   SDC: " << sdc[index] << endl;
 		//cout << "   Debye Temperature: " << dT[index]<< endl << endl;
 	}
+
 
 	char exit;
 
