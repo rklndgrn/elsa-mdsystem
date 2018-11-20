@@ -586,11 +586,9 @@ void World::updateSelfDiffusionConstantAndSpecificHeat(double elapsedTime)
 {
 	int index = (int)round(elapsedTime / _myParameters.getTimeStep());
 	int N = _myParameters.getNumberOfAtoms();
-	double selfDiffusionConstant = _mySimulation.calcSelfDiffusionCoefficient(*(_myResults.getPositions()), 0, (int) round(elapsedTime/_myParameters.getTimeStep()), N,
-																				_myParameters.getLengthX(),
-																				_myParameters.getLengthY(),
-																				_myParameters.getLengthZ(),
-																				_myParameters.getIs2D());
+	double selfDiffusionConstant = _mySimulation.calcSelfDiffusionCoefficient(*(_myResults.getPositions()), 0, elapsedTime, _myParameters.getTimeStep(),
+																				N, _myParameters.getLengthX(), _myParameters.getLengthY(),
+																				_myParameters.getLengthZ(),	_myParameters.getIs2D());
 	_myResults.setDiffusionConstant(selfDiffusionConstant, index);
 
 	double specificHeat = _mySimulation.calcSpecificHeat(N, _myParameters.getBoltzmann(), index, *(_myResults.getTemperature()));

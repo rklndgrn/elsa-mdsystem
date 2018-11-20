@@ -11,7 +11,15 @@ Simulation::Simulation(Material mat) :
 //Get debye temperature
 double Simulation::calcDebyeTemperature(double hBar, double T, double m, double kB, double MSD)
 {
-	return hBar * sqrt((3 * T) / (m*kB*MSD));
+	if (MSD == 0)
+	{
+		return 0;
+	}
+	else
+	{
+		return hBar * sqrt((3 * T) / (m*kB*MSD));
+
+	}
 }
 
 //Norm of force contribution from an atom pair 
@@ -62,10 +70,12 @@ double Simulation::calcMeanSquareDisplacement(double** currentPositionArray, dou
 }
 
 //Calculate the self-diffusion coefficient by comparing the MSD at 2 different points in time.
-double Simulation::calcSelfDiffusionCoefficient(double*** positionsArray, int t1, int t2, unsigned int numberOfAtoms, double lengthX, double lengthY, double lengthZ, bool is2D)
+double Simulation::calcSelfDiffusionCoefficient(double*** positionsArray, double t1, double t2, double timeStep, unsigned int numberOfAtoms, double lengthX, double lengthY, double lengthZ, bool is2D)
 {
-	double msd1 = calcMeanSquareDisplacement(positionsArray[t1], positionsArray[0], numberOfAtoms, lengthX, lengthY, lengthZ, is2D);
-	double msd2 = calcMeanSquareDisplacement(positionsArray[t2], positionsArray[0], numberOfAtoms, lengthX, lengthY, lengthZ, is2D);
+	double msd1 = calcMeanSquareDisplacement(positionsArray[(int) round(t1/timeStep)], positionsArray[0],
+												numberOfAtoms, lengthX, lengthY, lengthZ, is2D);
+	double msd2 = calcMeanSquareDisplacement(positionsArray[(int) round(t2/timeStep)], positionsArray[0], 
+												numberOfAtoms, lengthX, lengthY, lengthZ, is2D);
 
 	return (msd2 - msd1) / ((double)6 * (t2 - t1));
 }
