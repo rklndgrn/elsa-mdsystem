@@ -3,6 +3,9 @@
 #include <GL/glew.h>
 #include <array>
 #include <string>
+#include <fstream>
+#include <sstream>
+#include <iostream>
 
 // Include GLFW
 #include <GLFW/glfw3.h>
@@ -77,7 +80,7 @@ public:
 	double getCollisionFrequency();
 	int _counter;
 
-	float* _kinArray;
+	double* _kinArray;
 	
 	bool showCrystalSelector(const char* label);
 
@@ -95,5 +98,5 @@ public:
 
 	bool exitPressed() const;
 
-	void handlePlots(const float* potEn);// const float* kinEn, const float* totEn, const float* temp);
+	void handlePlots(const double* potEn);// const float* kinEn, const float* totEn, const float* temp);
 };

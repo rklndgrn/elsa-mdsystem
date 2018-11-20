@@ -22,7 +22,7 @@ int main()
 	myGui.setupGui(myVis.getWindow());
 
 	ofstream myFilePos;
-	myFilePos.open("BengtPos.txt");
+	myFilePos.open("Erik.txt");
 	while ((glfwGetKey(myVis.getWindow(), GLFW_KEY_ESCAPE) != GLFW_PRESS &&
 		glfwWindowShouldClose(myVis.getWindow()) == 0))// || myGui.exitPressed() )
 	{
@@ -91,8 +91,8 @@ int main()
 				myFilePos << K[index] << " ";
 			}
 			myGui.stopSimulate();
-
-			myGui._kinArray = reinterpret_cast<float*>(*kinArray);
+			myFilePos.close();
+			myGui._kinArray = *kinArray;
 		}
 
 		myGui.handlePlots(myGui._kinArray);// , kinenen, totenen, tempen);
@@ -168,7 +168,7 @@ int main()
 		cout << "   Temperature: " << T[index] << endl << endl;
 	}
 	*/
-	myFilePos.close();
+	//myFilePos.close();
 	//cout << "Hello there!" << endl;
 
 	// Cleanup

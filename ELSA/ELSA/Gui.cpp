@@ -242,7 +242,7 @@ void Gui::handleMenu()
 
 }
 
-void Gui::handlePlots(const float* potEn)//, const float* kinEn, const float* totEn, const float* temp)
+void Gui::handlePlots(const double* potEn)//, const float* kinEn, const float* totEn, const float* temp)
 {
 	if (_plotVisible)
 	{
@@ -251,7 +251,28 @@ void Gui::handlePlots(const float* potEn)//, const float* kinEn, const float* to
 	//{
 		if (ImGui::CollapsingHeader("Potential energy"))
 		{
-			ImGui::PlotLines("", potEn, (int)(floorf(_simulationTime / _timeStep)), 0, "Potential energy", 1.0f, 100.0f, ImVec2(1700, 480));
+			/*std::istringstream in("Erik.txt");
+			char tex[5000];
+			float tal[5000];
+			int i{ 0 };
+			std::ofstream outFile; 
+			outFile.open("Pelle.txt");
+			//std::ifstream myFile("Erik.txt");
+			while (i < 15) { in >> tal[i]; printf("tal[%i]: %f", i, tal[i]); i++; };
+			outFile.close();*/
+
+			float potEnD[5000];
+			float max = 0;
+			float min = 100;
+
+			for (int i = 0; i < (int)(floor(_simulationTime / _timeStep)); i++)
+			{
+				potEnD[i] = static_cast<float>(potEn[i]);
+				if (potEnD[i] > max) { max = potEnD[i]; }
+				else if (potEnD[i] < min) { min = potEnD[i]; }
+			}
+
+			ImGui::PlotLines("", potEnD, (int)(floor(_simulationTime / _timeStep)), 0, "Potential energy", min, max, ImVec2(1700, 480));
 		}
 		/*if (ImGui::CollapsingHeader("Kinetic energy"))
 		{
