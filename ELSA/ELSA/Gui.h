@@ -28,6 +28,7 @@ private:
 	bool _exitPressed;
 	bool _saveResultWindow;
 	bool _loadResultWindow;
+	bool _simulationWindow;
 
 	bool _unableToOpenFile;
 
@@ -107,6 +108,8 @@ public:
 
 	void simulateButtonHandler();
 	void stopButtonHandler();
+
+	void simulationWindow(double elapsedTime, double totalTime);
 
 	bool VisualVisible() const;
 

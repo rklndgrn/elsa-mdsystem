@@ -258,28 +258,54 @@ void Gui::handleMenu(double elapsedTime, double totalTime)
 	if (_mainVisible)
 	{
 		ImGui::Begin("ELSA MD-system", &_mainVisible, window_flags);
+		ImGui::SetWindowSize(ImVec2(560, 640));
+		ImGui::SetWindowPos(ImVec2(60, 140));
 		handleCollapsingHeaders();
 		simulateButtonHandler();
 		stopButtonHandler();
 
-		if (_simulate)
-		{
+		//if (_simulate)
+		//{
 			//ImGui::Text("Simulating...");// , _counter);
-			handleProgressBar(elapsedTime, totalTime);
+			//handleProgressBar(elapsedTime, totalTime);
 			
-		}
+		//}
 		ImGui::End();
 	}
 	handlePlots();
 	saveResultsWindow();
 	loadResultsWindow();
+	simulationWindow(elapsedTime, totalTime);
+}
+
+void Gui::simulationWindow(double elapsedTime, double totalTime)
+{
+	bool auto_resize = false;
+	//ImGuiWindowFlags window_flags = 0;
+	ImGuiWindowFlags flags = auto_resize ? ImGuiWindowFlags_AlwaysAutoResize : 0;
+	flags |= ImGuiWindowFlags_NoResize;
+	if (_simulationWindow)
+	{
+		ImGui::Begin("Simulation running...", &_simulationWindow, flags);
+		ImGui::SetWindowSize(ImVec2(900, 60));
+		handleProgressBar(elapsedTime, totalTime);
+		stopButtonHandler();
+		if (elapsedTime >= totalTime) { _simulationWindow = false; _simulate = false; }
+		ImGui::End();
+	}
 }
 
 void Gui::loadResultsWindow()
 {
+	bool auto_resize = false;
+	//ImGuiWindowFlags window_flags = 0;
+	ImGuiWindowFlags flags = auto_resize ? ImGuiWindowFlags_AlwaysAutoResize : 0;
+	flags |= ImGuiWindowFlags_NoResize;
 	if (_loadResultWindow)
 	{
-		ImGui::Begin("Load results file...", &_loadResultWindow);
+		ImGui::Begin("Load results file...", &_loadResultWindow, flags);
+		ImGui::SetWindowSize(ImVec2(500, 110));
+		ImGui::Text("Enter the name of the file you want to open:");
 		static char buf1[64] = "./SaveData/"; ImGui::InputText(".txt", buf1, 64);
 		if (ImGui::Button("Load")) {
 			strcat(buf1, ".txt");
@@ -288,16 +314,14 @@ void Gui::loadResultsWindow()
 			if (!myFile.is_open()) { _unableToOpenFile = true; }
 			else {
 				std::string dummy;
-				int sizeOfFile{ 0 };
-				while (!myFile.eof()) { getline(myFile, dummy); sizeOfFile++; printf("Size: %i\n", sizeOfFile); }
+				int sizeOfFile{ 0 }, i{ 0 };
+				while (!myFile.eof()) { getline(myFile, dummy); sizeOfFile++; }
 				myFile.close(); myFile.open(buf1);
 				if (_temp == NULL) { _temp = new double[sizeOfFile]; }
 				if (_totalEnergy == NULL) { _totalEnergy = new double[sizeOfFile]; }
 				if (_potentialEnergy == NULL) { _potentialEnergy = new double[sizeOfFile]; }
 				if (_kineticEnergy == NULL) { _kineticEnergy = new double[sizeOfFile]; }
 				std::getline(myFile, dummy);
-				int i{ 0 };
-				double dumdum{ 0 };
 				while (!myFile.eof())
 				{
 					myFile >> _temp[i];
@@ -320,9 +344,15 @@ void Gui::loadResultsWindow()
 
 void Gui::saveResultsWindow()
 {
+	bool auto_resize = false;
+	//ImGuiWindowFlags window_flags = 0;
+	ImGuiWindowFlags flags = auto_resize ? ImGuiWindowFlags_AlwaysAutoResize : 0;
+	flags |= ImGuiWindowFlags_NoResize;
 	if (_saveResultWindow)
 	{
-		ImGui::Begin("Save results file...", &_saveResultWindow);
+		ImGui::Begin("Save results file...", &_saveResultWindow, flags);
+		ImGui::SetWindowSize(ImVec2(500, 110));
+		ImGui::Text("Enter the name of the file you want to save to:");
 		static char buf1[64] = "./SaveData/"; ImGui::InputText(".txt", buf1, 64);
 		if (ImGui::Button("Save")) {
 			strcat(buf1, ".txt");
@@ -348,8 +378,14 @@ void Gui::handlePlots()
 	if (_plotVisible)
 	{
 	ImGui::Begin("Results", &_plotVisible);
-	/*if (_simulate)
-	{*/
+
+	ImGui::Text("Potential energy: \n %E", _potentialEnergy[(int)(floor(_simulationTime / _timeStep)) - 1]);
+	ImGui::SameLine();
+	ImGui::Text("Kinetic energy: \n %E", _kineticEnergy[(int)(floor(_simulationTime / _timeStep)) - 1]);
+	ImGui::SameLine();
+	ImGui::Text("Total energy: \n %E", _totalEnergy[(int)(floor(_simulationTime / _timeStep)) - 1]);
+	ImGui::SameLine();
+	ImGui::Text("Temperature: \n %E", _temp[(int)(floor(_simulationTime / _timeStep)) - 1]);
 		if (ImGui::CollapsingHeader("Potential energy"))
 		{
 			float potEnD[5000];
@@ -364,6 +400,8 @@ void Gui::handlePlots()
 			}
 
 			ImGui::PlotLines("", potEnD, (int)(floor(_simulationTime / _timeStep)) - 1, 0, "Potential energy", min, max, ImVec2(1700, 480));
+
+			
 		}
 		if (ImGui::CollapsingHeader("Kinetic energy"))
 		{
@@ -377,7 +415,7 @@ void Gui::handlePlots()
 				if (kinEnD[i] > max) { max = kinEnD[i]; }
 				else if (kinEnD[i] < min) { min = kinEnD[i]; }
 			}
-			ImGui::PlotLines("", kinEnD, (int)(floorf(_simulationTime / _timeStep)) - 1, 0, "Kinetic energy", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", kinEnD, (int)(floor(_simulationTime / _timeStep)) - 1, 0, "Kinetic energy", min, max, ImVec2(1700, 480));
 		}
 		if (ImGui::CollapsingHeader("Total energy"))
 		{
@@ -391,7 +429,7 @@ void Gui::handlePlots()
 				if (totEn[i] > max) { max = totEn[i]; }
 				else if (totEn[i] < min) { min = totEn[i]; }
 			}
-			ImGui::PlotLines("", totEn, (int)(floorf(_simulationTime / _timeStep)) - 1, 0, "Total energy", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", totEn, (int)(floor(_simulationTime / _timeStep)) - 1, 0, "Total energy", min, max, ImVec2(1700, 480));
 		}
 		if (ImGui::CollapsingHeader("Temperature"))
 		{
@@ -405,9 +443,9 @@ void Gui::handlePlots()
 				if (temp[i] > max) { max = temp[i]; }
 				else if (temp[i] < min) { min = temp[i]; }
 			}
-			ImGui::PlotLines("", temp, (int)(floorf(_simulationTime / _timeStep)) - 1, 0, "Temperature", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", temp, (int)(floor(_simulationTime / _timeStep)) - 1, 0, "Temperature", min, max, ImVec2(1700, 480));
 		}
-	//}
+
 	ImGui::End();
 	}
 }
@@ -525,7 +563,7 @@ void Gui::handleProgressBar(double elapsedTime, double totalTime)
 	// Animate a simple progress bar
 	static float progress = 0.0f, progress_dir = 1.0f;
 
-	float quota = elapsedTime / totalTime;
+	float quota = static_cast<float>(elapsedTime / totalTime);
 	printf("Progress: %f \n", quota);
 
 	progress = progress_dir * quota;// *ImGui::GetIO().DeltaTime;
@@ -542,7 +580,7 @@ void Gui::simulateButtonHandler()
 	
 	if (ImGui::Button("Simulate"))
 	{
-
+		_simulationWindow = true;
 		_simulate = true;
 	}
 
@@ -551,10 +589,13 @@ void Gui::simulateButtonHandler()
 void Gui::stopButtonHandler()
 {
 	ImGui::SameLine();
-	if (ImGui::Button("Stop Simulation"))
-	{
-		_simulate = false;
-	}
+	ImGui::PushID(1);
+	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV( 0.0f, 1.f, 1.f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 1.0f, 0.9f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.0f, 1.0f, 0.8f));
+	if (ImGui::Button("Stop Simulation")) { _simulate = false; }
+	ImGui::PopStyleColor(3);
+	ImGui::PopID();
 }
 
 bool Gui::VisualVisible() const

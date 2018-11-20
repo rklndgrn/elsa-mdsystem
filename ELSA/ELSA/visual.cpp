@@ -36,10 +36,10 @@ void visual::setParticlePosition(int id, glm::vec3 pos)
 
 void visual::setParticleColor(int id, glm::vec4 color)
 {
-	_particlesContainer[id].r = color.x;
-	_particlesContainer[id].g = color.y;
-	_particlesContainer[id].b = color.z;
-	_particlesContainer[id].a = color.w;
+	_particlesContainer[id].r = static_cast<unsigned char>(color.x);
+	_particlesContainer[id].g = static_cast<unsigned char>(color.y);
+	_particlesContainer[id].b = static_cast<unsigned char>(color.z);
+	_particlesContainer[id].a = static_cast<unsigned char>(color.w);
 }
 
 void visual::setParticleSize(int id, float size)
