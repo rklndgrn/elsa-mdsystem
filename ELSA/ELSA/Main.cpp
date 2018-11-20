@@ -75,6 +75,17 @@ int main()
 
 			for (double t = deltaT; t < myParameters.getSimulationTime() - 0.5*deltaT; t += deltaT)
 			{
+				glUseProgram(0);
+				ImGui::Render();
+
+				int display_w, display_h;
+				glfwMakeContextCurrent(myVis.getWindow());
+				glfwGetFramebufferSize(myVis.getWindow(), &display_w, &display_h);
+				glViewport(0, 0, display_w, display_h);
+				ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+				glfwPollEvents();
+				glfwSwapBuffers(myVis.getWindow());
 				if (deltaT > 0)
 				{
 					myWorld.updateCells();
@@ -90,6 +101,9 @@ int main()
 				//T = *tempArray;
 				index = (int)round(t / deltaT);
 				myFilePos << K[index] << " ";
+				myGui.handleFrame();
+				myGui.handleMenu();
+
 			}
 			myGui.stopSimulate();
 			myFilePos.close();
