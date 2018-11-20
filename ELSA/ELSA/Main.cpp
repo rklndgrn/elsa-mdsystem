@@ -36,7 +36,7 @@ int main()
 
 		// -------------------------------- MENU -----------------------------------------
 
-		myGui.handleMenu();
+		myGui.handleMenu(0,1); //1,1 does nothing
 		
 
 		if (myGui.simulate())
@@ -75,34 +75,39 @@ int main()
 
 			for (double t = deltaT; t < myParameters.getSimulationTime() - 0.5*deltaT; t += deltaT)
 			{
-				glUseProgram(0);
-				ImGui::Render();
-
-				int display_w, display_h;
-				glfwMakeContextCurrent(myVis.getWindow());
-				glfwGetFramebufferSize(myVis.getWindow(), &display_w, &display_h);
-				glViewport(0, 0, display_w, display_h);
-				ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-				glfwPollEvents();
-				glfwSwapBuffers(myVis.getWindow());
-				if (deltaT > 0)
+				if (myGui.simulate())
 				{
-					myWorld.updateCells();
-					myWorld.updateNeighbourList();
-				}
+					glUseProgram(0);
+					ImGui::Render();
 
-				myWorld.calcPotentialAndForce(t);
-				myWorld.solveEquationsOfMotion(t);
-				myWorld.calcPressure(t);
-				//U = *potArray;
-				K = *kinArray;
-				
-				//T = *tempArray;
-				index = (int)round(t / deltaT);
-				myFilePos << K[index] << " ";
-				myGui.handleFrame();
-				myGui.handleMenu();
+					//myGui.handleProgressBar(t,myParameters.getSimulationTime());
+
+					int display_w, display_h;
+					glfwMakeContextCurrent(myVis.getWindow());
+					glfwGetFramebufferSize(myVis.getWindow(), &display_w, &display_h);
+					glViewport(0, 0, display_w, display_h);
+					ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+					glfwPollEvents();
+					glfwSwapBuffers(myVis.getWindow());
+					if (deltaT > 0)
+					{
+						myWorld.updateCells();
+						myWorld.updateNeighbourList();
+					}
+
+					myWorld.calcPotentialAndForce(t);
+					myWorld.solveEquationsOfMotion(t);
+					myWorld.calcPressure(t);
+					//U = *potArray;
+					K = *kinArray;
+
+					//T = *tempArray;
+					index = (int)round(t / deltaT);
+					myFilePos << K[index] << " ";
+					myGui.handleFrame();
+					myGui.handleMenu(t, myParameters.getSimulationTime());
+				}
 
 			}
 			myGui.stopSimulate();

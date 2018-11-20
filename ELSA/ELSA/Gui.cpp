@@ -159,13 +159,40 @@ double Gui::getCollisionFrequency()
 
 bool Gui::showCrystalSelector(const char* label)
 {
-	static int style_idx = -1;
-	if (ImGui::Combo(label, &style_idx, "SC\0FCC\0"))
+	static int style_idx = 1;
+	const char* items[] = { "SC", "FCC" };
+	if (ImGui::Combo(label, &style_idx, items, IM_ARRAYSIZE(items)))
 	{
 		switch (style_idx)
 		{
 		case 0: _crystalType = "sc"; break;
 		case 1: _crystalType = "fcc"; break;
+		}
+		return true;
+	}
+	return false;
+}
+
+bool Gui::showMaterialSelector(const char* label)
+{
+	static int style_idx = 0;
+	const char* items[] = { "Ag: Silver", "Ar: Argon" };
+	if (ImGui::Combo(label, &style_idx, items, IM_ARRAYSIZE(items)))
+	{
+		switch (style_idx)
+		{
+			// Data for Silver
+		case 0: _latticeConstant = 408.53e-12;
+				_epsilon = 0.34*(1.6021766208E-19);
+				_sigma = 2.65e-10;
+				_mass = 107.8682*(1.660539040e-27);
+				break;
+			// Data for Argon
+		case 1: _latticeConstant = 525.6e-12;
+				_epsilon = 0.0104*(1.6021766208E-19);
+				_sigma = 3.40e-10;
+				_mass = 39.948*(1.660539040e-27);
+				break;
 		}
 		return true;
 	}
@@ -180,17 +207,17 @@ void Gui::handleFrame()
 	ImGui::NewFrame();
 }
 
-void Gui::handleMenu()
+void Gui::handleMenu(double elapsedTime, double totalTime)
 {
 	//Menu
 	if (ImGui::BeginMainMenuBar())
 	{
 		if (ImGui::BeginMenu("File"))
 		{
-			if(ImGui::MenuItem("Exit", NULL))
-			{
-				_exitPressed = true;
-			}
+			ImGui::MenuItem("Open result file", NULL, &_loadResultWindow);
+			ImGui::MenuItem("Save result file", NULL, &_saveResultWindow);
+	
+			if (ImGui::MenuItem("Exit", NULL)) { _exitPressed = true; }
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("View"))
@@ -233,13 +260,87 @@ void Gui::handleMenu()
 		ImGui::Begin("ELSA MD-system", &_mainVisible, window_flags);
 		handleCollapsingHeaders();
 		simulateButtonHandler();
+		stopButtonHandler();
+
 		if (_simulate)
 		{
-			ImGui::Text("Simulating...");// , _counter);
+			//ImGui::Text("Simulating...");// , _counter);
+			handleProgressBar(elapsedTime, totalTime);
+			
 		}
 		ImGui::End();
 	}
 	handlePlots();
+	saveResultsWindow();
+	loadResultsWindow();
+}
+
+void Gui::loadResultsWindow()
+{
+	if (_loadResultWindow)
+	{
+		ImGui::Begin("Load results file...", &_loadResultWindow);
+		static char buf1[64] = "./SaveData/"; ImGui::InputText(".txt", buf1, 64);
+		if (ImGui::Button("Load")) {
+			strcat(buf1, ".txt");
+			std::ifstream myFile;
+			myFile.open(buf1); 
+			if (!myFile.is_open()) { _unableToOpenFile = true; }
+			else {
+				std::string dummy;
+				int sizeOfFile{ 0 };
+				while (!myFile.eof()) { getline(myFile, dummy); sizeOfFile++; printf("Size: %i\n", sizeOfFile); }
+				myFile.close(); myFile.open(buf1);
+				if (_temp == NULL) { _temp = new double[sizeOfFile]; }
+				if (_totalEnergy == NULL) { _totalEnergy = new double[sizeOfFile]; }
+				if (_potentialEnergy == NULL) { _potentialEnergy = new double[sizeOfFile]; }
+				if (_kineticEnergy == NULL) { _kineticEnergy = new double[sizeOfFile]; }
+				std::getline(myFile, dummy);
+				int i{ 0 };
+				double dumdum{ 0 };
+				while (!myFile.eof())
+				{
+					myFile >> _temp[i];
+					myFile >> _totalEnergy[i];
+					myFile >> _potentialEnergy[i];
+					myFile >> _kineticEnergy[i];
+					i++;
+				}
+				myFile.close();
+				_loadResultWindow = false;
+				_unableToOpenFile = false;
+			}
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel")) { _loadResultWindow = false; };
+		if(_unableToOpenFile) { ImGui::Text("Unable to open file..."); }
+		ImGui::End();
+	}
+}
+
+void Gui::saveResultsWindow()
+{
+	if (_saveResultWindow)
+	{
+		ImGui::Begin("Save results file...", &_saveResultWindow);
+		static char buf1[64] = "./SaveData/"; ImGui::InputText(".txt", buf1, 64);
+		if (ImGui::Button("Save")) {
+			strcat(buf1, ".txt");
+			std::ofstream myFile;
+			myFile.open(buf1);
+
+			myFile << "Temperature [K] " << "Total energy [J] " << "Potential energy [J] " << "Kinetic energy [J] " << std::endl;
+				for (int i = 0; i < (int)(floor(_simulationTime / _timeStep)); i++)
+				{
+					myFile << _temp[i] << " " << _totalEnergy[i] << " " << _potentialEnergy[i] << " " << _kineticEnergy[i] << std::endl;
+				}
+				myFile.close();
+				_saveResultWindow = false;
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel")) { _saveResultWindow = false; };
+		ImGui::End();
+	}
 }
 
 void Gui::handlePlots()
@@ -257,12 +358,12 @@ void Gui::handlePlots()
 
 			for (int i = 0; i < (int)(floor(_simulationTime / _timeStep)); i++)
 			{
-				potEnD[i] = static_cast<float>(_potentialEnergy[i]);
+				potEnD[i] = static_cast<float>(_potentialEnergy[i+1]);
 				if (potEnD[i] > max) { max = potEnD[i]; }
 				else if (potEnD[i] < min) { min = potEnD[i]; }
 			}
 
-			ImGui::PlotLines("", potEnD, (int)(floor(_simulationTime / _timeStep)), 0, "Potential energy", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", potEnD, (int)(floor(_simulationTime / _timeStep)) - 1, 0, "Potential energy", min, max, ImVec2(1700, 480));
 		}
 		if (ImGui::CollapsingHeader("Kinetic energy"))
 		{
@@ -272,11 +373,11 @@ void Gui::handlePlots()
 
 			for (int i = 0; i < (int)(floor(_simulationTime / _timeStep)); i++)
 			{
-				kinEnD[i] = static_cast<float>(_kineticEnergy[i]);
+				kinEnD[i] = static_cast<float>(_kineticEnergy[i+1]);
 				if (kinEnD[i] > max) { max = kinEnD[i]; }
 				else if (kinEnD[i] < min) { min = kinEnD[i]; }
 			}
-			ImGui::PlotLines("", kinEnD, (int)(floorf(_simulationTime / _timeStep)), 0, "Kinetic energy", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", kinEnD, (int)(floorf(_simulationTime / _timeStep)) - 1, 0, "Kinetic energy", min, max, ImVec2(1700, 480));
 		}
 		if (ImGui::CollapsingHeader("Total energy"))
 		{
@@ -286,11 +387,11 @@ void Gui::handlePlots()
 
 			for (int i = 0; i < (int)(floor(_simulationTime / _timeStep)); i++)
 			{
-				totEn[i] = static_cast<float>(_totalEnergy[i]);
+				totEn[i] = static_cast<float>(_totalEnergy[i+1]);
 				if (totEn[i] > max) { max = totEn[i]; }
 				else if (totEn[i] < min) { min = totEn[i]; }
 			}
-			ImGui::PlotLines("", totEn, (int)(floorf(_simulationTime / _timeStep)), 0, "Total energy", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", totEn, (int)(floorf(_simulationTime / _timeStep)) - 1, 0, "Total energy", min, max, ImVec2(1700, 480));
 		}
 		if (ImGui::CollapsingHeader("Temperature"))
 		{
@@ -300,11 +401,11 @@ void Gui::handlePlots()
 
 			for (int i = 0; i < (int)(floor(_simulationTime / _timeStep)); i++)
 			{
-				temp[i] = static_cast<float>(_temp[i]);
+				temp[i] = static_cast<float>(_temp[i+1]);
 				if (temp[i] > max) { max = temp[i]; }
 				else if (temp[i] < min) { min = temp[i]; }
 			}
-			ImGui::PlotLines("", temp, (int)(floorf(_simulationTime / _timeStep)), 0, "Temperature", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", temp, (int)(floorf(_simulationTime / _timeStep)) - 1, 0, "Temperature", min, max, ImVec2(1700, 480));
 		}
 	//}
 	ImGui::End();
@@ -316,10 +417,10 @@ void Gui::handleConfigurationHeader()
 
 	if (ImGui::CollapsingHeader("Simulation parameters"))
 	{
-		ImGuiIO& io = ImGui::GetIO();
+		/*ImGuiIO& io = ImGui::GetIO();
 
 		if (showCrystalSelector("CrystalSelector"))
-			showCrystalSelector("cr");
+			showCrystalSelector("cr");*/
 
 		//ImGui::Text("Temperature: ");
 		//ImGui::SameLine();
@@ -342,6 +443,11 @@ void Gui::handleConfigurationHeader()
 		//ImGui::Text("Collision frequency: ");
 		//ImGui::SameLine();
 		ImGui::InputDouble("Collision frequency [Hz]", &_collisionFrequency, 0.0f, 0.0f, "%e");
+		ImGui::SameLine();
+		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");
+
+		//Cut off distance
+		ImGui::InputDouble("Cut off distance [m]", &_cutOffDistance, 0.0f, 0.0f, "%e");
 		ImGui::SameLine();
 		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");
 
@@ -374,6 +480,14 @@ void Gui::handleSettingsHeader()
 {
 	if (ImGui::CollapsingHeader("Material parameters"))
 	{
+		ImGuiIO& io = ImGui::GetIO();
+
+		if (showMaterialSelector("MaterialSelector"))
+			showMaterialSelector("mt");
+
+		if (showCrystalSelector("CrystalSelector"))
+			showCrystalSelector("cr");
+
 		//ImGui::Text("Lattice constant: ");
 		//ImGui::SameLine();
 		ImGui::InputDouble("Lattice constant [m]", &_latticeConstant, 0.0f, 0.0f, "%e");
@@ -382,21 +496,21 @@ void Gui::handleSettingsHeader()
 
 		//ImGui::Text("Epsilon: ");
 		//ImGui::SameLine();
-		ImGui::InputDouble("Epsilon [1]", &_epsilon, 0.0f, 0.0f, "%e");
+		ImGui::InputDouble("Epsilon [m]", &_epsilon, 0.0f, 0.0f, "%e");
 		ImGui::SameLine();
 		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");
 
 		//ImGui::Text("Sigma: ");
 		//ImGui::SameLine();
-		ImGui::InputDouble("Sigma [1]", &_sigma, 0.0f, 0.0f, "%e");
+		ImGui::InputDouble("Sigma [J]", &_sigma, 0.0f, 0.0f, "%e");
 		ImGui::SameLine();
 		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");
 
 		//ImGui::Text("Cut off distance: ");
 		//ImGui::SameLine();
-		ImGui::InputDouble("Cut off distance [m]", &_cutOffDistance, 0.0f, 0.0f, "%e");
+		/*ImGui::InputDouble("Cut off distance [m]", &_cutOffDistance, 0.0f, 0.0f, "%e");
 		ImGui::SameLine();
-		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");
+		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");*/
 
 		//ImGui::Text("Mass: ");
 		//ImGui::SameLine();
@@ -406,13 +520,41 @@ void Gui::handleSettingsHeader()
 	}
 }
 
+void Gui::handleProgressBar(double elapsedTime, double totalTime)
+{
+	// Animate a simple progress bar
+	static float progress = 0.0f, progress_dir = 1.0f;
+
+	float quota = elapsedTime / totalTime;
+	printf("Progress: %f \n", quota);
+
+	progress = progress_dir * quota;// *ImGui::GetIO().DeltaTime;
+
+	// Typically we would use ImVec2(-1.0f,0.0f) to use all available width, or ImVec2(width,0.0f) for a specified width. ImVec2(0.0f,0.0f) uses ItemWidth.
+	ImGui::ProgressBar(progress, ImVec2(0.0f, 0.0f));
+	ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
+	ImGui::Text("Simulating...");
+
+}
+
 void Gui::simulateButtonHandler()
 {
+	
 	if (ImGui::Button("Simulate"))
 	{
+
 		_simulate = true;
 	}
-	//ImGui::End();
+
+}
+
+void Gui::stopButtonHandler()
+{
+	ImGui::SameLine();
+	if (ImGui::Button("Stop Simulation"))
+	{
+		_simulate = false;
+	}
 }
 
 bool Gui::VisualVisible() const

@@ -26,6 +26,10 @@ private:
 	bool _visualVisible;
 	bool _mainVisible;
 	bool _exitPressed;
+	bool _saveResultWindow;
+	bool _loadResultWindow;
+
+	bool _unableToOpenFile;
 
 	std::string _crystalType;
 	double _temperature;
@@ -86,16 +90,23 @@ public:
 	double* _temp;
 	
 	bool showCrystalSelector(const char* label);
+	bool showMaterialSelector(const char* label);
 
 	void handleFrame();
 
-	void handleMenu();
+	void saveResultsWindow();
+	void loadResultsWindow();
+
+	void handleMenu(double, double);
 
 	void handleCollapsingHeaders();
 	void handleConfigurationHeader();
 	void handleSettingsHeader();
 
+	void handleProgressBar(double, double);
+
 	void simulateButtonHandler();
+	void stopButtonHandler();
 
 	bool VisualVisible() const;
 
