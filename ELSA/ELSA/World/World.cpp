@@ -173,7 +173,7 @@ void World::correctPositions(array<double, 3>& r)
 //Set the atoms' velocities from temperature according to Maxwell-Boltzmann distribution 
 void World::distributeInitialVelocities(double desiredTemperature)
 {
-	omp_set_num_threads(numberOfThreads);
+	//omp_set_num_threads(numberOfThreads);
 	//double sigma = sqrt(_myParameters.getBoltzmann() * _myParameters.getTemperature() / _myParameters.getChosenMaterial().getMass());
 	double variance = _myParameters.getBoltzmann() * _myParameters.getTemperature() / _myParameters.getChosenMaterial().getMass();
 	double K{ 0 }, T{ 0 };
@@ -196,11 +196,12 @@ void World::distributeInitialVelocities(double desiredTemperature)
 			totalVelocityZ += v[2];
 		}
 	}
-
+	
 	Atom* lastAtom = _atomList.at(_myParameters.getNumberOfAtoms() - 1);
 	lastAtom->setVelocityX(-totalVelocityX);
 	lastAtom->setVelocityY(-totalVelocityY);
 	lastAtom->setVelocityZ(-totalVelocityZ);
+	//cout << "Last atom gets velocity " << -totalVelocityX << " " << -totalVelocityY << " " << - totalVelocityZ << endl;
 	K += _mySimulation.calcKineticEnergy(-totalVelocityX, -totalVelocityY, -totalVelocityZ);
 
 	T = _mySimulation.calcTemperature(K, _myParameters.getBoltzmann(), _myParameters.getNumberOfAtoms());
@@ -585,7 +586,7 @@ void World::updateSelfDiffusionConstantAndSpecificHeat(double elapsedTime)
 {
 	int index = (int)round(elapsedTime / _myParameters.getTimeStep());
 	int N = _myParameters.getNumberOfAtoms();
-	double selfDiffusionConstant = _mySimulation.calcSelfDiffusionCoefficient(*(_myResults.getPositions()), 0, elapsedTime, N,
+	double selfDiffusionConstant = _mySimulation.calcSelfDiffusionCoefficient(*(_myResults.getPositions()), 0, (int) round(elapsedTime/_myParameters.getTimeStep()), N,
 																				_myParameters.getLengthX(),
 																				_myParameters.getLengthY(),
 																				_myParameters.getLengthZ(),

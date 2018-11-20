@@ -44,9 +44,10 @@ double Simulation::calcMeanSquareDisplacement(double** currentPositionArray, dou
 {
 	array<double, 3> currPos;
 	array<double, 3> initPos;
+	array<double, 4> r;
 
 	double sum{ 0 };
-	for (unsigned int i{ 0 }; i < numberOfAtoms; i++)
+	for (int i{ 0 }; i < (int) numberOfAtoms; i++)
 	{
 		for (int j{ 0 }; j < 3; j++)
 		{
@@ -54,8 +55,8 @@ double Simulation::calcMeanSquareDisplacement(double** currentPositionArray, dou
 			initPos[j] = initPositionArray[i][j];
 		}
 
-		sum += pow(calcDistance(initPos, currPos, lengthX, lengthY, lengthZ, is2D)[0], 2);
-		cout << calcDistance(initPos, currPos, lengthX, lengthY, lengthZ, is2D)[0] << endl;
+		r = calcDistance(currPos, initPos, lengthX, lengthY, lengthZ, is2D);
+		sum += pow(r[0], 2);
 	}
 	return sum / ((double)numberOfAtoms);
 }
