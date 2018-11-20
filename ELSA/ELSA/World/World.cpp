@@ -17,8 +17,10 @@ void World::addCellToCellList(Cell* c)
 
 //Help function to step 2 of the Velocity Verlet algorithm.
 //Distributes new Gaussian velocities with a probability based on the collision frequency.
-void World::andersonThermostat(double elapsedTime, double T)
+void World::andersenThermostat(double elapsedTime, double T)
 {
+	omp_set_num_threads(numberOfThreads);
+
 	Atom* thisAtom;
 	array<double, 3> newV;
 
@@ -26,10 +28,11 @@ void World::andersonThermostat(double elapsedTime, double T)
 	mt19937 generator(rd());
 	uniform_real_distribution<double> distribution(0, 1);
 	double randomValue;
+	double variance = _myParameters.getBoltzmann() * _myParameters.getTemperature() / _myParameters.getChosenMaterial().getMass();
 
-	#pragma omp parallel private(newV, randomValue, thisAtom) shared(distribution, generator)
+	#pragma omp parallel private(distribution, generator, newV, randomValue, thisAtom) shared(variance)
 	{
-		//Anderson thermostat.
+		//Andersen thermostat.
 		#pragma omp for schedule(static)
 		for (int i{ 0 }; i < _atomList.size(); i++)
 		{
@@ -38,7 +41,19 @@ void World::andersonThermostat(double elapsedTime, double T)
 
 			if (randomValue < _myParameters.getCollisionFrequency()*elapsedTime)
 			{
-				newV = _mySimulation.generateGaussianVelocity(T);
+				newV = _mySimulation.generateGaussianVelocity(variance);
+				if (i == 0)
+				{
+					cout << "Atom 0 had the velocity (" << thisAtom->getVelocityX() << ", " << thisAtom->getVelocityY() << ", " << thisAtom->getVelocityZ() << ")!" << endl;
+					cout << "Thread " << omp_get_thread_num() << " gives atom 0 the velocity (" << newV[0] << ", " << newV[1] << ", " << newV[2] << ")!" << endl;
+					cout << "The random value was " << randomValue << ", which is smaller than " << _myParameters.getCollisionFrequency()*elapsedTime << "." << endl;
+				}
+				if (i == 1)
+				{
+					cout << "Atom 1 had the velocity (" << thisAtom->getVelocityX() << ", " << thisAtom->getVelocityY() << ", " << thisAtom->getVelocityZ() << ")!" << endl;
+					cout << "Thread " << omp_get_thread_num() << " gives atom 1 the velocity (" << newV[0] << ", " << newV[1] << ", " << newV[2] << ")!" << endl;
+					cout << "The random value was " << randomValue << ", which is smaller than " << _myParameters.getCollisionFrequency()*elapsedTime << "." << endl;
+				}
 				thisAtom->setVelocity(newV);
 			}
 		}
@@ -681,7 +696,7 @@ void World::velocityVerletStep2(double elapsedTime)
 
 	if (T > 0 && _myParameters.getIsThermostatOn())
 	{
-		andersonThermostat(elapsedTime, T);
+		andersenThermostat(elapsedTime, _myParameters.getTemperature());
 	}
 }
 

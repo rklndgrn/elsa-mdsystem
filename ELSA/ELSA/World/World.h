@@ -35,7 +35,7 @@ private:
 
 	void addAtomToAtomList(Atom*);
 	void addCellToCellList(Cell*);
-	void andersonThermostat(double, double);
+	void andersenThermostat(double, double);
 	void calcPotentialAndForce(double);
 	void calcPressure(double);
 	void correctPositions(std::array<double, 3>&);
