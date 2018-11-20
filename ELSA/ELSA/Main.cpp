@@ -64,8 +64,9 @@ int main()
 			World myWorld(myParameters);
 
 			double deltaT = myParameters.getTimeStep();
-			double** potArray = myWorld.getResults().getTotalEnergy();
+			double** potArray = myWorld.getResults().getPotentialEnergy();
 			double** kinArray = myWorld.getResults().getKineticEnergy();
+			double** totArray = myWorld.getResults().getTotalEnergy();
 			double** tempArray = myWorld.getResults().getTemperature();
 			//double* U = *potArray;
 			double* K = *kinArray;
@@ -92,10 +93,13 @@ int main()
 			}
 			myGui.stopSimulate();
 			myFilePos.close();
-			myGui._kinArray = *kinArray;
+			myGui._kineticEnergy = *kinArray;
+			myGui._totalEnergy = *totArray;
+			myGui._potentialEnergy = *potArray;
+			myGui._temp = *tempArray;
 		}
 
-		myGui.handlePlots(myGui._kinArray);// , kinenen, totenen, tempen);
+		//myGui.handlePlots();// , kinenen, totenen, tempen);
 
 		bool tesr = true;
 		ImGui::ShowDemoWindow(&tesr);

@@ -80,7 +80,10 @@ public:
 	double getCollisionFrequency();
 	int _counter;
 
-	double* _kinArray;
+	double* _totalEnergy;
+	double* _potentialEnergy;
+	double* _kineticEnergy;
+	double* _temp;
 	
 	bool showCrystalSelector(const char* label);
 
@@ -98,5 +101,5 @@ public:
 
 	bool exitPressed() const;
 
-	void handlePlots(const double* potEn);// const float* kinEn, const float* totEn, const float* temp);
+	void handlePlots();// const float* kinEn, const float* totEn, const float* temp);
 };

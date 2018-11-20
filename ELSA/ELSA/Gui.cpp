@@ -239,53 +239,73 @@ void Gui::handleMenu()
 		}
 		ImGui::End();
 	}
-
+	handlePlots();
 }
 
-void Gui::handlePlots(const double* potEn)//, const float* kinEn, const float* totEn, const float* temp)
+void Gui::handlePlots()
 {
 	if (_plotVisible)
 	{
 	ImGui::Begin("Results", &_plotVisible);
-	//if (_simulate)
-	//{
+	/*if (_simulate)
+	{*/
 		if (ImGui::CollapsingHeader("Potential energy"))
 		{
-			/*std::istringstream in("Erik.txt");
-			char tex[5000];
-			float tal[5000];
-			int i{ 0 };
-			std::ofstream outFile; 
-			outFile.open("Pelle.txt");
-			//std::ifstream myFile("Erik.txt");
-			while (i < 15) { in >> tal[i]; printf("tal[%i]: %f", i, tal[i]); i++; };
-			outFile.close();*/
-
 			float potEnD[5000];
 			float max = 0;
 			float min = 100;
 
 			for (int i = 0; i < (int)(floor(_simulationTime / _timeStep)); i++)
 			{
-				potEnD[i] = static_cast<float>(potEn[i]);
+				potEnD[i] = static_cast<float>(_potentialEnergy[i]);
 				if (potEnD[i] > max) { max = potEnD[i]; }
 				else if (potEnD[i] < min) { min = potEnD[i]; }
 			}
 
 			ImGui::PlotLines("", potEnD, (int)(floor(_simulationTime / _timeStep)), 0, "Potential energy", min, max, ImVec2(1700, 480));
 		}
-		/*if (ImGui::CollapsingHeader("Kinetic energy"))
+		if (ImGui::CollapsingHeader("Kinetic energy"))
 		{
-			ImGui::PlotLines("", kinEn, (int)(floorf(_simulationTime / _timeStep)), 0, "Kinetic energy", 1.0f, 100.0f, ImVec2(1700, 480));
+			float kinEnD[5000];
+			float max = 0;
+			float min = 100;
+
+			for (int i = 0; i < (int)(floor(_simulationTime / _timeStep)); i++)
+			{
+				kinEnD[i] = static_cast<float>(_kineticEnergy[i]);
+				if (kinEnD[i] > max) { max = kinEnD[i]; }
+				else if (kinEnD[i] < min) { min = kinEnD[i]; }
+			}
+			ImGui::PlotLines("", kinEnD, (int)(floorf(_simulationTime / _timeStep)), 0, "Kinetic energy", min, max, ImVec2(1700, 480));
 		}
 		if (ImGui::CollapsingHeader("Total energy"))
 		{
-			ImGui::PlotLines("", totEn, (int)(floorf(_simulationTime / _timeStep)), 0, "Total energy", 1.0f, 100.0f, ImVec2(1700, 480));
+			float totEn[5000];
+			float max = 0;
+			float min = 100;
+
+			for (int i = 0; i < (int)(floor(_simulationTime / _timeStep)); i++)
+			{
+				totEn[i] = static_cast<float>(_totalEnergy[i]);
+				if (totEn[i] > max) { max = totEn[i]; }
+				else if (totEn[i] < min) { min = totEn[i]; }
+			}
+			ImGui::PlotLines("", totEn, (int)(floorf(_simulationTime / _timeStep)), 0, "Total energy", min, max, ImVec2(1700, 480));
 		}
 		if (ImGui::CollapsingHeader("Temperature"))
 		{
-			ImGui::PlotLines("", temp, (int)(floorf(_simulationTime / _timeStep)), 0, "Temperature", 1.0f, 100.0f, ImVec2(1700, 480));
-		}*/
+			float temp[5000];
+			float max = 0;
+			float min = 100;
+
+			for (int i = 0; i < (int)(floor(_simulationTime / _timeStep)); i++)
+			{
+				temp[i] = static_cast<float>(_temp[i]);
+				if (temp[i] > max) { max = temp[i]; }
+				else if (temp[i] < min) { min = temp[i]; }
+			}
+			ImGui::PlotLines("", temp, (int)(floorf(_simulationTime / _timeStep)), 0, "Temperature", min, max, ImVec2(1700, 480));
+		}
 	//}
 	ImGui::End();
 	}
