@@ -228,10 +228,10 @@ void World::generateAtomsAtFccLattice(double latticeConstant, unsigned int nOfUn
 				addAtomToAtomList(ax);
 				addAtomToAtomList(ay);
 				addAtomToAtomList(az);
-				_myResults.setPositions(a0->getPositionX(), a0->getPositionY(), a0->getPositionY(), 0, atomId - 4);
-				_myResults.setPositions(ax->getPositionX(), ax->getPositionY(), ax->getPositionY(), 0, atomId - 3);
-				_myResults.setPositions(ay->getPositionX(), ay->getPositionY(), ay->getPositionY(), 0, atomId - 2);
-				_myResults.setPositions(az->getPositionX(), az->getPositionY(), az->getPositionY(), 0, atomId - 1);
+				_myResults.setPositions(a0->getPositionX(), a0->getPositionY(), a0->getPositionZ(), 0, atomId - 4);
+				_myResults.setPositions(ax->getPositionX(), ax->getPositionY(), ax->getPositionZ(), 0, atomId - 3);
+				_myResults.setPositions(ay->getPositionX(), ay->getPositionY(), ay->getPositionZ(), 0, atomId - 2);
+				_myResults.setPositions(az->getPositionX(), az->getPositionY(), az->getPositionZ(), 0, atomId - 1);
 
 			}
 		}
