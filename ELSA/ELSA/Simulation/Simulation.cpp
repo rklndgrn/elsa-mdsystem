@@ -1,20 +1,25 @@
 #include "Simulation.h"
+#include <iostream>
 
 using namespace std;
 
 Simulation::Simulation(Material mat) :
 	_mat{mat}
 {};
-//Get potential energy per atom
-double Simulation::calcCohesiveEnergy(double potentialEnergy, double numberOfAtoms)
-{
-	return potentialEnergy / numberOfAtoms;
-}
+
 
 //Get debye temperature
 double Simulation::calcDebyeTemperature(double hBar, double T, double m, double kB, double MSD)
 {
-	return hBar * sqrt((3 * T) / (m*kB*MSD));
+	if (MSD == 0)
+	{
+		return 0;
+	}
+	else
+	{
+		return hBar * sqrt((3 * T) / (m*kB*MSD));
+
+	}
 }
 
 //Norm of force contribution from an atom pair 
@@ -43,13 +48,14 @@ double Simulation::calcLJPotential(double dist) const
 }
 
 //Calculate the average deviation from the atoms' initial positions.
-double Simulation::calcMeanSquareDisplacement(double** currentPositionArray, double** initPositionArray, unsigned int numberOfAtoms)
+double Simulation::calcMeanSquareDisplacement(double** currentPositionArray, double** initPositionArray, unsigned int numberOfAtoms, double lengthX, double lengthY, double lengthZ, bool is2D)
 {
 	array<double, 3> currPos;
 	array<double, 3> initPos;
+	array<double, 4> r;
 
 	double sum{ 0 };
-	for (unsigned int i{ 0 }; i < numberOfAtoms; i++)
+	for (int i{ 0 }; i < (int) numberOfAtoms; i++)
 	{
 		for (int j{ 0 }; j < 3; j++)
 		{
@@ -57,16 +63,19 @@ double Simulation::calcMeanSquareDisplacement(double** currentPositionArray, dou
 			initPos[j] = initPositionArray[i][j];
 		}
 
-		sum += pow(currPos[0] - initPos[0], 2) + pow(currPos[1] - initPos[1], 2) + pow(currPos[2] - initPos[2], 2);
+		r = calcDistance(currPos, initPos, lengthX, lengthY, lengthZ, is2D);
+		sum += pow(r[0], 2);
 	}
 	return sum / ((double)numberOfAtoms);
 }
 
 //Calculate the self-diffusion coefficient by comparing the MSD at 2 different points in time.
-double Simulation::calcSelfDiffusionCoefficient(double*** positionsArray, int t1, int t2, unsigned int numberOfAtoms)
+double Simulation::calcSelfDiffusionCoefficient(double*** positionsArray, double t1, double t2, double timeStep, unsigned int numberOfAtoms, double lengthX, double lengthY, double lengthZ, bool is2D)
 {
-	double msd1 = calcMeanSquareDisplacement(positionsArray[t1], positionsArray[0], numberOfAtoms);
-	double msd2 = calcMeanSquareDisplacement(positionsArray[t2], positionsArray[0], numberOfAtoms);
+	double msd1 = calcMeanSquareDisplacement(positionsArray[(int) round(t1/timeStep)], positionsArray[0],
+												numberOfAtoms, lengthX, lengthY, lengthZ, is2D);
+	double msd2 = calcMeanSquareDisplacement(positionsArray[(int) round(t2/timeStep)], positionsArray[0], 
+												numberOfAtoms, lengthX, lengthY, lengthZ, is2D);
 
 	return (msd2 - msd1) / ((double)6 * (t2 - t1));
 }
@@ -90,7 +99,7 @@ double Simulation::calcSpecificHeat(unsigned int numberOfAtoms, double kB, doubl
 		tmp *= ((2 * numberOfAtoms) / (3 * pow(expT, 2)));
 		tmp = 1 - tmp;
 		tmp = 1 / tmp;
-		tmp *= 2 / (3 * numberOfAtoms*kB);
+		tmp *= (3 * numberOfAtoms*kB)/2;
 	}
 
 	return tmp;
@@ -131,6 +140,54 @@ array<double, 4> Simulation::calcDistance(Atom* a1, Atom* a2, double lengthX, do
 	rx = a1->getPositionX() - a2->getPositionX();
 	ry = a1->getPositionY() - a2->getPositionY();
 	rz = a1->getPositionZ() - a2->getPositionZ();
+
+	if (rx > lengthX / 2.0)
+	{
+		rx -= lengthX;
+	}
+	else if (rx < -lengthX / 2.0)
+	{
+		rx += lengthX;
+	}
+
+	if (ry > lengthY / 2.0)
+	{
+		ry -= lengthY;
+	}
+	else if (ry < -lengthY / 2.0)
+	{
+		ry += lengthY;
+	}
+
+	if (!is2D)
+	{
+		if (rz > lengthZ / 2.0)
+		{
+			rz -= lengthZ;
+		}
+		else if (rz < -lengthZ / 2.0)
+		{
+			rz += lengthZ;
+		}
+	}
+
+	r = sqrt(pow(rx, 2) + pow(ry, 2) + pow(rz, 2));
+	rx = rx / r;
+	ry = ry / r;
+	rz = rz / r;
+	array<double, 4> temp = { r, rx, ry, rz };
+	return temp;
+}
+
+//Calc Euclidean distance with respect to periodic boundary conditions
+//element 0: total distance; element 1, 2, 3: normalized x-,y-,z-components.
+array<double, 4> Simulation::calcDistance(array<double, 3> pos1, array<double, 3> pos2,
+	double lengthX, double lengthY, double lengthZ, bool is2D) const
+{
+	double rx, ry, rz, r;
+	rx = pos1[0] - pos2[0];
+	ry = pos1[1] - pos2[1];
+	rz = pos1[2] - pos2[2];
 
 	if (rx > lengthX / 2.0)
 	{

@@ -25,7 +25,7 @@ Parameters::Parameters(
 	unsigned int numberOfUnitCellsY,
 	unsigned int numberOfUnitCellsZ,
 	double temperature,
-	double collisionFrequency,
+	double collisionPercentage,
 	bool isThermostatOn,
 	bool is2D,
 	Material chosenMaterial) : 
@@ -35,7 +35,7 @@ Parameters::Parameters(
 	_numberOfUnitCellsY{ numberOfUnitCellsY },
 	_numberOfUnitCellsZ{ numberOfUnitCellsZ },
 	_temperature{ temperature },
-	_collisionFrequency{ collisionFrequency },
+	_collisionFrequency{ collisionPercentage/timeStep },
 	_isThermostatOn{ isThermostatOn },
 	_is2D{ is2D },
 	_chosenMaterial{ chosenMaterial }
