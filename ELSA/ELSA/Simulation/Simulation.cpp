@@ -99,7 +99,7 @@ double Simulation::calcSpecificHeat(unsigned int numberOfAtoms, double kB, doubl
 		tmp *= ((2 * numberOfAtoms) / (3 * pow(expT, 2)));
 		tmp = 1 - tmp;
 		tmp = 1 / tmp;
-		tmp *= 2 / (3 * numberOfAtoms*kB);
+		tmp *= (3 * numberOfAtoms*kB)/2;
 	}
 
 	return tmp;

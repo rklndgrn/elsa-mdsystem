@@ -44,13 +44,13 @@ private:
 	void generateAtomsAtScLattice(double, unsigned int, unsigned int, unsigned int);
 	void generateCells();
 	void initializeAtoms();
+	void initializeResults();
 	void populateCells();
 	void resetAllPotentialsAndForces();
 	void setupNeighbourLists(bool);
 	void setupSystem(Parameters);
 	void solveEquationsOfMotion(double);
-	void updateMSDAndDebyeTemperature(double, double);
-	void updateSelfDiffusionConstantAndSpecificHeat(double);
+	void updateResults(double, double);
 	void velocityVerletStep1(double);
 	void velocityVerletStep2(double);
 

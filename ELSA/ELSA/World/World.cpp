@@ -266,6 +266,7 @@ void World::initializeAtoms()
 	//omp_set_num_threads(numberOfThreads);
 	distributeInitialVelocities(_myParameters.getTemperature());
 	calcPotentialAndForce(0);
+	calcPressure(0);
 	Atom* thisAtom;
 	array<double, 3> newA;
 	for (int i = 0; i < _atomList.size(); i++)
@@ -274,10 +275,13 @@ void World::initializeAtoms()
 		newA = _mySimulation.calcAcceleration(thisAtom->getForceX(), thisAtom->getForceY(), thisAtom->getForceZ());
 		thisAtom->setAcceleration(newA);
 	}
+}
 
+void World::initializeResults()
+{
 	_myResults.setTotalEnergy(0);
-
-	updateMSDAndDebyeTemperature(0, _myParameters.getTemperature());
+	double T = (*_myResults.getTemperature())[0];
+	updateResults(0, T);
 }
 
 //Creates cells for faster neighbourlist setup
@@ -560,37 +564,39 @@ void World::setupSystem(Parameters p)
 	setupNeighbourLists(_myParameters.getIs2D());
 
 	initializeAtoms();
+	initializeResults();
 }
 
-void World::updateMSDAndDebyeTemperature(double elapsedTime, double T)
+//Update the results arrays.
+void World::updateResults(double elapsedTime, double T)
 {
 	double**** positionsArray = _myResults.getPositions();
 	double*** positions = *positionsArray;
 	int index = (int)round(elapsedTime / _myParameters.getTimeStep());
-
-	double MSD = _mySimulation.calcMeanSquareDisplacement(positions[index], positions[0], 
-														_myParameters.getNumberOfAtoms(),
-														_myParameters.getLengthX(), 
-														_myParameters.getLengthY(), 
-														_myParameters.getLengthZ(),
-														_myParameters.getIs2D());
-	double debyeTemperature = _mySimulation.calcDebyeTemperature(_myParameters.getNormalizedPlanck(), T, 
-																_myParameters.getChosenMaterial().getMass(), 
-																_myParameters.getBoltzmann(), MSD);
-
-	_myResults.setMeanSquareDisplacement(MSD, index);
-	_myResults.setDebyeTemperature(debyeTemperature, index);
-}
-
-void World::updateSelfDiffusionConstantAndSpecificHeat(double elapsedTime)
-{
-	int index = (int)round(elapsedTime / _myParameters.getTimeStep());
 	int N = _myParameters.getNumberOfAtoms();
-	double selfDiffusionConstant = _mySimulation.calcSelfDiffusionCoefficient(*(_myResults.getPositions()), 0, elapsedTime, _myParameters.getTimeStep(),
-																				N, _myParameters.getLengthX(), _myParameters.getLengthY(),
-																				_myParameters.getLengthZ(),	_myParameters.getIs2D());
-	_myResults.setDiffusionConstant(selfDiffusionConstant, index);
 
+	//The mean square displacement.
+	double MSD = _mySimulation.calcMeanSquareDisplacement(positions[index], positions[0],
+		_myParameters.getNumberOfAtoms(),
+		_myParameters.getLengthX(),
+		_myParameters.getLengthY(),
+		_myParameters.getLengthZ(),
+		_myParameters.getIs2D());
+	_myResults.setMeanSquareDisplacement(MSD, index);
+
+	//The Debye Temperature.
+	double debyeTemperature = _mySimulation.calcDebyeTemperature(_myParameters.getNormalizedPlanck(), T,
+		_myParameters.getChosenMaterial().getMass(),
+		_myParameters.getBoltzmann(), MSD);
+	_myResults.setDebyeTemperature(debyeTemperature, index);
+
+	//Self diffusion coefficient
+	double selfDiffusionCoefficient = _mySimulation.calcSelfDiffusionCoefficient(*(_myResults.getPositions()), 0, elapsedTime, _myParameters.getTimeStep(),
+		N, _myParameters.getLengthX(), _myParameters.getLengthY(),
+		_myParameters.getLengthZ(), _myParameters.getIs2D());
+	_myResults.setDiffusionConstant(selfDiffusionCoefficient, index);
+
+	//Specific heat.
 	double specificHeat = _mySimulation.calcSpecificHeat(N, _myParameters.getBoltzmann(), index, *(_myResults.getTemperature()));
 	_myResults.setSpecificHeat(specificHeat, index);
 }
@@ -634,7 +640,6 @@ void World::velocityVerletStep2(double elapsedTime)
 	Atom* thisAtom;
 	array<double, 3> oldV, oldA, newV, newA;
 	double m = _myParameters.getChosenMaterial().getMass();
-	double U{ 0 }; //Total potential energy.
 	double K{ 0 }; //Kinetic energy.
 	double T{ 0 }; //Instantenous temperature
 	double px{ 0 }, py{ 0 }, pz{ 0 }; //Momentum.
@@ -642,7 +647,7 @@ void World::velocityVerletStep2(double elapsedTime)
 	double timeStep = _myParameters.getTimeStep();
 	int index = (int)round(elapsedTime / timeStep);
 
-	#pragma omp parallel private(thisAtom, oldV, oldA, newV, newA) shared(m, timeStep) reduction(+: K, U, px, py, pz)
+	#pragma omp parallel private(thisAtom, oldV, oldA, newV, newA) shared(m, timeStep) reduction(+: K)//reduction(+: K, U, px, py, pz)
 	{
 	#pragma omp for 
 		for (int i{ 0 }; i < _atomList.size(); i++)
@@ -656,25 +661,23 @@ void World::velocityVerletStep2(double elapsedTime)
 			thisAtom->setVelocity(newV);
 			thisAtom->setAcceleration(newA);
 
-			U += thisAtom->getPotential();
 			K += _mySimulation.calcKineticEnergy(newV[0], newV[1], newV[2]);
-			px += m * newV[0];
-			py += m * newV[1];
-			pz += m * newV[2];
-
+			//px += m * newV[0];
+			//py += m * newV[1];
+			//pz += m * newV[2];
 		}
 	}
 
 	T = _mySimulation.calcTemperature(K, _myParameters.getBoltzmann(), _myParameters.getNumberOfAtoms());
 
 	//Save the energies, temperature and momentum (?) for the results presentation.
-	_myResults.setPotentialEnergy(U, index);
 	_myResults.setKineticEnergy(K, index);
-	_myResults.setMomentum(px, py, pz, index);
+	//_myResults.setMomentum(px, py, pz, index);
 	_myResults.setTemperature(T, index);
 	_myResults.setTotalEnergy(index);
 
-	updateMSDAndDebyeTemperature(elapsedTime, T);
+	//Update some of the results that are to be plotted.
+	updateResults(elapsedTime, T);
 
 	if (T > 0 && _myParameters.getIsThermostatOn())
 	{
@@ -725,10 +728,10 @@ void World::performSimulation(double elapsedTime, int iterationsBetweenCellUpdat
 		updateNeighbourList();
 	}
 
-	calcPotentialAndForce(elapsedTime);
 	solveEquationsOfMotion(elapsedTime);
 	calcPressure(elapsedTime);
-	updateSelfDiffusionConstantAndSpecificHeat(elapsedTime);
+	//updateMSDAndDebyeTemperature(elapsedTime, );
+	//updateSelfDiffusionConstantAndSpecificHeat(elapsedTime);
 }
 
 void World::updateCells()
