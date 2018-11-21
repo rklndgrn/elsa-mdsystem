@@ -91,6 +91,7 @@ public:
 	double* _potentialEnergy;
 	double* _kineticEnergy;
 	double* _temp;
+	double*** _pos;
 	
 	bool showCrystalSelector(const char* label);
 	bool showMaterialSelector(const char* label);

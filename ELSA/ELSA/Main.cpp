@@ -17,7 +17,7 @@ int main()
 	//Parameters myParameters(1e-14, 20e-14, 5, 5, 5, 10, 10, false, false, anotherMaterial);
 	//World myWorld(myParameters);
 	visual myVis;
-
+	bool myWorldDefined{ false };
 	Gui myGui;
 	myGui.setupGui(myVis.getWindow());
 
@@ -32,7 +32,8 @@ int main()
 			myVis.setAtomsVisible(true);
 		else
 			myVis.setAtomsVisible(false);
-		myVis.mainLoopVisual();
+
+		myVis.mainLoopVisual(myGui._pos);
 
 		// -------------------------------- MENU -----------------------------------------
 
@@ -62,16 +63,17 @@ int main()
 				myGui.is2D(),
 				myMaterial);
 
-			World myWorld(myParameters);
+			World myWorld(myParameters); myWorldDefined = true;
+
+			
 
 			double deltaT = myParameters.getTimeStep();
 			double** potArray = myWorld.getResults().getPotentialEnergy();
 			double** kinArray = myWorld.getResults().getKineticEnergy();
 			double** totArray = myWorld.getResults().getTotalEnergy();
 			double** tempArray = myWorld.getResults().getTemperature();
-			//double* U = *potArray;
-			double* K = *kinArray;
-			//double* T = *tempArray;
+			
+
 			int index{ 0 };
 
 			myGui._initializing = false;
@@ -82,8 +84,6 @@ int main()
 				{
 					glUseProgram(0);
 					ImGui::Render();
-
-					//myGui.handleProgressBar(t,myParameters.getSimulationTime());
 
 					int display_w, display_h;
 					glfwMakeContextCurrent(myVis.getWindow());
@@ -102,16 +102,21 @@ int main()
 					myWorld.calcPotentialAndForce(t);
 					myWorld.solveEquationsOfMotion(t);
 					myWorld.calcPressure(t);
-					//U = *potArray;
-					K = *kinArray;
 
-					//T = *tempArray;
-					index = (int)round(t / deltaT);
-					myFilePos << K[index] << " ";
 					myGui.handleFrame();
 					myGui.handleMenu(t, myParameters.getSimulationTime());
 				}
 
+			}
+			double**** positions = myWorld.getResults().getPositions();
+
+			double*** pos = *positions;
+			for (double t{ 0 }; t < myParameters.getSimulationTime() - 0.5*deltaT; t += deltaT) {
+				for (int i{ 0 }; i < 27; i++) {
+					index = (int)round(t / deltaT);
+					myFilePos << pos[index][i][0] << " " << pos[index][i][1] << " " << pos[index][i][2] << " ";
+					printf("Pos x: %f y: %f z: %f at time index %i\n", pos[index][i][0], pos[index][i][1], pos[index][i][2], index);
+				}
 			}
 			myGui.stopSimulate();
 			myFilePos.close();
@@ -119,13 +124,9 @@ int main()
 			myGui._totalEnergy = *totArray;
 			myGui._potentialEnergy = *potArray;
 			myGui._temp = *tempArray;
+			myGui._pos = *positions;
 		}
-
-		//myGui.handlePlots();// , kinenen, totenen, tempen);
-
-		/*bool tesr = false;
-		ImGui::ShowDemoWindow(&tesr);*/
-
+		//myVis.mainLoopVisual();
 		// Rendering
 		glUseProgram(0);
 		ImGui::Render();
@@ -140,62 +141,7 @@ int main()
 		glfwSwapBuffers(myVis.getWindow());
 	}
 
-	/*double** potArray = myWorld.getResults().getPotentialEnergy();
-	double** kinArray = myWorld.getResults().getKineticEnergy();
-	double** tempArray = myWorld.getResults().getTemperature();
-	double* U = *potArray;
-	double* K = *kinArray;
-	double* T = *tempArray;
-	int index{ 0 };
-	
-
-	
-	ofstream myFilePos;
-	myFilePos.open("BengtPos.txt");
-	
-
-
-	cout << "Time 0: " << endl;
-	cout << "   Potential energy: " << U[index] << endl;
-	cout << "   Kinetic energy: " << K[index] << endl;
-	cout << "   Total energy: " << U[index] + K[index] << endl;
-	cout << "   Temperature: " << T[index] << endl;
-	
-	
-	Atom* a = myWorld.getAtomInAtomList(62);
-	Atom* b = myWorld.getAtomInAtomList(63);
-	myFilePos << a->getPositionX() << " " << a->getPositionY() << " " << a->getPositionZ() << " " << b->getPositionX() << " " << b->getPositionY() << " " << b->getPositionZ() << " ";
-
-	
-	for (double t = deltaT; t < myParameters.getSimulationTime() - 0.5*deltaT; t += deltaT)
-	{
-		if (deltaT > 0)
-		{
-			myWorld.updateCells();
-			myWorld.updateNeighbourList();
-		}
-
-		myWorld.calcPotentialAndForce(t);
-		myWorld.solveEquationsOfMotion(t);
-		myWorld.calcPressure(t);
-		U = *potArray;
-		K = *kinArray;
-		T = *tempArray;
-		index = (int)round(t / deltaT);
-
-
-		myFilePos << a->getPositionX() << " " << a->getPositionY() << " " << a->getPositionZ() << " " << b->getPositionX() << " " << b->getPositionY() << " " << b->getPositionZ() << " ";
-		
-		
-		cout << "Time " << t << ": " << endl;
-		cout << "   Potential energy: " << U[index] << endl;
-		cout << "   Kinetic energy: " << K[index] << endl;
-		cout << "   Total energy: " << U[index] + K[index] << endl;
-		cout << "   Temperature: " << T[index] << endl << endl;
-	}
-	*/
-	//myFilePos.close();
-	//cout << "Hello there!" << endl;
+	myFilePos.close();
 
 	// Cleanup
 	ImGui_ImplOpenGL3_Shutdown();

@@ -266,12 +266,6 @@ void Gui::handleMenu(double elapsedTime, double totalTime)
 		simulateButtonHandler();
 		stopButtonHandler();
 
-		//if (_simulate)
-		//{
-			//ImGui::Text("Simulating...");// , _counter);
-			//handleProgressBar(elapsedTime, totalTime);
-			
-		//}
 		ImGui::End();
 	}
 	handlePlots();
@@ -455,7 +449,7 @@ void Gui::handlePlots()
 
 			for (int i = 0; i < (int)(floor(_simulationTime / _timeStep) - 1); i++)
 			{
-				totEn[i] = 10e16 * static_cast<float>(_totalEnergy[i+1]);
+				totEn[i] = static_cast<float>(_totalEnergy[i+1]);
 				if (totEn[i] > max) { max = totEn[i]; printf("Vi kom in! nuvarande max: %f tot en: %f \n", max, totEn[i]); }
 				else if (totEn[i] < min) { min = totEn[i]; }
 			}
@@ -487,60 +481,31 @@ void Gui::handleConfigurationHeader()
 
 	if (ImGui::CollapsingHeader("Simulation parameters"))
 	{
-		/*ImGuiIO& io = ImGui::GetIO();
-
-		if (showCrystalSelector("CrystalSelector"))
-			showCrystalSelector("cr");*/
-
-		//ImGui::Text("Temperature: ");
-		//ImGui::SameLine();
 		ImGui::InputDouble("Temperature [K]", &_temperature, 0.0f, 0.0f, "%e");
 		ImGui::SameLine();
 		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");
 
-		//ImGui::Text("Time step length: ");
-		//ImGui::SameLine();
 		ImGui::InputDouble("Time step length [s]", &_timeStep, 0.0f, 0.0f, "%e");
 		ImGui::SameLine();
 		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");
 
-		//ImGui::Text("Simulation time: ");
-		//ImGui::SameLine();
 		ImGui::InputDouble("Simulation time [s]", &_simulationTime, 0.0f, 0.0f, "%e");
 		ImGui::SameLine();
 		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");
 
-		//ImGui::Text("Collision frequency: ");
-		//ImGui::SameLine();
 		ImGui::InputDouble("Collision frequency [Hz]", &_collisionFrequency, 0.0f, 0.0f, "%e");
 		ImGui::SameLine();
 		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");
 
-		//Cut off distance
 		ImGui::InputDouble("Cut off distance [m]", &_cutOffDistance, 0.0f, 0.0f, "%e");
 		ImGui::SameLine();
 		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");
 
-		//ImGui::Text("Number of unit cells x: ");
-		//ImGui::SameLine();
 		ImGui::InputInt("Number of unit cells x [1]", &_numberOfUnitCellsX);
-		/*ImGui::SameLine();
-		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");*/
-
-		//ImGui::Text("Number of unit cells y: ");
-		//ImGui::SameLine();
 		ImGui::InputInt("Number of unit cells y [1]", &_numberOfUnitCellsY);
-		/*ImGui::SameLine();
-		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");*/
-
-		//ImGui::Text("Number of unit cells z: ");
-		//ImGui::SameLine();
 		ImGui::InputInt("Number of unit cells z [1]", &_numberOfUnitCellsZ);
-		/*ImGui::SameLine();
-		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");*/
 
-		ImGui::Checkbox("Visualization", &_visualization);      // Edit bools storing our window open/close state
-											
+		ImGui::Checkbox("Visualization", &_visualization);      // Edit bools storing our window open/close state							
 		ImGui::Checkbox("Anderson thermostat", &_thermostat);
 		ImGui::Checkbox("2D simulation", &_2D);
 	}
@@ -558,32 +523,18 @@ void Gui::handleSettingsHeader()
 		if (showCrystalSelector("CrystalSelector"))
 			showCrystalSelector("cr");
 
-		//ImGui::Text("Lattice constant: ");
-		//ImGui::SameLine();
 		ImGui::InputDouble("Lattice constant [m]", &_latticeConstant, 0.0f, 0.0f, "%e");
 		ImGui::SameLine();
 		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");
 
-		//ImGui::Text("Epsilon: ");
-		//ImGui::SameLine();
 		ImGui::InputDouble("Epsilon [m]", &_epsilon, 0.0f, 0.0f, "%e");
 		ImGui::SameLine();
 		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");
 
-		//ImGui::Text("Sigma: ");
-		//ImGui::SameLine();
 		ImGui::InputDouble("Sigma [J]", &_sigma, 0.0f, 0.0f, "%e");
 		ImGui::SameLine();
 		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");
 
-		//ImGui::Text("Cut off distance: ");
-		//ImGui::SameLine();
-		/*ImGui::InputDouble("Cut off distance [m]", &_cutOffDistance, 0.0f, 0.0f, "%e");
-		ImGui::SameLine();
-		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");*/
-
-		//ImGui::Text("Mass: ");
-		//ImGui::SameLine();
 		ImGui::InputDouble("Mass [kg]", &_mass, 0.0f, 0.0f, "%e");
 		ImGui::SameLine();
 		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");
