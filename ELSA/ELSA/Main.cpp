@@ -13,17 +13,18 @@ using namespace std;
 int main()
 {
 	Material anotherMaterial("fcc", 408.53e-12, 0.34*(1.6021766208E-19), 2.65e-10, 1.75*408.53e-12, 39.948*(1.660539040e-27));
-	Parameters myParameters(1e-15, 100e-15, 10, 10, 10, 298, 0.5, true, false, anotherMaterial);
+	Parameters myParameters(1e-15, 100e-15, 5, 5, 5, 298, 0.5, true, false, anotherMaterial);
 	World myWorld(myParameters);
 
-	double** energyArray = myWorld.getResults().getTotalEnergy();
-	double** tempArray = myWorld.getResults().getTemperature();
+	//double** energyArray = myWorld.getResults().getTotalEnergy();
+	//double** tempArray = myWorld.getResults().getTemperature();
 	//double** msdArr = myWorld.getResults().getMeanSquareDisplacement();
 	//double** debArr = myWorld.getResults().getDebyeTemperature();
 	//double** sdcArr = myWorld.getResults().getDiffusionConstant();
-	double* sh = *myWorld.getResults().getSpecificHeat();
-	double* E = *energyArray;
-	double* T = *tempArray;
+	//double* sh = *myWorld.getResults().getSpecificHeat();
+	//double* E = *energyArray;
+	//double* T = *tempArray;
+	double* U = *myWorld.getResults().getPotentialEnergy();
 	//double* dT = *debArr;
 	//double* msd = *msdArr;
 	//double* sdc = *sdcArr;
@@ -32,8 +33,8 @@ int main()
 	double deltaT = myParameters.getTimeStep();
 
 	cout << "Time 0: " << endl;
-	cout << "   Total energy: " << E[index] << endl;
-	cout << "   Temperature: " << T[index] << endl;
+	cout << "   In main it's " << U[index] << endl;
+	//cout << "   Temperature: " << T[index] << endl;
 	//cout << "   MSD: " << msd[index] << endl;
 	//cout << "   SDC: " << sdc[index] << endl;
 	//cout << "   Debye Temperature: " << dT[index] << endl << endl;
@@ -46,9 +47,10 @@ int main()
 		index = (int)round(t / deltaT);
 		
 		cout << "Time " << t << ": " << endl;
-		cout << "   Total energy: " << E[index] << endl;
-		cout << "   Temperature: " << T[index] << endl;
-		cout << "   Specific heat: " << sh[index] << endl << endl;
+		cout << "   In main it's " << U[index] << endl;
+		//cout << "   Total energy: " << E[index] << endl;
+		//cout << "   Temperature: " << T[index] << endl;
+		//cout << "   Specific heat: " << sh[index] << endl << endl;
 		//cout << "   MSD: " << msd[index] << endl;
 		//cout << "   SDC: " << sdc[index] << endl;
 		//cout << "   Debye Temperature: " << dT[index]<< endl << endl;

@@ -55,7 +55,7 @@ void World::calcPotentialAndForce(double elapsedTime)
 	resetAllPotentialsAndForces();
 	_pressureRFSum = 0;
 
-	double potential{ 0 }, force{ 0 }, totalPotential{ 0 };
+	double potential{ 0 }, force{ 0 };// , totalPotential{ 0 };
 	Atom* a1;
 	Atom* a2;
 	array<double, 4> r;
@@ -91,12 +91,12 @@ void World::calcPotentialAndForce(double elapsedTime)
 			//Accumulate for internal pressure calculation
 			_pressureRFSum += r[0] * force;
 
-			totalPotential += potential;
+			//totalPotential += potential;
 		}
 	}
 
-	_myResults.setPotentialEnergy(totalPotential, index);
-	_myResults.setCohesiveEnergy(index);
+	//_myResults.setPotentialEnergy(totalPotential, index);
+	//_myResults.setCohesiveEnergy(index);
 }
 
 //Calculate the internal pressure at a certain time
@@ -644,13 +644,14 @@ void World::velocityVerletStep2(double elapsedTime)
 	array<double, 3> oldV, oldA, newV, newA;
 	double m = _myParameters.getChosenMaterial().getMass();
 	double K{ 0 }; //Kinetic energy.
+	double U{ 0 }; //Potential energy.
 	double T{ 0 }; //Instantenous temperature
 	double px{ 0 }, py{ 0 }, pz{ 0 }; //Momentum.
 
 	double timeStep = _myParameters.getTimeStep();
 	int index = (int)round(elapsedTime / timeStep);
 
-	#pragma omp parallel private(thisAtom, oldV, oldA, newV, newA) shared(m, timeStep) reduction(+: K)//reduction(+: K, U, px, py, pz)
+	#pragma omp parallel private(thisAtom, oldV, oldA, newV, newA) shared(m, timeStep) reduction(+: K, U)//reduction(+: K, U, px, py, pz)
 	{
 	#pragma omp for 
 		for (int i{ 0 }; i < _atomList.size(); i++)
@@ -664,6 +665,7 @@ void World::velocityVerletStep2(double elapsedTime)
 			thisAtom->setVelocity(newV);
 			thisAtom->setAcceleration(newA);
 
+			U += thisAtom->getPotential();
 			K += _mySimulation.calcKineticEnergy(newV[0], newV[1], newV[2]);
 			//px += m * newV[0];
 			//py += m * newV[1];
@@ -674,7 +676,10 @@ void World::velocityVerletStep2(double elapsedTime)
 	T = _mySimulation.calcTemperature(K, _myParameters.getBoltzmann(), _myParameters.getNumberOfAtoms());
 
 	//Save the energies, temperature and momentum (?) for the results presentation.
+	_myResults.setPotentialEnergy(U, index);
+	_myResults.setCohesiveEnergy(index);
 	_myResults.setKineticEnergy(K, index);
+	cout << "U is set to " << U << " at index " << index << "!" << endl;
 	//_myResults.setMomentum(px, py, pz, index);
 	_myResults.setTemperature(T, index);
 	_myResults.setTotalEnergy(index);
