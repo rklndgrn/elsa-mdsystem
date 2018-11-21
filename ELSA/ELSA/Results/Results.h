@@ -18,7 +18,6 @@ private:
 	double* _internalPressure;
 	double* _kineticEnergy;
 	double* _meanSquareDisplacement;
-	//double** _momentum;
 	double*** _positions;
 	double* _potentialEnergy;
 	double* _specificHeat;
@@ -30,9 +29,6 @@ public:
 	Results(double, double, unsigned int);
 	~Results() = default;
 
-	//std::array<double, 3> getMomentumVector(int);
-
-	//void addToMomentum(double, double, double, int);
 	void printPositions();
 
 	//Getters.
@@ -42,7 +38,6 @@ public:
 	double** getInternalPressure();
 	double** getKineticEnergy();
 	double** getMeanSquareDisplacement();
-	//double*** getMomentum();
 	double**** getPositions();
 	double** getPotentialEnergy();
 	double** getSpecificHeat();
@@ -56,7 +51,6 @@ public:
 	void setInternalPressure(double, int);
 	void setKineticEnergy(double, int);
 	void setMeanSquareDisplacement(double, int);
-	//void setMomentum(double, double, double, int);
 	void setPositions(double, double, double, int, int);
 	void setPotentialEnergy(double, int);
 	void setSpecificHeat(double, int);

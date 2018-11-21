@@ -4,6 +4,8 @@
 #include "./Cell/Cell.h"
 #include "./Simulation/Simulation.h"
 #include "./World/World.h"
+#include "visual.h"
+
 #include <iostream>
 #include <fstream>
 #include <cmath>
@@ -12,54 +14,123 @@ using namespace std;
 
 int main()
 {
-	Material anotherMaterial("fcc", 408.53e-12, 0.34*(1.6021766208E-19), 2.65e-10, 1.75*408.53e-12, 39.948*(1.660539040e-27));
-	Parameters myParameters(1e-15, 100e-15, 5, 5, 5, 298, 0.5, true, false, anotherMaterial);
-	World myWorld(myParameters);
 
-	//double** energyArray = myWorld.getResults().getTotalEnergy();
-	//double** tempArray = myWorld.getResults().getTemperature();
-	//double** msdArr = myWorld.getResults().getMeanSquareDisplacement();
-	//double** debArr = myWorld.getResults().getDebyeTemperature();
-	//double** sdcArr = myWorld.getResults().getDiffusionConstant();
-	//double* sh = *myWorld.getResults().getSpecificHeat();
-	//double* E = *energyArray;
-	//double* T = *tempArray;
-	double* U = *myWorld.getResults().getPotentialEnergy();
-	//double* dT = *debArr;
-	//double* msd = *msdArr;
-	//double* sdc = *sdcArr;
-	int index{ 0 };
-	double simulationTime = myParameters.getSimulationTime();
-	double deltaT = myParameters.getTimeStep();
+	visual myVis;
 
-	cout << "Time 0: " << endl;
-	cout << "   In main it's " << U[index] << endl;
-	//cout << "   Temperature: " << T[index] << endl;
-	//cout << "   MSD: " << msd[index] << endl;
-	//cout << "   SDC: " << sdc[index] << endl;
-	//cout << "   Debye Temperature: " << dT[index] << endl << endl;
+	Gui myGui;
+	myGui.setupGui(myVis.getWindow());
 
-	
-	for (double t = deltaT; t < simulationTime - 0.5*deltaT; t += deltaT)
+	while ((glfwGetKey(myVis.getWindow(), GLFW_KEY_ESCAPE) != GLFW_PRESS &&
+		glfwWindowShouldClose(myVis.getWindow()) == 0))// || myGui.exitPressed() )
 	{
+		myGui.handleFrame();
 
-		myWorld.performSimulation(t, 10);
-		index = (int)round(t / deltaT);
+		if (myGui.VisualVisible())
+			myVis.setAtomsVisible(true);
+		else
+			myVis.setAtomsVisible(false);
+		myVis.mainLoopVisual();
+
+		// -------------------------------- MENU -----------------------------------------
+
+		myGui.handleMenu(0,1); //1,1 does nothing
 		
-		cout << "Time " << t << ": " << endl;
-		cout << "   In main it's " << U[index] << endl;
-		//cout << "   Total energy: " << E[index] << endl;
-		//cout << "   Temperature: " << T[index] << endl;
-		//cout << "   Specific heat: " << sh[index] << endl << endl;
-		//cout << "   MSD: " << msd[index] << endl;
-		//cout << "   SDC: " << sdc[index] << endl;
-		//cout << "   Debye Temperature: " << dT[index]<< endl << endl;
+
+		if (myGui.simulate())
+		{
+			myGui._initializing = true;
+			Material myMaterial(
+				myGui.getCrystalType(),
+				myGui.getLatticeConstant(),
+				myGui.getEpsilon(),
+				myGui.getSigma(),
+				myGui.getCutOffDistance(),
+				myGui.getMass());
+
+			Parameters myParameters(
+				myGui.getTimeStep(),
+				myGui.getSimulationTime(),
+				myGui.getNumberOfUnitCellsX(),
+				myGui.getNumberOfUnitCellsY(),
+				myGui.getNumberOfUnitCellsZ(),
+				myGui.getTemperature(),
+				myGui.getCollisionPercentage(),
+				myGui.isThermostat(),
+				myGui.is2D(),
+				myMaterial);
+
+			World myWorld(myParameters);
+
+			double deltaT = myParameters.getTimeStep();
+			double** potArray = myWorld.getResults().getPotentialEnergy();
+			double** kinArray = myWorld.getResults().getKineticEnergy();
+			double** totArray = myWorld.getResults().getTotalEnergy();
+			double** tempArray = myWorld.getResults().getTemperature();
+
+			int index{ 0 };
+
+			myGui._initializing = false;
+
+			for (double t = deltaT; t < myParameters.getSimulationTime() - 0.5*deltaT; t += deltaT)
+			{
+				if (myGui.simulate())
+				{
+					glUseProgram(0);
+					ImGui::Render();
+
+					//myGui.handleProgressBar(t,myParameters.getSimulationTime());
+
+					int display_w, display_h;
+					glfwMakeContextCurrent(myVis.getWindow());
+					glfwGetFramebufferSize(myVis.getWindow(), &display_w, &display_h);
+					glViewport(0, 0, display_w, display_h);
+					ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+					glfwPollEvents();
+					glfwSwapBuffers(myVis.getWindow());
+
+					//Here's where the magic happens
+					myWorld.performSimulation(t, 10);
+					//---//
+
+					myGui.handleFrame();
+					myGui.handleMenu(t, myParameters.getSimulationTime());
+				}
+
+			}
+			myGui.stopSimulate();
+			myGui._kineticEnergy = *kinArray;
+			myGui._totalEnergy = *totArray;
+			myGui._potentialEnergy = *potArray;
+			myGui._temp = *tempArray;
+		}
+
+		//myGui.handlePlots();// , kinenen, totenen, tempen);
+
+		/*bool tesr = false;
+		ImGui::ShowDemoWindow(&tesr);*/
+
+		// Rendering
+		glUseProgram(0);
+		ImGui::Render();
+
+		int display_w, display_h;
+		glfwMakeContextCurrent(myVis.getWindow());
+		glfwGetFramebufferSize(myVis.getWindow(), &display_w, &display_h);
+		glViewport(0, 0, display_w, display_h);
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+		glfwPollEvents();
+		glfwSwapBuffers(myVis.getWindow());
 	}
 
+	// Cleanup
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
 
-	char exit;
-
-	cin >> exit;
+	glfwDestroyWindow(myVis.getWindow());
+	glfwTerminate();
 
 	return 0;
 }
