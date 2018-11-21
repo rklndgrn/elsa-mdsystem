@@ -90,13 +90,8 @@ void World::calcPotentialAndForce(double elapsedTime)
 
 			//Accumulate for internal pressure calculation
 			_pressureRFSum += r[0] * force;
-
-			//totalPotential += potential;
 		}
 	}
-
-	//_myResults.setPotentialEnergy(totalPotential, index);
-	//_myResults.setCohesiveEnergy(index);
 }
 
 //Calculate the internal pressure at a certain time
@@ -673,9 +668,6 @@ void World::velocityVerletStep2(double elapsedTime)
 
 			U += thisAtom->getPotential();
 			K += _mySimulation.calcKineticEnergy(newV[0], newV[1], newV[2]);
-			//px += m * newV[0];
-			//py += m * newV[1];
-			//pz += m * newV[2];
 		}
 	}
 
@@ -685,7 +677,6 @@ void World::velocityVerletStep2(double elapsedTime)
 	_myResults.setPotentialEnergy(U, index);
 	_myResults.setKineticEnergy(K, index);
 	_myResults.setCohesiveEnergy(index);
-	//_myResults.setMomentum(px, py, pz, index);
 	_myResults.setTemperature(T, index);
 	_myResults.setTotalEnergy(index);
 
@@ -767,5 +758,4 @@ void World::updateNeighbourList()
 	}
 
 	setupNeighbourLists(_myParameters.getIs2D());
-	//_myParameters.getIs2D();
 }
