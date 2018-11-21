@@ -3,6 +3,9 @@
 #include <stdlib.h>
 #include <vector>
 #include <array>
+#include <fstream>
+#include <sstream>
+#include <iostream>
 
 //Include classes
 #include "Gui.h"
@@ -53,6 +56,8 @@ public:
 	void initGLEW();
 	void initOpenGL();
 
+	void mainLoopVisual(double*** pos);
+
 	void mainLoopVisual();
 
 	GLuint getTexture();
@@ -75,10 +80,11 @@ public:
 	GLubyte* getGParticuleColorData();
 
 	Gui getGui();
-	void handleGui();
+	//void handleGui();
 
 private:
 	Gui _theGui;
+	//int _maxParticles;
 	bool _atomsVisible = false;
 	GLFWwindow * window;
 	GLuint _texture;
