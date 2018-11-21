@@ -455,7 +455,7 @@ void Gui::handlePlots()
 
 			for (int i = 0; i < (int)(floor(_simulationTime / _timeStep) - 1); i++)
 			{
-				totEn[i] = 10e16 * static_cast<float>(_totalEnergy[i+1]);
+				totEn[i] = static_cast<float>(_totalEnergy[i+1]);
 				if (totEn[i] > max) { max = totEn[i]; printf("Vi kom in! nuvarande max: %f tot en: %f \n", max, totEn[i]); }
 				else if (totEn[i] < min) { min = totEn[i]; }
 			}
