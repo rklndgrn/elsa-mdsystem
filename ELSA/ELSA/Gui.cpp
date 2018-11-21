@@ -62,6 +62,8 @@ bool Gui::simulate() const
 void Gui::stopSimulate()
 {
 	_simulate = false;
+	_simulationWindow = false;
+	_plotVisible = true;
 }
 
 void Gui::hide()
@@ -275,7 +277,27 @@ void Gui::handleMenu(double elapsedTime, double totalTime)
 	handlePlots();
 	saveResultsWindow();
 	loadResultsWindow();
+	visualWindow();
 	simulationWindow(elapsedTime, totalTime);
+}
+
+void Gui::visualWindow()
+{
+	bool auto_resize = false;
+	//ImGuiWindowFlags window_flags = 0;
+	ImGuiWindowFlags flags = auto_resize ? ImGuiWindowFlags_AlwaysAutoResize : 0;
+	flags |= ImGuiWindowFlags_NoResize;
+	if (_visualVisible)
+	{
+		ImGui::Begin("Visualization", &_visualVisible, flags);
+		ImGui::SetWindowSize(ImVec2(400, 50));
+		ImGui::Text("Enable moving camera by holding space");
+		ImGui::Text("Strafe by using w,a,s & d");
+		ImGui::Text("Rotate by using up,left,down & right");
+		ImGui::End();
+	}
+
+
 }
 
 void Gui::simulationWindow(double elapsedTime, double totalTime)
@@ -290,7 +312,7 @@ void Gui::simulationWindow(double elapsedTime, double totalTime)
 		ImGui::SetWindowSize(ImVec2(900, 60));
 		handleProgressBar(elapsedTime, totalTime);
 		stopButtonHandler();
-		if (elapsedTime >= totalTime) { _simulationWindow = false; _simulate = false; }
+		//if (!_simulate) { _simulationWindow = false; _simulate = false; }
 		ImGui::End();
 	}
 }
@@ -375,9 +397,17 @@ void Gui::saveResultsWindow()
 
 void Gui::handlePlots()
 {
+	bool auto_resize = false;
+	//ImGuiWindowFlags window_flags = 0;
+	ImGuiWindowFlags flags = auto_resize ? ImGuiWindowFlags_AlwaysAutoResize : 0;
+	flags |= ImGuiWindowFlags_NoResize;
+	
 	if (_plotVisible)
 	{
-	ImGui::Begin("Results", &_plotVisible);
+	ImGui::Begin("Results", &_plotVisible, flags);
+	ImGui::SetWindowSize(ImVec2(glfwGetVideoMode(glfwGetPrimaryMonitor())->width, glfwGetVideoMode(glfwGetPrimaryMonitor())->height - 22));
+	ImGui::SetWindowPos(ImVec2(0, 22));
+
 
 	ImGui::Text("Potential energy: \n %E", _potentialEnergy[(int)(floor(_simulationTime / _timeStep)) - 1]);
 	ImGui::SameLine();
@@ -389,10 +419,10 @@ void Gui::handlePlots()
 		if (ImGui::CollapsingHeader("Potential energy"))
 		{
 			float potEnD[5000];
-			float max = 0;
-			float min = 100;
+			float max = -1E15;
+			float min = 1E15;
 
-			for (int i = 0; i < (int)(floor(_simulationTime / _timeStep)); i++)
+			for (int i = 0; i < (int)(floor(_simulationTime / _timeStep) - 1); i++)
 			{
 				potEnD[i] = static_cast<float>(_potentialEnergy[i+1]);
 				if (potEnD[i] > max) { max = potEnD[i]; }
@@ -406,10 +436,10 @@ void Gui::handlePlots()
 		if (ImGui::CollapsingHeader("Kinetic energy"))
 		{
 			float kinEnD[5000];
-			float max = 0;
-			float min = 100;
+			float max = -1E15;
+			float min = 1E15;
 
-			for (int i = 0; i < (int)(floor(_simulationTime / _timeStep)); i++)
+			for (int i = 0; i < (int)(floor(_simulationTime / _timeStep) - 1); i++)
 			{
 				kinEnD[i] = static_cast<float>(_kineticEnergy[i+1]);
 				if (kinEnD[i] > max) { max = kinEnD[i]; }
@@ -420,24 +450,26 @@ void Gui::handlePlots()
 		if (ImGui::CollapsingHeader("Total energy"))
 		{
 			float totEn[5000];
-			float max = 0;
-			float min = 100;
+			float max = -1E5;
+			float min = 1E5;
 
-			for (int i = 0; i < (int)(floor(_simulationTime / _timeStep)); i++)
+			for (int i = 0; i < (int)(floor(_simulationTime / _timeStep) - 1); i++)
 			{
-				totEn[i] = static_cast<float>(_totalEnergy[i+1]);
-				if (totEn[i] > max) { max = totEn[i]; }
+				totEn[i] = 10e16 * static_cast<float>(_totalEnergy[i+1]);
+				if (totEn[i] > max) { max = totEn[i]; printf("Vi kom in! nuvarande max: %f tot en: %f \n", max, totEn[i]); }
 				else if (totEn[i] < min) { min = totEn[i]; }
 			}
+			//printf("Min: %f Max: %f", min, max);
+
 			ImGui::PlotLines("", totEn, (int)(floor(_simulationTime / _timeStep)) - 1, 0, "Total energy", min, max, ImVec2(1700, 480));
 		}
 		if (ImGui::CollapsingHeader("Temperature"))
 		{
 			float temp[5000];
-			float max = 0;
-			float min = 100;
+			float max = -1E15;
+			float min = 1E15;
 
-			for (int i = 0; i < (int)(floor(_simulationTime / _timeStep)); i++)
+			for (int i = 0; i < (int)(floor(_simulationTime / _timeStep) - 1); i++)
 			{
 				temp[i] = static_cast<float>(_temp[i+1]);
 				if (temp[i] > max) { max = temp[i]; }
@@ -564,14 +596,15 @@ void Gui::handleProgressBar(double elapsedTime, double totalTime)
 	static float progress = 0.0f, progress_dir = 1.0f;
 
 	float quota = static_cast<float>(elapsedTime / totalTime);
-	printf("Progress: %f \n", quota);
+	//printf("Progress: %f \n", quota);
 
 	progress = progress_dir * quota;// *ImGui::GetIO().DeltaTime;
 
 	// Typically we would use ImVec2(-1.0f,0.0f) to use all available width, or ImVec2(width,0.0f) for a specified width. ImVec2(0.0f,0.0f) uses ItemWidth.
 	ImGui::ProgressBar(progress, ImVec2(0.0f, 0.0f));
 	ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
-	ImGui::Text("Simulating...");
+	if (_simulate && !_initializing) { ImGui::Text("Simulating..."); }
+	else { ImGui::Text("Initializing..."); }
 
 }
 

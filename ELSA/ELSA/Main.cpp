@@ -41,6 +41,7 @@ int main()
 
 		if (myGui.simulate())
 		{
+			myGui._initializing = true;
 			Material myMaterial(
 				myGui.getCrystalType(),
 				myGui.getLatticeConstant(),
@@ -72,6 +73,8 @@ int main()
 			double* K = *kinArray;
 			//double* T = *tempArray;
 			int index{ 0 };
+
+			myGui._initializing = false;
 
 			for (double t = deltaT; t < myParameters.getSimulationTime() - 0.5*deltaT; t += deltaT)
 			{
@@ -120,8 +123,8 @@ int main()
 
 		//myGui.handlePlots();// , kinenen, totenen, tempen);
 
-		bool tesr = true;
-		ImGui::ShowDemoWindow(&tesr);
+		/*bool tesr = false;
+		ImGui::ShowDemoWindow(&tesr);*/
 
 		// Rendering
 		glUseProgram(0);

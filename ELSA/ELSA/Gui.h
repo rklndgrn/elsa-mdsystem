@@ -29,6 +29,7 @@ private:
 	bool _saveResultWindow;
 	bool _loadResultWindow;
 	bool _simulationWindow;
+	
 
 	bool _unableToOpenFile;
 
@@ -59,6 +60,7 @@ public:
 	void setupGui(GLFWwindow *window);
 
 	bool _visible{ false };
+	bool _initializing{ false };
 
 	void show();
 	bool visible() const;
@@ -108,6 +110,8 @@ public:
 
 	void simulateButtonHandler();
 	void stopButtonHandler();
+
+	void Gui::visualWindow();
 
 	void simulationWindow(double elapsedTime, double totalTime);
 
