@@ -66,6 +66,7 @@ public:
 	Cell* getCellInCellList(unsigned int, unsigned int, unsigned int);
 
 	void performSimulation(double, int);
+
 	void updateCells();
 	void updateNeighbourList();
 
