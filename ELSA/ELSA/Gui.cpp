@@ -461,7 +461,7 @@ void Gui::handlePlots()
 			}
 			//printf("Min: %f Max: %f", min, max);
 
-			ImGui::PlotLines("", totEn, (int)(floor(_simulationTime / _timeStep)) - 1, 0, "Total energy", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", totEn, (int)(floor(_simulationTime / _timeStep)) - 1, 0, "Total energy[J]", min, max, ImVec2(1700, 480));
 		}
 		if (ImGui::CollapsingHeader("Temperature"))
 		{
