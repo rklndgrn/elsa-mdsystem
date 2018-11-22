@@ -59,7 +59,7 @@ int main()
 				myGui.is2D(),
 				myMaterial);
 
-			World myWorld(myParameters);
+			World myWorld(myParameters, myGui.getNumberOfThreads());
 
 			double deltaT = myParameters.getTimeStep();
 			double** potArray = myWorld.getResults().getPotentialEnergy();

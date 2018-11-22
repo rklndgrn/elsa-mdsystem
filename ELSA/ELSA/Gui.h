@@ -2,6 +2,7 @@
 // Include GLEW
 #include <GL/glew.h>
 #include <array>
+#include <omp.h>
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -45,6 +46,7 @@ private:
 	double _cutOffDistance;
 	double _mass;
 	bool _visualization;
+	int _numberOfThreads{omp_get_max_threads()};
 	int _numberOfUnitCellsX;
 	int _numberOfUnitCellsY;
 	int _numberOfUnitCellsZ;
@@ -79,6 +81,7 @@ public:
 	int getNumberOfUnitCellsX();
 	int getNumberOfUnitCellsY();
 	int getNumberOfUnitCellsZ();
+	int getNumberOfThreads();
 	double getLatticeConstant();
 	double getEpsilon();
 	double getSigma();
@@ -94,6 +97,7 @@ public:
 	
 	bool showCrystalSelector(const char* label);
 	bool showMaterialSelector(const char* label);
+	bool showThreadSelector(const char* label);
 
 	void handleFrame();
 

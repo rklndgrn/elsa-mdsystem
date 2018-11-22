@@ -171,8 +171,7 @@ void World::correctPositions(array<double, 3>& r)
 //Set the atoms' velocities from temperature according to Maxwell-Boltzmann distribution 
 void World::distributeInitialVelocities(double desiredTemperature)
 {
-
-	//omp_set_num_threads(numberOfThreads);
+	omp_set_num_threads(numberOfThreads);
 
 	//double sigma = sqrt(_myParameters.getBoltzmann() * _myParameters.getTemperature() / _myParameters.getChosenMaterial().getMass());
 	double variance = _myParameters.getBoltzmann() * _myParameters.getTemperature() / _myParameters.getChosenMaterial().getMass();
@@ -691,8 +690,9 @@ void World::velocityVerletStep2(double elapsedTime)
 
 /* PUBLIC */
 //Constructor.
-World::World(Parameters p)
+World::World(Parameters p, int n)
 {
+	setNumberOfThreads(n);
 	setupSystem(p);
 }
 
@@ -707,6 +707,11 @@ Cell* World::getCellInCellList(unsigned int i, unsigned int j, unsigned int k)
 {
 	unsigned int index = i + j * _myParameters.getNumberOfCellsI() + k * _myParameters.getNumberOfCellsI()*_myParameters.getNumberOfCellsJ();
 	return _cellList.at(index);
+}
+
+int World::getNumberOfThreads() const
+{
+	return numberOfThreads;
 }
 
 //Returns results object
@@ -736,6 +741,22 @@ void World::performSimulation(double elapsedTime, int iterationsBetweenCellUpdat
 	calcPressure(elapsedTime);
 	//updateMSDAndDebyeTemperature(elapsedTime, );
 	//updateSelfDiffusionConstantAndSpecificHeat(elapsedTime);
+}
+
+void World::setNumberOfThreads(int n)
+{
+	if (n > omp_get_max_threads())
+	{
+		numberOfThreads = omp_get_max_threads();
+	}
+	else if (n < 1)
+	{
+		numberOfThreads = 1;
+	}
+	else
+	{
+		numberOfThreads = n;
+	}
 }
 
 void World::updateCells()

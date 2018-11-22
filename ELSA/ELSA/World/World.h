@@ -26,7 +26,7 @@ private:
 
 	double _pressureRFSum{ 0 };
 
-	int numberOfThreads{4};
+	int numberOfThreads{omp_get_max_threads()};
 
 	//Member functions
 	bool checkM(int, bool, unsigned int, unsigned int, unsigned int);
@@ -56,7 +56,7 @@ private:
 
 public:
 	World() = default;
-	World(Parameters);
+	World(Parameters, int);
 	~World() = default;
 
 	Results getResults();
@@ -65,8 +65,10 @@ public:
 
 	Cell* getCellInCellList(unsigned int, unsigned int, unsigned int);
 
-	void performSimulation(double, int);
+	int getNumberOfThreads() const;
 
+	void performSimulation(double, int);
+	void setNumberOfThreads(int);
 	void updateCells();
 	void updateNeighbourList();
 

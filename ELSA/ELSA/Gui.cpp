@@ -8,6 +8,7 @@ Gui::Gui()
 	_mainVisible = true;
 	_exitPressed = false;
 	_crystalType = "fcc";
+	_numberOfThreads = omp_get_max_threads();
 	_latticeConstant = 408.53e-12;
 	_epsilon = 0.34*(1.6021766208E-19);
 	_sigma = 2.65e-10;
@@ -154,6 +155,11 @@ double Gui::getMass()
 	return _mass;
 }
 
+int Gui::getNumberOfThreads()
+{
+	return _numberOfThreads;
+}
+
 double Gui::getCollisionPercentage()
 {
 	return _collisionPercentage;
@@ -196,6 +202,38 @@ bool Gui::showMaterialSelector(const char* label)
 				_mass = 39.948*(1.660539040e-27);
 				break;
 		}
+		return true;
+	}
+	return false;
+}
+
+bool Gui::showThreadSelector(const char* label)
+{
+	static int style_idx = 0;
+	const char* items[] = {"1", "2", "3", "4", "5", "6", "7", "8"};
+	//const char* items = items_tmp;
+	if (ImGui::Combo(label, &style_idx, items, IM_ARRAYSIZE(items)))
+	{
+		switch (style_idx)
+		{
+		case 1: _numberOfThreads = 1;
+				break;
+		case 2: _numberOfThreads = 2;
+			break;
+		case 3: _numberOfThreads = 3;
+			break;
+		case 4: _numberOfThreads = 4;
+			break;
+		case 5: _numberOfThreads = 5;
+			break;
+		case 6: _numberOfThreads = 6;
+			break;
+		case 7: _numberOfThreads = 7;
+			break;
+		case 8: _numberOfThreads = 8;
+			break;
+		}
+
 		return true;
 	}
 	return false;
@@ -487,10 +525,13 @@ void Gui::handleConfigurationHeader()
 
 	if (ImGui::CollapsingHeader("Simulation parameters"))
 	{
-		/*ImGuiIO& io = ImGui::GetIO();
+		ImGuiIO& io = ImGui::GetIO();
 
-		if (showCrystalSelector("CrystalSelector"))
-			showCrystalSelector("cr");*/
+		if (showThreadSelector("Thread Selector"))
+			showThreadSelector("th");
+
+		//if (showCrystalSelector("CrystalSelector"))
+		//	showCrystalSelector("cr");*/
 
 		//ImGui::Text("Temperature: ");
 		//ImGui::SameLine();
@@ -557,6 +598,7 @@ void Gui::handleSettingsHeader()
 
 		if (showCrystalSelector("CrystalSelector"))
 			showCrystalSelector("cr");
+
 
 		//ImGui::Text("Lattice constant: ");
 		//ImGui::SameLine();
