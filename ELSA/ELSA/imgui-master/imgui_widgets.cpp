@@ -5275,6 +5275,7 @@ void ImGui::PlotEx(ImGuiPlotType plot_type, const char* label, float (*values_ge
 
         const ImU32 col_base = GetColorU32((plot_type == ImGuiPlotType_Lines) ? ImGuiCol_PlotLines : ImGuiCol_PlotHistogram);
         const ImU32 col_hovered = GetColorU32((plot_type == ImGuiPlotType_Lines) ? ImGuiCol_PlotLinesHovered : ImGuiCol_PlotHistogramHovered);
+		const ImU32 col_grid = GetColorU32(ImVec4(0.5f, 0.5f, 0.5f, 0.6f));
 
         for (int n = 0; n < res_w; n++)
         {
@@ -5289,7 +5290,7 @@ void ImGui::PlotEx(ImGuiPlotType plot_type, const char* label, float (*values_ge
             ImVec2 pos1 = ImLerp(inner_bb.Min, inner_bb.Max, (plot_type == ImGuiPlotType_Lines) ? tp1 : ImVec2(tp1.x, histogram_zero_line_t));
             if (plot_type == ImGuiPlotType_Lines)
             {
-                window->DrawList->AddLine(pos0, pos1, v_hovered == v1_idx ? col_hovered : col_base);
+                window->DrawList->AddLine(pos0, pos1, v_hovered == v1_idx ? col_hovered : col_base, 2.0f);
             }
             else if (plot_type == ImGuiPlotType_Histogram)
             {
@@ -5301,6 +5302,20 @@ void ImGui::PlotEx(ImGuiPlotType plot_type, const char* label, float (*values_ge
             t0 = t1;
             tp0 = tp1;
         }
+
+		window->DrawList->AddLine(ImLerp(inner_bb.Min, inner_bb.Max, ImVec2(0.0f, 1.0f)), ImLerp(inner_bb.Min, inner_bb.Max, ImVec2(1.0f, 1.0f)), col_base, 3.0f);
+
+		for (int i = 0; i < 4; i++)
+		{
+			//horizontal
+			window->DrawList->AddLine(ImLerp(inner_bb.Min, inner_bb.Max, ImVec2(0.0f, 0.25f*i)), ImLerp(inner_bb.Min, inner_bb.Max, ImVec2(1.0f, 0.25f*i)), col_grid, 1.0f);
+			//vertical
+			window->DrawList->AddLine(ImLerp(inner_bb.Min, inner_bb.Max, ImVec2(0.25f*i, 1.0f)), ImLerp(inner_bb.Min, inner_bb.Max, ImVec2(0.25f*i, 0.0f)), col_grid, 1.0f);
+		}
+		
+
+
+		window->DrawList->AddLine(ImLerp(inner_bb.Min, inner_bb.Max, ImVec2(0.0f, 1.0f)), ImLerp(inner_bb.Min, inner_bb.Max, ImVec2(0.0f, 0.0f)), col_base, 3.0f);
     }
 
     // Text overlay
@@ -5309,6 +5324,25 @@ void ImGui::PlotEx(ImGuiPlotType plot_type, const char* label, float (*values_ge
 
     if (label_size.x > 0.0f)
         RenderText(ImVec2(frame_bb.Max.x + style.ItemInnerSpacing.x, inner_bb.Min.y), label);
+
+	//Print values for the y-axis
+	char buf[50];
+	float scale_point = 0;
+	for (int i = 0; i < 4; i++)
+	{
+		scale_point = scale_min + 0.25f*i*(scale_max - scale_min);
+		sprintf(buf, "%e", scale_point);
+
+		RenderText(ImLerp(inner_bb.Min, inner_bb.Max, ImVec2(0.0f + 0.008f, 1.0f - 0.25f*i - 0.04f)), buf);
+	}
+	//max y-value
+	sprintf(buf, "%e", scale_max);
+	RenderText(ImLerp(inner_bb.Min, inner_bb.Max, ImVec2(0.0f + 0.008f, 0.0f)), buf);
+
+	//max x-value
+	sprintf(buf, "t_max = %d", values_count);
+	RenderText(ImLerp(inner_bb.Min, inner_bb.Max, ImVec2(1.0f - 0.05f, 1.0f - 0.04f)), buf);
+
 }
 
 struct ImGuiPlotArrayGetterData
