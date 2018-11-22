@@ -5325,12 +5325,8 @@ void ImGui::PlotEx(ImGuiPlotType plot_type, const char* label, float (*values_ge
     if (label_size.x > 0.0f)
         RenderText(ImVec2(frame_bb.Max.x + style.ItemInnerSpacing.x, inner_bb.Min.y), label);
 
-
-	char buf[10000];
-	sprintf(buf, "%e", scale_max);
-	RenderText(ImVec2(inner_bb.Min.x + 0.05, inner_bb.Min.y), buf);
-
-
+	//Print values for the y-axis
+	char buf[50];
 	float scale_point = 0;
 	for (int i = 0; i < 4; i++)
 	{
@@ -5339,6 +5335,14 @@ void ImGui::PlotEx(ImGuiPlotType plot_type, const char* label, float (*values_ge
 
 		RenderText(ImLerp(inner_bb.Min, inner_bb.Max, ImVec2(0.0f + 0.008f, 1.0f - 0.25f*i - 0.04f)), buf);
 	}
+	//max y-value
+	sprintf(buf, "%e", scale_max);
+	RenderText(ImLerp(inner_bb.Min, inner_bb.Max, ImVec2(0.0f + 0.008f, 0.0f)), buf);
+
+	//max x-value
+	sprintf(buf, "t_max = %d", values_count);
+	RenderText(ImLerp(inner_bb.Min, inner_bb.Max, ImVec2(1.0f - 0.05f, 1.0f - 0.04f)), buf);
+
 }
 
 struct ImGuiPlotArrayGetterData

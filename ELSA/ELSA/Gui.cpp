@@ -429,7 +429,7 @@ void Gui::handlePlots()
 				else if (potEnD[i] < min) { min = potEnD[i]; }
 			}
 
-			ImGui::PlotLines("", potEnD, (int)(floor(_simulationTime / _timeStep)) - 1, 0, "Potential energy", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", potEnD, (int)(floor(_simulationTime / _timeStep)) - 1, 0, "Potential energy [J]", min, max, ImVec2(1700, 480));
 
 			
 		}
@@ -445,7 +445,7 @@ void Gui::handlePlots()
 				if (kinEnD[i] > max) { max = kinEnD[i]; }
 				else if (kinEnD[i] < min) { min = kinEnD[i]; }
 			}
-			ImGui::PlotLines("", kinEnD, (int)(floor(_simulationTime / _timeStep)) - 1, 0, "Kinetic energy", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", kinEnD, (int)(floor(_simulationTime / _timeStep)) - 1, 0, "Kinetic energy [J]", min, max, ImVec2(1700, 480));
 		}
 		if (ImGui::CollapsingHeader("Total energy"))
 		{
@@ -461,7 +461,7 @@ void Gui::handlePlots()
 			}
 			//printf("Min: %f Max: %f", min, max);
 
-			ImGui::PlotLines("", totEn, (int)(floor(_simulationTime / _timeStep)) - 1, 0, "Total energy[J]", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", totEn, (int)(floor(_simulationTime / _timeStep)) - 1, 0, "Total energy [J]", min, max, ImVec2(1700, 480));
 		}
 		if (ImGui::CollapsingHeader("Temperature"))
 		{
@@ -475,7 +475,7 @@ void Gui::handlePlots()
 				if (temp[i] > max) { max = temp[i]; }
 				else if (temp[i] < min) { min = temp[i]; }
 			}
-			ImGui::PlotLines("", temp, (int)(floor(_simulationTime / _timeStep)) - 1, 0, "Temperature", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", temp, (int)(floor(_simulationTime / _timeStep)) - 1, 0, "Temperature [K]", min, max, ImVec2(1700, 480));
 		}
 
 	ImGui::End();
