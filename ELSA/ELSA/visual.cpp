@@ -286,9 +286,9 @@ void visual::mainLoopVisual(double*** pos, int time, int maxTime)
 	{
 		for (int i = 0; i < _maxParticles; i++)
 		{
-			positionsF[i][0] = static_cast<float>(pos[time][i][0]) / latticeConstant;
-			positionsF[i][1] = static_cast<float>(pos[time][i][1]) / latticeConstant;
-			positionsF[i][2] = static_cast<float>(pos[time][i][2]) / latticeConstant;
+			positionsF[i][0] = static_cast<float>(pos[time][i][0]) / latticeConstant -2.5;
+			positionsF[i][1] = static_cast<float>(pos[time][i][1]) / latticeConstant -2.5;
+			positionsF[i][2] = static_cast<float>(pos[time][i][2]) / latticeConstant -2.5;
 		}
 
 		for (int i = 0; i < _maxParticles; i++) {
@@ -303,7 +303,7 @@ void visual::mainLoopVisual(double*** pos, int time, int maxTime)
 			_particlesContainer[i].cameradistance = glm::length(_particlesContainer[i].pos - CameraPosition);
 
 			// Fill the GPU buffer
-			if (positionsF[i][0] > 0.1 && positionsF[i][0] < 4.9 && positionsF[i][1] > 0.1 && positionsF[i][1] < 4.9 &&positionsF[i][2] > 0.1 && positionsF[i][2] < 4.9)
+			if (positionsF[i][0] > 0.1 -2.5 && positionsF[i][0] < 4.9 -2.5 && positionsF[i][1] > 0.1 -2.5 && positionsF[i][1] < 4.9 -2.5 &&positionsF[i][2] > 0.1-2.5 && positionsF[i][2] < 4.9-2.5)
 			{
 				_gParticulePositionSizeData[4 * ParticlesCount + 0] = _particlesContainer[i].pos.x;
 				_gParticulePositionSizeData[4 * ParticlesCount + 1] = _particlesContainer[i].pos.y;
