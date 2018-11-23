@@ -29,7 +29,7 @@ float verticalAngle = 0.0f;
 // Initial Field of View
 float initialFoV = 45.0f;
 
-float speed = 0.005f; // 3 units / second
+float speed = 0.01f; // 3 units / second
 float mouseSpeed = 0.005f;
 
 

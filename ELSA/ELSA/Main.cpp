@@ -20,16 +20,34 @@ int main()
 	Gui myGui;
 	myGui.setupGui(myVis.getWindow());
 
+	int count = 0;
+	int visualTime = 0;
+	int maxVisualTime = 1;
 	while ((glfwGetKey(myVis.getWindow(), GLFW_KEY_ESCAPE) != GLFW_PRESS &&
 		glfwWindowShouldClose(myVis.getWindow()) == 0))// || myGui.exitPressed() )
 	{
 		myGui.handleFrame();
 
 		if (myGui.VisualVisible())
+		{
 			myVis.setAtomsVisible(true);
+			count++;
+			if (count % 5 == 0)
+			{
+				visualTime++;
+			}
+			if (visualTime >= (int)floor(maxVisualTime / 5))
+			{
+				visualTime = 0;
+			}
+		}
 		else
+		{
 			myVis.setAtomsVisible(false);
-		myVis.mainLoopVisual();
+			visualTime = 0;
+		}
+		myVis.mainLoopVisual(myGui._pos, visualTime, maxVisualTime);
+
 
 		// -------------------------------- MENU -----------------------------------------
 
@@ -67,6 +85,7 @@ int main()
 			double** debyeTempArray = myWorld.getResults().getDebyeTemperature();
 			double** kinArray = myWorld.getResults().getKineticEnergy();
 			double** msdArray = myWorld.getResults().getMeanSquareDisplacement();
+			double**** posArray = myWorld.getResults().getPositions();
 			double** potArray = myWorld.getResults().getPotentialEnergy();
 			double** pressureArray = myWorld.getResults().getInternalPressure();
 			double** selfDiffArray = myWorld.getResults().getDiffusionConstant();
@@ -111,12 +130,14 @@ int main()
 			myGui._debyeTemperature = *debyeTempArray;
 			myGui._kineticEnergy = *kinArray;
 			myGui._meanSquareDisplacement = *msdArray;
+			myGui._pos = *posArray;
 			myGui._potentialEnergy = *potArray;
 			myGui._pressure = *pressureArray;
 			myGui._selfDiffusionCoeff = *selfDiffArray;
 			myGui._specificHeat = *specificHeatArray;
 			myGui._temp = *tempArray;
 			myGui._totalEnergy = *totArray;
+			maxVisualTime = (int)round(myParameters.getSimulationTime() / myParameters.getTimeStep());
 
 		}
 

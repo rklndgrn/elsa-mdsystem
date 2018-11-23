@@ -74,6 +74,7 @@ void visual::openWindow()
 		//return -1;
 	}
 	glfwMakeContextCurrent(window);
+	glfwSwapInterval(1);
 	//return 0;
 }
 
@@ -165,41 +166,10 @@ void visual::initOpenGL()
 		int particleIndex = i;
 
 		//setParticlePosition(particleIndex, glm::vec3(0, 0, -20.0f));
-		setParticleColor(particleIndex, glm::vec4(0, 30, 255, 255));
-		setParticleSize(particleIndex, 0.5f);
+		setParticleColor(particleIndex, glm::vec4(50, 30, 255, 255));
+		setParticleSize(particleIndex, 0.1f);
 
 		visual::_particle& p = getParticlesContainer()[i]; // shortcut
-
-		switch (i)
-		{
-		case 0: _particlesContainer[1].pos = glm::vec3(0, 0, 0); break;
-		case 1: _particlesContainer[2].pos = glm::vec3(0, 0, 1); break;
-		case 2: _particlesContainer[3].pos = glm::vec3(0, 0, 2); break;
-		case 3: _particlesContainer[4].pos = glm::vec3(0, 1, 0); break;
-		case 4: _particlesContainer[5].pos = glm::vec3(0, 1, 1); break;
-		case 5: _particlesContainer[6].pos = glm::vec3(0, 1, 2); break;
-		case 6: _particlesContainer[7].pos = glm::vec3(0, 2, 0); break;
-		case 7: _particlesContainer[8].pos = glm::vec3(0, 2, 1); break;
-		case 8: _particlesContainer[9].pos = glm::vec3(0, 2, 2); break;
-		case 9: _particlesContainer[10].pos = glm::vec3(1, 0, 0); break;
-		case 10: _particlesContainer[11].pos = glm::vec3(1, 0, 1); break;
-		case 11: _particlesContainer[12].pos = glm::vec3(1, 0, 2); break;
-		case 12: _particlesContainer[13].pos = glm::vec3(1, 1, 0); break;
-		case 13: _particlesContainer[14].pos = glm::vec3(1, 1, 1); break;
-		case 14: _particlesContainer[15].pos = glm::vec3(1, 1, 2); break;
-		case 15: _particlesContainer[16].pos = glm::vec3(1, 2, 0); break;
-		case 16: _particlesContainer[17].pos = glm::vec3(1, 2, 1); break;
-		case 17: _particlesContainer[18].pos = glm::vec3(1, 2, 2); break;
-		case 18: _particlesContainer[19].pos = glm::vec3(2, 0, 0); break;
-		case 19: _particlesContainer[20].pos = glm::vec3(2, 0, 1); break;
-		case 20: _particlesContainer[21].pos = glm::vec3(2, 0, 2); break;
-		case 21: _particlesContainer[22].pos = glm::vec3(2, 1, 0); break;
-		case 22: _particlesContainer[23].pos = glm::vec3(2, 1, 1); break;
-		case 23: _particlesContainer[24].pos = glm::vec3(2, 1, 2); break;
-		case 24: _particlesContainer[25].pos = glm::vec3(2, 2, 0); break;
-		case 25: _particlesContainer[26].pos = glm::vec3(2, 2, 1); break;
-		case 26: _particlesContainer[27].pos = glm::vec3(2, 2, 2); break;
-		}
 	}
 }
 
@@ -278,7 +248,7 @@ Gui visual::getGui()
 	return _theGui;
 }
 
-void visual::mainLoopVisual()
+void visual::mainLoopVisual(double*** pos, int time, int maxTime)
 {
 	// Clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -310,31 +280,51 @@ void visual::mainLoopVisual()
 
 	// Simulate all particles
 	int ParticlesCount = 0;
-	for (int i = 0; i < _maxParticles; i++) {																 
-		_particlesContainer[i].speed = glm::vec3(0.001,0.001,0.001);
-		_particlesContainer[i].pos += _particlesContainer[i].speed;
+	float positionsF[_maxParticles][3];
+	float latticeConstant = 408.53e-12;
+	if (pos != NULL && time < (int)floor(maxTime/5))
+	{
+		for (int i = 0; i < _maxParticles; i++)
+		{
+			positionsF[i][0] = static_cast<float>(pos[time*5][i][0]) / latticeConstant;
+			positionsF[i][1] = static_cast<float>(pos[time*5][i][1]) / latticeConstant;
+			positionsF[i][2] = static_cast<float>(pos[time*5][i][2]) / latticeConstant;
+		}
 
-		_particlesContainer[i].cameradistance = glm::length(_particlesContainer[i].pos - CameraPosition);
+		for (int i = 0; i < _maxParticles; i++) {
+			//_particlesContainer[i].speed = glm::vec3(0.001,0.001,0.001);
+			//_particlesContainer[i].pos += _particlesContainer[i].speed;
+			_particlesContainer[i].pos = glm::vec3(positionsF[i][0], positionsF[i][1], positionsF[i][2]);
 
-		// Fill the GPU buffer
-		_gParticulePositionSizeData[4 * ParticlesCount + 0] = _particlesContainer[i].pos.x;
-		_gParticulePositionSizeData[4 * ParticlesCount + 1] = _particlesContainer[i].pos.y;
-		_gParticulePositionSizeData[4 * ParticlesCount + 2] = _particlesContainer[i].pos.z;
+			//_particlesContainer[i].pos = glm::vec3(0, 1, 2);
+			//printf("Pos x: %e y: %e z: %e\n", pos[0][i][0], pos[0][i][1], pos[0][i][2]);
+			//printf("PPos x: %e y: %e z: %e\n", _particlesContainer[i].pos.x, _particlesContainer[i].pos.y, _particlesContainer[i].pos.z);
 
-		_gParticulePositionSizeData[4 * ParticlesCount + 3] = _particlesContainer[i].size;
+			_particlesContainer[i].cameradistance = glm::length(_particlesContainer[i].pos - CameraPosition);
 
-		_gParticuleColorData[4 * ParticlesCount + 0] = _particlesContainer[i].r;
-		_gParticuleColorData[4 * ParticlesCount + 1] = _particlesContainer[i].g;
-		_gParticuleColorData[4 * ParticlesCount + 2] = _particlesContainer[i].b;
-		_gParticuleColorData[4 * ParticlesCount + 3] = _particlesContainer[i].a;
+			// Fill the GPU buffer
+			if (positionsF[i][0] > 0.1 && positionsF[i][0] < 4.9 && positionsF[i][1] > 0.1 && positionsF[i][1] < 4.9 &&positionsF[i][2] > 0.1 && positionsF[i][2] < 4.9)
+			{
+				_gParticulePositionSizeData[4 * ParticlesCount + 0] = _particlesContainer[i].pos.x;
+				_gParticulePositionSizeData[4 * ParticlesCount + 1] = _particlesContainer[i].pos.y;
+				_gParticulePositionSizeData[4 * ParticlesCount + 2] = _particlesContainer[i].pos.z;
 
-		ParticlesCount++;
+				_gParticulePositionSizeData[4 * ParticlesCount + 3] = _particlesContainer[i].size;
 
 
+				_gParticuleColorData[4 * ParticlesCount + 0] = _particlesContainer[i].r;
+				_gParticuleColorData[4 * ParticlesCount + 1] = _particlesContainer[i].g;
+				_gParticuleColorData[4 * ParticlesCount + 2] = _particlesContainer[i].b;
+				_gParticuleColorData[4 * ParticlesCount + 3] = _particlesContainer[i].a;
+
+				ParticlesCount++;
+			}
+
+
+		}
+
+		sortParticles();
 	}
-
-	sortParticles();
-
 	// Update the buffers that OpenGL uses for rendering.
 	// There are much more sophisticated means to stream data from the CPU to the GPU, 
 	// but this is outside the scope of this tutorial.

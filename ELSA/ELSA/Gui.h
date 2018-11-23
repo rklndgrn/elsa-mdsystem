@@ -94,6 +94,7 @@ public:
 	double* _debyeTemperature;
 	double* _kineticEnergy;
 	double* _meanSquareDisplacement;
+	double*** _pos;
 	double* _potentialEnergy;
 	double* _pressure;
 	double* _selfDiffusionCoeff;

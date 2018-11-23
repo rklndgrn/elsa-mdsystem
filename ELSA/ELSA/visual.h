@@ -20,7 +20,7 @@ using namespace glm;
 #include "objloader.hpp"
 
 #pragma once
-#define _maxParticles 27
+#define _maxParticles 500
 
 class visual
 {
@@ -53,7 +53,7 @@ public:
 	void initGLEW();
 	void initOpenGL();
 
-	void mainLoopVisual();
+	void mainLoopVisual(double***, int, int);
 
 	GLuint getTexture();
 	GLuint getBillboardVertexBuffer();
