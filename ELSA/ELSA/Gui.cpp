@@ -436,6 +436,7 @@ void Gui::saveResultsWindow()
 void Gui::handlePlots()
 {
 	bool auto_resize = false;
+	int numberOfTimeSteps = (int)round(_simulationTime / _timeStep);
 	//ImGuiWindowFlags window_flags = 0;
 	ImGuiWindowFlags flags = auto_resize ? ImGuiWindowFlags_AlwaysAutoResize : 0;
 	flags |= ImGuiWindowFlags_NoResize;
@@ -447,13 +448,13 @@ void Gui::handlePlots()
 		ImGui::SetWindowPos(ImVec2(0, 22));
 
 
-		ImGui::Text("Potential energy: \n %E", _potentialEnergy[(int)(floor(_simulationTime / _timeStep)) - 1]);
+		ImGui::Text("Potential energy: \n %E", _potentialEnergy[numberOfTimeSteps - 1]);
 		ImGui::SameLine();
-		ImGui::Text("Kinetic energy: \n %E", _kineticEnergy[(int)(floor(_simulationTime / _timeStep)) - 1]);
+		ImGui::Text("Kinetic energy: \n %E", _kineticEnergy[numberOfTimeSteps - 1]);
 		ImGui::SameLine();
-		ImGui::Text("Total energy: \n %E", _totalEnergy[(int)(floor(_simulationTime / _timeStep)) - 1]);
+		ImGui::Text("Total energy: \n %E", _totalEnergy[numberOfTimeSteps - 1]);
 		ImGui::SameLine();
-		ImGui::Text("Temperature: \n %E", _temp[(int)(floor(_simulationTime / _timeStep)) - 1]);
+		ImGui::Text("Temperature: \n %E", _temp[numberOfTimeSteps - 1]);
 
 		if (ImGui::CollapsingHeader("Cohesive energy"))
 		{
@@ -461,15 +462,14 @@ void Gui::handlePlots()
 			float max = -1E15;
 			float min = 1E15;
 
-			for (int i = 0; i < (int)(floor(_simulationTime / _timeStep) - 1); i++)
+			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
 				cohEnEnD[i] = static_cast<float>(_cohesiveEnergy[i + 1]);
 				if (cohEnEnD[i] > max) { max = cohEnEnD[i]; }
 				else if (cohEnEnD[i] < min) { min = cohEnEnD[i]; }
 			}
 
-			ImGui::PlotLines("", cohEnEnD, (int)(floor(_simulationTime / _timeStep)) - 1, 0, "Cohesive energy [J]", min, max, ImVec2(1700, 480));
-
+			ImGui::PlotLines("", cohEnEnD, numberOfTimeSteps - 1, 0, "Cohesive energy [J]", min, max, ImVec2(1700, 480));
 
 		}
 		if (ImGui::CollapsingHeader("Debye Temperature"))
@@ -478,14 +478,14 @@ void Gui::handlePlots()
 			float max = -1E15;
 			float min = 1E15;
 
-			for (int i = 0; i < (int)(floor(_simulationTime / _timeStep) - 1); i++)
+			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
 				debyeTempEnD[i] = static_cast<float>(_debyeTemperature[i + 1]);
 				if (debyeTempEnD[i] > max) { max = debyeTempEnD[i]; }
 				else if (debyeTempEnD[i] < min) { min = debyeTempEnD[i]; }
 			}
 
-			ImGui::PlotLines("", debyeTempEnD, (int)(floor(_simulationTime / _timeStep)) - 1, 0, "Debye Temperature [K]", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", debyeTempEnD, numberOfTimeSteps - 1, 0, "Debye Temperature [K]", min, max, ImVec2(1700, 480));
 
 
 		}
@@ -495,14 +495,14 @@ void Gui::handlePlots()
 			float max = -1E15;
 			float min = 1E15;
 
-			for (int i = 0; i < (int)(floor(_simulationTime / _timeStep) - 1); i++)
+			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
 				pressureEnD[i] = static_cast<float>(_pressure[i + 1]);
 				if (pressureEnD[i] > max) { max = pressureEnD[i]; }
 				else if (pressureEnD[i] < min) { min = pressureEnD[i]; }
 			}
 
-			ImGui::PlotLines("", pressureEnD, (int)(floor(_simulationTime / _timeStep)) - 1, 0, "Internal pressure [Pa]", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", pressureEnD, numberOfTimeSteps - 1, 0, "Internal pressure [Pa]", min, max, ImVec2(1700, 480));
 
 
 		}
@@ -512,13 +512,13 @@ void Gui::handlePlots()
 			float max = -1E15;
 			float min = 1E15;
 
-			for (int i = 0; i < (int)(floor(_simulationTime / _timeStep) - 1); i++)
+			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
 				kinEnD[i] = static_cast<float>(_kineticEnergy[i + 1]);
 				if (kinEnD[i] > max) { max = kinEnD[i]; }
 				else if (kinEnD[i] < min) { min = kinEnD[i]; }
 			}
-			ImGui::PlotLines("", kinEnD, (int)(floor(_simulationTime / _timeStep)) - 1, 0, "Kinetic energy [J]", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", kinEnD, numberOfTimeSteps - 1, 0, "Kinetic energy [J]", min, max, ImVec2(1700, 480));
 		}
 		if (ImGui::CollapsingHeader("Mean square displacement"))
 		{
@@ -526,14 +526,14 @@ void Gui::handlePlots()
 			float max = -1E15;
 			float min = 1E15;
 
-			for (int i = 0; i < (int)(floor(_simulationTime / _timeStep) - 1); i++)
+			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
 				msdEnD[i] = static_cast<float>(_meanSquareDisplacement[i + 1]);
 				if (msdEnD[i] > max) { max = msdEnD[i]; }
 				else if (msdEnD[i] < min) { min = msdEnD[i]; }
 			}
 
-			ImGui::PlotLines("", msdEnD, (int)(floor(_simulationTime / _timeStep)) - 1, 0, "Mean square displacement [m^2]", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", msdEnD, numberOfTimeSteps - 1, 0, "Mean square displacement [m^2]", min, max, ImVec2(1700, 480));
 
 
 		}
@@ -543,14 +543,14 @@ void Gui::handlePlots()
 			float max = -1E15;
 			float min = 1E15;
 
-			for (int i = 0; i < (int)(floor(_simulationTime / _timeStep) - 1); i++)
+			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
 				potEnD[i] = static_cast<float>(_potentialEnergy[i + 1]);
 				if (potEnD[i] > max) { max = potEnD[i]; }
 				else if (potEnD[i] < min) { min = potEnD[i]; }
 			}
 
-			ImGui::PlotLines("", potEnD, (int)(floor(_simulationTime / _timeStep)) - 1, 0, "Potential energy [J]", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", potEnD, numberOfTimeSteps - 1, 0, "Potential energy [J]", min, max, ImVec2(1700, 480));
 			ImGui::SameLine();
 			ImGui::Text("Jonas1");
 			ImGui::Text("Jonas2");
@@ -562,14 +562,14 @@ void Gui::handlePlots()
 			float max = -1E15;
 			float min = 1E15;
 
-			for (int i = 0; i < (int)(floor(_simulationTime / _timeStep) - 1); i++)
+			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
 				selfDiffEnD[i] = static_cast<float>(_selfDiffusionCoeff[i + 1]);
 				if (selfDiffEnD[i] > max) { max = selfDiffEnD[i]; }
 				else if (selfDiffEnD[i] < min) { min = selfDiffEnD[i]; }
 			}
 
-			ImGui::PlotLines("", selfDiffEnD, (int)(floor(_simulationTime / _timeStep)) - 1, 0, "Self diffusion coefficient [m^2 s^-1]", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", selfDiffEnD, numberOfTimeSteps - 1, 0, "Self diffusion coefficient [m^2 s^-1]", min, max, ImVec2(1700, 480));
 
 
 		}
@@ -579,14 +579,14 @@ void Gui::handlePlots()
 			float max = -1E15;
 			float min = 1E15;
 
-			for (int i = 0; i < (int)(floor(_simulationTime / _timeStep) - 1); i++)
+			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
 				specHeatEnD[i] = static_cast<float>(_specificHeat[i + 1]);
 				if (specHeatEnD[i] > max) { max = specHeatEnD[i]; }
 				else if (specHeatEnD[i] < min) { min = specHeatEnD[i]; }
 			}
 
-			ImGui::PlotLines("", specHeatEnD, (int)(floor(_simulationTime / _timeStep)) - 1, 0, "Specific heat [J kg^-1 K^-1]", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", specHeatEnD, numberOfTimeSteps - 1, 0, "Specific heat [J kg^-1 K^-1]", min, max, ImVec2(1700, 480));
 
 
 		}
@@ -597,13 +597,13 @@ void Gui::handlePlots()
 			float max = -1E15;
 			float min = 1E15;
 
-			for (int i = 0; i < (int)(floor(_simulationTime / _timeStep) - 1); i++)
+			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
 				temp[i] = static_cast<float>(_temp[i + 1]);
 				if (temp[i] > max) { max = temp[i]; }
 				else if (temp[i] < min) { min = temp[i]; }
 			}
-			ImGui::PlotLines("", temp, (int)(floor(_simulationTime / _timeStep)) - 1, 0, "Temperature [K]", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", temp, numberOfTimeSteps - 1, 0, "Temperature [K]", min, max, ImVec2(1700, 480));
 		}
 		if (ImGui::CollapsingHeader("Total energy"))
 		{
@@ -611,7 +611,7 @@ void Gui::handlePlots()
 			float max = -1E5;
 			float min = 1E5;
 
-			for (int i = 0; i < (int)(floor(_simulationTime / _timeStep) - 1); i++)
+			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
 				totEn[i] = static_cast<float>(_totalEnergy[i + 1]);
 				if (totEn[i] > max) { max = totEn[i]; printf("Vi kom in! nuvarande max: %f tot en: %f \n", max, totEn[i]); }
@@ -619,7 +619,7 @@ void Gui::handlePlots()
 			}
 			//printf("Min: %f Max: %f", min, max);
 
-			ImGui::PlotLines("", totEn, (int)(floor(_simulationTime / _timeStep)) - 1, 0, "Total energy [J]", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", totEn, numberOfTimeSteps - 1, 0, "Total energy [J]", min, max, ImVec2(1700, 480));
 		}
 
 
