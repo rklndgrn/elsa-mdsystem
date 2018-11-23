@@ -62,10 +62,17 @@ int main()
 			World myWorld(myParameters, myGui.getNumberOfThreads());
 
 			double deltaT = myParameters.getTimeStep();
-			double** potArray = myWorld.getResults().getPotentialEnergy();
+
+			double** cohesiveEnergyArray = myWorld.getResults().getCohesiveEnergy();
+			double** debyeTempArray = myWorld.getResults().getDebyeTemperature();
 			double** kinArray = myWorld.getResults().getKineticEnergy();
-			double** totArray = myWorld.getResults().getTotalEnergy();
+			double** msdArray = myWorld.getResults().getMeanSquareDisplacement();
+			double** potArray = myWorld.getResults().getPotentialEnergy();
+			double** pressureArray = myWorld.getResults().getInternalPressure();
+			double** selfDiffArray = myWorld.getResults().getDiffusionConstant();
+			double** specificHeatArray = myWorld.getResults().getSpecificHeat();
 			double** tempArray = myWorld.getResults().getTemperature();
+			double** totArray = myWorld.getResults().getTotalEnergy();
 
 			int index{ 0 };
 
@@ -99,10 +106,18 @@ int main()
 
 			}
 			myGui.stopSimulate();
+
+			myGui._cohesiveEnergy = *cohesiveEnergyArray;
+			myGui._debyeTemperature = *debyeTempArray;
 			myGui._kineticEnergy = *kinArray;
-			myGui._totalEnergy = *totArray;
+			myGui._meanSquareDisplacement = *msdArray;
 			myGui._potentialEnergy = *potArray;
+			myGui._pressure = *pressureArray;
+			myGui._selfDiffusionCoeff = *selfDiffArray;
+			myGui._specificHeat = *specificHeatArray;
 			myGui._temp = *tempArray;
+			myGui._totalEnergy = *totArray;
+
 		}
 
 		//myGui.handlePlots();// , kinenen, totenen, tempen);

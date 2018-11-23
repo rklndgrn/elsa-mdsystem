@@ -90,11 +90,17 @@ public:
 	double getCollisionPercentage();
 	int _counter;
 
-	double* _totalEnergy;
-	double* _potentialEnergy;
+	double* _cohesiveEnergy;
+	double* _debyeTemperature;
 	double* _kineticEnergy;
+	double* _meanSquareDisplacement;
+	double* _potentialEnergy;
+	double* _pressure;
+	double* _selfDiffusionCoeff;
+	double* _specificHeat;
 	double* _temp;
-	
+	double* _totalEnergy;
+
 	bool showCrystalSelector(const char* label);
 	bool showMaterialSelector(const char* label);
 	bool showThreadSelector(const char* label);
