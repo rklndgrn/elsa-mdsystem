@@ -253,7 +253,7 @@ void visual::mainLoopVisual(double*** pos, int time, int maxTime)
 	// Clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	if (glfwGetKey(getWindow(), GLFW_KEY_M) == GLFW_PRESS)
+	if (glfwGetKey(getWindow(), GLFW_KEY_SPACE) == GLFW_PRESS)
 	{
 		glfwSetCursorPos(getWindow(),
 			glfwGetVideoMode(glfwGetPrimaryMonitor())->width / 2,
@@ -282,13 +282,13 @@ void visual::mainLoopVisual(double*** pos, int time, int maxTime)
 	int ParticlesCount = 0;
 	float positionsF[_maxParticles][3];
 	float latticeConstant = 408.53e-12;
-	if (pos != NULL && time < (int)floor(maxTime/5))
+	if (pos != NULL && time < maxTime)
 	{
 		for (int i = 0; i < _maxParticles; i++)
 		{
-			positionsF[i][0] = static_cast<float>(pos[time*5][i][0]) / latticeConstant;
-			positionsF[i][1] = static_cast<float>(pos[time*5][i][1]) / latticeConstant;
-			positionsF[i][2] = static_cast<float>(pos[time*5][i][2]) / latticeConstant;
+			positionsF[i][0] = static_cast<float>(pos[time][i][0]) / latticeConstant;
+			positionsF[i][1] = static_cast<float>(pos[time][i][1]) / latticeConstant;
+			positionsF[i][2] = static_cast<float>(pos[time][i][2]) / latticeConstant;
 		}
 
 		for (int i = 0; i < _maxParticles; i++) {

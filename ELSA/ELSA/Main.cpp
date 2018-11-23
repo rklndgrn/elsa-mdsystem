@@ -32,11 +32,11 @@ int main()
 		{
 			myVis.setAtomsVisible(true);
 			count++;
-			if (count % 5 == 0)
+			if (count % 1 == 0)
 			{
 				visualTime++;
 			}
-			if (visualTime >= (int)floor(maxVisualTime / 5))
+			if (visualTime >= maxVisualTime)
 			{
 				visualTime = 0;
 			}
