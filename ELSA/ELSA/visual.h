@@ -20,7 +20,7 @@ using namespace glm;
 #include "objloader.hpp"
 
 #pragma once
-#define _maxParticles 500
+#define _maxParticles 4000
 
 class visual
 {

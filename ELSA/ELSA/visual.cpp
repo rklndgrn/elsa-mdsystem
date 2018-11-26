@@ -303,22 +303,22 @@ void visual::mainLoopVisual(double*** pos, int time, int maxTime)
 			_particlesContainer[i].cameradistance = glm::length(_particlesContainer[i].pos - CameraPosition);
 
 			// Fill the GPU buffer
-			if (positionsF[i][0] > 0.1 -2.5 && positionsF[i][0] < 4.9 -2.5 && positionsF[i][1] > 0.1 -2.5 && positionsF[i][1] < 4.9 -2.5 &&positionsF[i][2] > 0.1-2.5 && positionsF[i][2] < 4.9-2.5)
-			{
-				_gParticulePositionSizeData[4 * ParticlesCount + 0] = _particlesContainer[i].pos.x;
-				_gParticulePositionSizeData[4 * ParticlesCount + 1] = _particlesContainer[i].pos.y;
-				_gParticulePositionSizeData[4 * ParticlesCount + 2] = _particlesContainer[i].pos.z;
+			//if (positionsF[i][0] > 0.1 -2.5 && positionsF[i][0] < 4.9 -2.5 && positionsF[i][1] > 0.1 -2.5 && positionsF[i][1] < 4.9 -2.5 &&positionsF[i][2] > 0.1-2.5 && positionsF[i][2] < 4.9-2.5)
+			//{
+			_gParticulePositionSizeData[4 * ParticlesCount + 0] = _particlesContainer[i].pos.x;
+			_gParticulePositionSizeData[4 * ParticlesCount + 1] = _particlesContainer[i].pos.y;
+			_gParticulePositionSizeData[4 * ParticlesCount + 2] = _particlesContainer[i].pos.z;
 
-				_gParticulePositionSizeData[4 * ParticlesCount + 3] = _particlesContainer[i].size;
+			_gParticulePositionSizeData[4 * ParticlesCount + 3] = _particlesContainer[i].size;
 
 
-				_gParticuleColorData[4 * ParticlesCount + 0] = _particlesContainer[i].r;
-				_gParticuleColorData[4 * ParticlesCount + 1] = _particlesContainer[i].g;
-				_gParticuleColorData[4 * ParticlesCount + 2] = _particlesContainer[i].b;
-				_gParticuleColorData[4 * ParticlesCount + 3] = _particlesContainer[i].a;
+			_gParticuleColorData[4 * ParticlesCount + 0] = _particlesContainer[i].r;
+			_gParticuleColorData[4 * ParticlesCount + 1] = _particlesContainer[i].g;
+			_gParticuleColorData[4 * ParticlesCount + 2] = _particlesContainer[i].b;
+			_gParticuleColorData[4 * ParticlesCount + 3] = _particlesContainer[i].a;
 
-				ParticlesCount++;
-			}
+			ParticlesCount++;
+			//}
 
 
 		}
