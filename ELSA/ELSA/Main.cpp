@@ -48,7 +48,7 @@ int main()
 		}
 		myVis.mainLoopVisual(myGui._pos, visualTime, maxVisualTime);
 
-
+		
 		// -------------------------------- MENU -----------------------------------------
 
 		myGui.handleMenu(0,1); //1,1 does nothing
@@ -118,6 +118,11 @@ int main()
 					//Here's where the magic happens
 					myWorld.performSimulation(t, 10);
 					//---//
+					//for each (Atom* a in myWorld.getAtomInAtomList(103)->getNeighbourList())
+					//{
+					//	printf("%d ", a->getID());
+					//}
+					//printf("\n");
 
 					myGui.handleFrame();
 					myGui.handleMenu(t, myParameters.getSimulationTime());
@@ -125,6 +130,21 @@ int main()
 
 			}
 			myGui.stopSimulate();
+
+			Atom* a;
+			ofstream saveLastState;
+			saveLastState.open("lastState.txt");
+
+			for(unsigned int i = 0; i < myParameters.getNumberOfAtoms(); i++)
+			{
+				a = myWorld.getAtomInAtomList(i);
+
+				saveLastState << a->getID() << " ";
+				saveLastState << a->getPositionX() << " " << a->getPositionY() << " " << a->getPositionZ() << " ";
+				saveLastState << a->getVelocityX() << " " << a->getVelocityY() << " " << a->getVelocityZ() << " ";
+			}
+
+			saveLastState.close();
 
 			myGui._cohesiveEnergy = *cohesiveEnergyArray;
 			myGui._debyeTemperature = *debyeTempArray;

@@ -165,8 +165,10 @@ void visual::initOpenGL()
 	for (int i = 0; i < _maxParticles; i++) {
 		int particleIndex = i;
 
+
 		//setParticlePosition(particleIndex, glm::vec3(0, 0, -20.0f));
 		setParticleColor(particleIndex, glm::vec4(50, 30, 255, 255));
+		
 		setParticleSize(particleIndex, 0.1f);
 
 		visual::_particle& p = getParticlesContainer()[i]; // shortcut
@@ -310,8 +312,23 @@ void visual::mainLoopVisual(double*** pos, int time, int maxTime)
 			_gParticulePositionSizeData[4 * ParticlesCount + 2] = _particlesContainer[i].pos.z;
 
 			_gParticulePositionSizeData[4 * ParticlesCount + 3] = _particlesContainer[i].size;
+			if (i == 103)
+			{
+				setParticleColor(i, glm::vec4(50, 255, 255, 255));
+			}
+			else if (i < 400)
+			{
+				setParticleColor(i, glm::vec4(255, 30, 50, 255));
+			}
 
-
+			else if (i > 3600)
+			{
+				setParticleColor(i, glm::vec4(50, 255, 50, 255));
+			}
+			else
+			{
+				setParticleColor(i, glm::vec4(50, 30, 255, 255));
+			}
 			_gParticuleColorData[4 * ParticlesCount + 0] = _particlesContainer[i].r;
 			_gParticuleColorData[4 * ParticlesCount + 1] = _particlesContainer[i].g;
 			_gParticuleColorData[4 * ParticlesCount + 2] = _particlesContainer[i].b;

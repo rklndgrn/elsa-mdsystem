@@ -186,9 +186,11 @@ void World::distributeInitialVelocities(double desiredTemperature)
 		for (int atomId = 0; atomId < (int)_myParameters.getNumberOfAtoms() - 1; atomId++)
 		{
 			v = _mySimulation.generateGaussianVelocity(variance);
+
 			_atomList.at(atomId)->setVelocityX(v[0]);
 			_atomList.at(atomId)->setVelocityY(v[1]);
 			_atomList.at(atomId)->setVelocityZ(v[2]);
+
 			K += _mySimulation.calcKineticEnergy(v[0], v[1], v[2]);
 			totalVelocityX += v[0];
 			totalVelocityY += v[1];
@@ -211,6 +213,11 @@ void World::distributeInitialVelocities(double desiredTemperature)
 //Populate an FCC lattice with atoms.
 void World::generateAtomsAtFccLattice(double latticeConstant, unsigned int nOfUnitCellsX, unsigned int nOfUnitCellsY, unsigned int nOfUnitCellsZ)
 {
+
+	double offset = _myParameters.getChosenMaterial().getCellSize() / 4.0;
+	offset = 0.0;
+
+	
 	unsigned int atomId{ 0 };
 	for (unsigned int z = 0; z < nOfUnitCellsZ; z++)
 	{
@@ -219,10 +226,16 @@ void World::generateAtomsAtFccLattice(double latticeConstant, unsigned int nOfUn
 			for (unsigned int x = 0; x < nOfUnitCellsX; x++)
 			{
 				//Place atoms in the corner and in the middle of the neighbouring sides of the "dice."
-				Atom* a0 = new Atom(atomId++, x*latticeConstant, y*latticeConstant, z*latticeConstant);
-				Atom* ax = new Atom(atomId++, x*latticeConstant, (y + 0.5)*latticeConstant, (z + 0.5)*latticeConstant);
-				Atom* ay = new Atom(atomId++, (x + 0.5)*latticeConstant, y*latticeConstant, (z + 0.5)*latticeConstant);
-				Atom* az = new Atom(atomId++, (x + 0.5)*latticeConstant, (y + 0.5)*latticeConstant, z*latticeConstant);
+				Atom* a0 = new Atom(atomId++, offset + x*latticeConstant, offset + y*latticeConstant, offset + z*latticeConstant);
+				Atom* ax = new Atom(atomId++, offset + x*latticeConstant, offset + (y + 0.5)*latticeConstant, offset + (z + 0.5)*latticeConstant);
+				Atom* ay = new Atom(atomId++, offset + (x + 0.5)*latticeConstant, offset + y*latticeConstant, offset + (z + 0.5)*latticeConstant);
+				Atom* az = new Atom(atomId++, offset + (x + 0.5)*latticeConstant, offset + (y + 0.5)*latticeConstant, offset + z*latticeConstant);
+				
+				//Atom* a0 = new Atom(atomId++, x * latticeConstant, y * latticeConstant, z * latticeConstant);
+				//Atom* ax = new Atom(atomId++, x * latticeConstant, (y + 0.5)*latticeConstant, (z + 0.5)*latticeConstant);
+				//Atom* ay = new Atom(atomId++, (x + 0.5)*latticeConstant, y * latticeConstant, (z + 0.5)*latticeConstant);
+				//Atom* az = new Atom(atomId++, (x + 0.5)*latticeConstant, (y + 0.5)*latticeConstant, z * latticeConstant);
+				
 				addAtomToAtomList(a0);
 				addAtomToAtomList(ax);
 				addAtomToAtomList(ay);
@@ -264,7 +277,66 @@ void World::generateAtomsAtScLattice(double latticeConstant, unsigned int nOfUni
 void World::initializeAtoms()
 {
 	//omp_set_num_threads(numberOfThreads);
-	distributeInitialVelocities(_myParameters.getTemperature());
+	bool useLastStates = false;
+
+	if (useLastStates)
+	{
+		double K{ 0 }, T{ 0 };
+
+		ifstream inFile("lastState.txt", ios::in);
+		double num;
+		Atom* a = getAtomInAtomList(0);
+
+		int counter = 0;
+		while (inFile >> num)
+		{
+			if (counter == 0)
+			{
+				a = getAtomInAtomList((unsigned int)num);
+				counter++;
+			}
+			else if (counter == 1)
+			{
+				a->setPositionX(num);
+				counter++;
+			}
+			else if (counter == 2)
+			{
+				a->setPositionY(num);
+				counter++;
+			}
+			else if (counter == 3)
+			{
+				a->setPositionZ(num);
+				counter++;
+			}
+			else if (counter == 4)
+			{
+				a->setVelocityX(num);
+				counter++;
+			}
+			else if (counter == 5)
+			{
+				a->setVelocityY(num);
+				counter++;
+			}
+			else
+			{
+				a->setVelocityZ(num);
+				K += _mySimulation.calcKineticEnergy(a->getVelocityX(), a->getVelocityY(), a->getVelocityZ());
+				counter = 0;
+			}
+		}
+
+
+		T = _mySimulation.calcTemperature(K, _myParameters.getBoltzmann(), _myParameters.getNumberOfAtoms());
+		_myResults.setKineticEnergy(K, 0);
+		_myResults.setTemperature(T, 0);
+	}
+	else
+	{
+		distributeInitialVelocities(_myParameters.getTemperature());
+	}
 	calcPotentialAndForce(0);
 	calcPressure(0);
 
@@ -332,7 +404,7 @@ void World::populateCells()
 		{
 			a = getAtomInAtomList(atomId);
 
-			//Find index of the cell tha atom is currently in
+			//Find index of the cell the atom is currently in
 			i = (unsigned int)floor(a->getPositionX() / cellSize);
 			j = (unsigned int)floor(a->getPositionY() / cellSize);
 			k = (unsigned int)floor(a->getPositionZ() / cellSize);
