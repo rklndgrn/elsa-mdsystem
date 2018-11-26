@@ -64,23 +64,23 @@ void computeMatricesFromInputs(GLFWwindow * window){
 	glm::mat3 verticalRotationNeg(1, 0, 0, 0, cos(-mouseSpeed), sin(-mouseSpeed), 0, -sin(-mouseSpeed), cos(-mouseSpeed));
 
 
-	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
 	{
 		horizontalAngle -= mouseSpeed;
 		position = horizontalRotationNeg * position;
 	}
-	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
 	{
 		horizontalAngle += mouseSpeed;
 		position = horizontalRotationPos * position;
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
 	{
 		verticalAngle -= mouseSpeed;
 		position = verticalRotationPos * position;
 	}
-	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
 	{
 		verticalAngle += mouseSpeed;
 		position = verticalRotationNeg * position;
