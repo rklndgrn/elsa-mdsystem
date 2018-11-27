@@ -30,6 +30,7 @@ private:
 	bool _saveResultWindow;
 	bool _loadResultWindow;
 	bool _simulationWindow;
+	float _elementaryCharge = 1.602176620898e-19;
 	
 
 	bool _unableToOpenFile;
@@ -39,6 +40,7 @@ private:
 	double _timeStep;
 	double _simulationTime;
 	bool _thermostat;
+	bool _useLastSimulationState;
 	bool _2D;
 	double _latticeConstant;
 	double _epsilon;
@@ -51,8 +53,11 @@ private:
 	int _numberOfUnitCellsY;
 	int _numberOfUnitCellsZ;
 	double _collisionPercentage;
+	char* _lastStateFileName;
 
 	bool _simulate;
+
+	void printStatistics(double, double, double);
 	
 public:
 	Gui();
@@ -77,6 +82,7 @@ public:
 	double getTimeStep();
 	double getSimulationTime();
 	bool isThermostat();
+	bool isUseLastSimulationState();
 	bool is2D();
 	int getNumberOfUnitCellsX();
 	int getNumberOfUnitCellsY();
@@ -88,12 +94,15 @@ public:
 	double getCutOffDistance();
 	double getMass();
 	double getCollisionPercentage();
+	char* getLastStateFileName();
+
 	int _counter;
 
 	double* _cohesiveEnergy;
 	double* _debyeTemperature;
 	double* _kineticEnergy;
 	double* _meanSquareDisplacement;
+	double*** _pos;
 	double* _potentialEnergy;
 	double* _pressure;
 	double* _selfDiffusionCoeff;

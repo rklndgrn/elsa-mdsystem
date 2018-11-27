@@ -20,17 +20,39 @@ int main()
 	Gui myGui;
 	myGui.setupGui(myVis.getWindow());
 
+	int count = 0;
+	int visualTime = 0;
+	int maxVisualTime = 1;
+	double latticeConstant = 1.0;
+	int unitCellsX = 1;
+	int unitCellsY = 1;
+	int unitCellsZ = 1;
 	while ((glfwGetKey(myVis.getWindow(), GLFW_KEY_ESCAPE) != GLFW_PRESS &&
 		glfwWindowShouldClose(myVis.getWindow()) == 0))// || myGui.exitPressed() )
 	{
 		myGui.handleFrame();
 
 		if (myGui.VisualVisible())
+		{
 			myVis.setAtomsVisible(true);
+			count++;
+			if (count % 1 == 0)
+			{
+				visualTime++;
+			}
+			if (visualTime >= maxVisualTime)
+			{
+				visualTime = 0;
+			}
+		}
 		else
+		{
 			myVis.setAtomsVisible(false);
-		myVis.mainLoopVisual();
+			visualTime = 0;
+		}
+		myVis.mainLoopVisual(myGui._pos, visualTime, maxVisualTime, latticeConstant, unitCellsX, unitCellsY, unitCellsZ);
 
+		
 		// -------------------------------- MENU -----------------------------------------
 
 		myGui.handleMenu(0,1); //1,1 does nothing
@@ -56,7 +78,9 @@ int main()
 				myGui.getTemperature(),
 				myGui.getCollisionPercentage(),
 				myGui.isThermostat(),
+				myGui.isUseLastSimulationState(),
 				myGui.is2D(),
+				myGui.getLastStateFileName(),
 				myMaterial);
 
 			World myWorld(myParameters, myGui.getNumberOfThreads());
@@ -67,6 +91,7 @@ int main()
 			double** debyeTempArray = myWorld.getResults().getDebyeTemperature();
 			double** kinArray = myWorld.getResults().getKineticEnergy();
 			double** msdArray = myWorld.getResults().getMeanSquareDisplacement();
+			double**** posArray = myWorld.getResults().getPositions();
 			double** potArray = myWorld.getResults().getPotentialEnergy();
 			double** pressureArray = myWorld.getResults().getInternalPressure();
 			double** selfDiffArray = myWorld.getResults().getDiffusionConstant();
@@ -99,6 +124,11 @@ int main()
 					//Here's where the magic happens
 					myWorld.performSimulation(t, 10);
 					//---//
+					//for each (Atom* a in myWorld.getAtomInAtomList(103)->getNeighbourList())
+					//{
+					//	printf("%d ", a->getID());
+					//}
+					//printf("\n");
 
 					myGui.handleFrame();
 					myGui.handleMenu(t, myParameters.getSimulationTime());
@@ -107,17 +137,39 @@ int main()
 			}
 			myGui.stopSimulate();
 
+			Atom* a;
+			ofstream saveLastState;
+			saveLastState.open("lastState.txt");
+
+			for(unsigned int i = 0; i < myParameters.getNumberOfAtoms(); i++)
+			{
+				a = myWorld.getAtomInAtomList(i);
+
+				saveLastState << a->getID() << " ";
+				saveLastState << a->getPositionX() << " " << a->getPositionY() << " " << a->getPositionZ() << " ";
+				saveLastState << a->getVelocityX() << " " << a->getVelocityY() << " " << a->getVelocityZ() << " ";
+			}
+
+			saveLastState.close();
+
 			myGui._cohesiveEnergy = *cohesiveEnergyArray;
 			myGui._debyeTemperature = *debyeTempArray;
 			myGui._kineticEnergy = *kinArray;
 			myGui._meanSquareDisplacement = *msdArray;
+			myGui._pos = *posArray;
 			myGui._potentialEnergy = *potArray;
 			myGui._pressure = *pressureArray;
 			myGui._selfDiffusionCoeff = *selfDiffArray;
 			myGui._specificHeat = *specificHeatArray;
 			myGui._temp = *tempArray;
 			myGui._totalEnergy = *totArray;
+			maxVisualTime = (int)round(myParameters.getSimulationTime() / myParameters.getTimeStep());
+			latticeConstant = myParameters.getChosenMaterial().getLatticeConstant();
+			unitCellsX = myParameters.getNumberOfUnitCellsX();
+			unitCellsY = myParameters.getNumberOfUnitCellsY();
+			unitCellsZ = myParameters.getNumberOfUnitCellsZ();
 
+			myVis.setNumberOfParticles(myParameters.getNumberOfAtoms());
 		}
 
 		//myGui.handlePlots();// , kinenen, totenen, tempen);

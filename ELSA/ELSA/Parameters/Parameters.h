@@ -32,7 +32,10 @@ private:
 	double _timeStep;
 
 	bool _isThermostatOn;
+	bool _isUseLastSimulationState;
 	bool _is2D;
+
+	char* _lastStateFileName;
 
 	Material _chosenMaterial;
 
@@ -49,6 +52,8 @@ public:
 		double,
 		bool,
 		bool,
+		bool,
+		char*,
 		Material);
 
 	//Getters.
@@ -72,6 +77,9 @@ public:
 
 	bool getIs2D() const;
 	bool getIsThermostatOn() const;
+	bool getIsUseLastSimulationState() const;
+
+	char* getLastStateFileName();
 
 	Material getChosenMaterial() const;
 
@@ -79,6 +87,7 @@ public:
 	void setChosenMaterial(Material);
 	void setCollisionFrequency(double);
 	void setIsThermostatOn(bool);
+	void setIsUseLastSimulationState(bool);
 	void setIs2D(bool);
 	void setNumberOfAtoms(unsigned int);
 	void setSimulationTime(double);

@@ -27,7 +27,9 @@ Parameters::Parameters(
 	double temperature,
 	double collisionPercentage,
 	bool isThermostatOn,
+	bool isUseLastSimulationState,
 	bool is2D,
+	char* lastStateFileName,
 	Material chosenMaterial) : 
 	_timeStep{ timeStep },
 	_simulationTime{ simulationTime },
@@ -37,7 +39,9 @@ Parameters::Parameters(
 	_temperature{ temperature },
 	_collisionFrequency{ collisionPercentage/timeStep },
 	_isThermostatOn{ isThermostatOn },
+	_isUseLastSimulationState{isUseLastSimulationState},
 	_is2D{ is2D },
+	_lastStateFileName{lastStateFileName},
 	_chosenMaterial{ chosenMaterial }
 {
 	if (chosenMaterial.getCrystalStructure() == "fcc")
@@ -161,6 +165,16 @@ bool Parameters::getIsThermostatOn() const
 	return _isThermostatOn;
 }
 
+bool Parameters::getIsUseLastSimulationState() const
+{
+	return _isUseLastSimulationState;
+}
+
+char* Parameters::getLastStateFileName()
+{
+	return _lastStateFileName;
+}
+
 Material Parameters::getChosenMaterial() const
 {
 	return _chosenMaterial;
@@ -187,6 +201,11 @@ void Parameters::setIs2D(bool is2)
 void Parameters::setIsThermostatOn(bool isT)
 {
 	_isThermostatOn = isT;
+}
+
+void Parameters::setIsUseLastSimulationState(bool isU)
+{
+	_isUseLastSimulationState = isU;
 }
 
 void Parameters::setNumberOfAtoms(unsigned int noa)
