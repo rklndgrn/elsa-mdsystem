@@ -14,11 +14,11 @@ Gui::Gui()
 	_sigma = 2.65e-10;
 	_cutOffDistance = 1.5*408.53e-12;
 	_mass = 39.948*(1.660539040e-27);
-	_timeStep = 1e-14;
-	_simulationTime = 20e-14;
-	_numberOfUnitCellsX = 5;
-	_numberOfUnitCellsY = 5;
-	_numberOfUnitCellsZ = 5;
+	_timeStep = 1e-15;
+	_simulationTime = 20e-15;
+	_numberOfUnitCellsX = 10;
+	_numberOfUnitCellsY = 10;
+	_numberOfUnitCellsZ = 10;
 	_temperature = 10;
 	_collisionPercentage = 0.2;
 	_thermostat = false;
@@ -83,6 +83,20 @@ void Gui::showHelpMarker(const char* desc)
 		ImGui::PopTextWrapPos();
 		ImGui::EndTooltip();
 	}
+}
+
+void Gui::printStatistics(double min, double max, double sumLast10)
+{
+	char buf[50];
+	double avgLast10 = sumLast10 / 10.0;
+	sprintf(buf, "Min: %e", min);
+	ImGui::Text(buf);
+	sprintf(buf, "Max: %e", max);
+	ImGui::SameLine();
+	ImGui::Text(buf);
+	sprintf(buf, "Average last 10: %e", avgLast10);
+	ImGui::SameLine();
+	ImGui::Text(buf);
 }
 
 std::string Gui::getCrystalType()
@@ -461,32 +475,42 @@ void Gui::handlePlots()
 			float cohEnEnD[5000];
 			float max = -1E15;
 			float min = 1E15;
+			float sumLast10 = 0;
 
 			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
-				cohEnEnD[i] = static_cast<float>(_cohesiveEnergy[i + 1]);
+				cohEnEnD[i] = static_cast<float>(_cohesiveEnergy[i + 1]) / _elementaryCharge;
 				if (cohEnEnD[i] > max) { max = cohEnEnD[i]; }
 				else if (cohEnEnD[i] < min) { min = cohEnEnD[i]; }
+				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
+				{
+					sumLast10 += cohEnEnD[i];
+				}
 			}
 
-			ImGui::PlotLines("", cohEnEnD, numberOfTimeSteps - 1, 0, "Cohesive energy [J]", min, max, ImVec2(1700, 480));
-
+			ImGui::PlotLines("", cohEnEnD, numberOfTimeSteps - 1, 0, "Cohesive energy [eV]", min, max, ImVec2(1700, 480));
+			printStatistics(min, max, sumLast10);
 		}
 		if (ImGui::CollapsingHeader("Debye Temperature"))
 		{
 			float debyeTempEnD[5000];
 			float max = -1E15;
 			float min = 1E15;
+			float sumLast10 = 0;
 
 			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
 				debyeTempEnD[i] = static_cast<float>(_debyeTemperature[i + 1]);
 				if (debyeTempEnD[i] > max) { max = debyeTempEnD[i]; }
 				else if (debyeTempEnD[i] < min) { min = debyeTempEnD[i]; }
+				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
+				{
+					sumLast10 += debyeTempEnD[i];
+				}
 			}
 
 			ImGui::PlotLines("", debyeTempEnD, numberOfTimeSteps - 1, 0, "Debye Temperature [K]", min, max, ImVec2(1700, 480));
-
+			printStatistics(min, max, sumLast10);
 
 		}
 		if (ImGui::CollapsingHeader("Internal pressure"))
@@ -494,16 +518,21 @@ void Gui::handlePlots()
 			float pressureEnD[5000];
 			float max = -1E15;
 			float min = 1E15;
+			float sumLast10 = 0;
 
 			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
 				pressureEnD[i] = static_cast<float>(_pressure[i + 1]);
 				if (pressureEnD[i] > max) { max = pressureEnD[i]; }
 				else if (pressureEnD[i] < min) { min = pressureEnD[i]; }
+				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
+				{
+					sumLast10 += pressureEnD[i];
+				}
 			}
 
 			ImGui::PlotLines("", pressureEnD, numberOfTimeSteps - 1, 0, "Internal pressure [Pa]", min, max, ImVec2(1700, 480));
-
+			printStatistics(min, max, sumLast10);
 
 		}
 		if (ImGui::CollapsingHeader("Kinetic energy"))
@@ -511,30 +540,41 @@ void Gui::handlePlots()
 			float kinEnD[5000];
 			float max = -1E15;
 			float min = 1E15;
+			float sumLast10 = 0;
 
 			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
-				kinEnD[i] = static_cast<float>(_kineticEnergy[i + 1]);
+				kinEnD[i] = static_cast<float>(_kineticEnergy[i + 1]) / _elementaryCharge;
 				if (kinEnD[i] > max) { max = kinEnD[i]; }
 				else if (kinEnD[i] < min) { min = kinEnD[i]; }
+				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
+				{
+					sumLast10 += kinEnD[i];
+				}
 			}
-			ImGui::PlotLines("", kinEnD, numberOfTimeSteps - 1, 0, "Kinetic energy [J]", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", kinEnD, numberOfTimeSteps - 1, 0, "Kinetic energy [eV]", min, max, ImVec2(1700, 480));
+			printStatistics(min, max, sumLast10);
 		}
 		if (ImGui::CollapsingHeader("Mean square displacement"))
 		{
 			float msdEnD[5000];
 			float max = -1E15;
 			float min = 1E15;
+			float sumLast10 = 0;
 
 			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
-				msdEnD[i] = static_cast<float>(_meanSquareDisplacement[i + 1]);
+				msdEnD[i] = 1e20*static_cast<float>(_meanSquareDisplacement[i + 1]);
 				if (msdEnD[i] > max) { max = msdEnD[i]; }
 				else if (msdEnD[i] < min) { min = msdEnD[i]; }
+				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
+				{
+					sumLast10 += msdEnD[i];
+				}
 			}
 
-			ImGui::PlotLines("", msdEnD, numberOfTimeSteps - 1, 0, "Mean square displacement [m^2]", min, max, ImVec2(1700, 480));
-
+			ImGui::PlotLines("", msdEnD, numberOfTimeSteps - 1, 0, "Mean square displacement [Angstrom^2]", min, max, ImVec2(1700, 480));
+			printStatistics(min, max, sumLast10);
 
 		}
 		if (ImGui::CollapsingHeader("Potential energy"))
@@ -542,35 +582,45 @@ void Gui::handlePlots()
 			float potEnD[5000];
 			float max = -1E15;
 			float min = 1E15;
+			float sumLast10 = 0;
 
 			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
-				potEnD[i] = static_cast<float>(_potentialEnergy[i + 1]);
+				potEnD[i] = static_cast<float>(_potentialEnergy[i + 1]) / _elementaryCharge;
 				if (potEnD[i] > max) { max = potEnD[i]; }
 				else if (potEnD[i] < min) { min = potEnD[i]; }
+
+				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
+				{
+					sumLast10 += potEnD[i];
+				}
 			}
+			sumLast10 = sumLast10 / 10.0;
 
-			ImGui::PlotLines("", potEnD, numberOfTimeSteps - 1, 0, "Potential energy [J]", min, max, ImVec2(1700, 480));
-			ImGui::SameLine();
-			ImGui::Text("Jonas1");
-			ImGui::Text("Jonas2");
+			ImGui::PlotLines("", potEnD, numberOfTimeSteps - 1, 0, "Potential energy [eV]", min, max, ImVec2(1700, 480));
 
+			printStatistics(min, max, sumLast10);
 		}
 		if (ImGui::CollapsingHeader("Self diffusion coefficient"))
 		{
 			float selfDiffEnD[5000];
 			float max = -1E15;
 			float min = 1E15;
+			float sumLast10 = 0;
 
 			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
 				selfDiffEnD[i] = static_cast<float>(_selfDiffusionCoeff[i + 1]);
 				if (selfDiffEnD[i] > max) { max = selfDiffEnD[i]; }
 				else if (selfDiffEnD[i] < min) { min = selfDiffEnD[i]; }
+				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
+				{
+					sumLast10 += selfDiffEnD[i];
+				}
 			}
 
 			ImGui::PlotLines("", selfDiffEnD, numberOfTimeSteps - 1, 0, "Self diffusion coefficient [m^2 s^-1]", min, max, ImVec2(1700, 480));
-
+			printStatistics(min, max, sumLast10);
 
 		}
 		if (ImGui::CollapsingHeader("Specific heat"))
@@ -578,16 +628,21 @@ void Gui::handlePlots()
 			float specHeatEnD[5000];
 			float max = -1E15;
 			float min = 1E15;
+			float sumLast10 = 0;
 
 			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
 				specHeatEnD[i] = static_cast<float>(_specificHeat[i + 1]);
 				if (specHeatEnD[i] > max) { max = specHeatEnD[i]; }
 				else if (specHeatEnD[i] < min) { min = specHeatEnD[i]; }
+				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
+				{
+					sumLast10 += specHeatEnD[i];
+				}
 			}
 
 			ImGui::PlotLines("", specHeatEnD, numberOfTimeSteps - 1, 0, "Specific heat [J kg^-1 K^-1]", min, max, ImVec2(1700, 480));
-
+			printStatistics(min, max, sumLast10);
 
 		}
 
@@ -596,30 +651,42 @@ void Gui::handlePlots()
 			float temp[5000];
 			float max = -1E15;
 			float min = 1E15;
+			float sumLast10 = 0;
 
 			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
 				temp[i] = static_cast<float>(_temp[i + 1]);
 				if (temp[i] > max) { max = temp[i]; }
 				else if (temp[i] < min) { min = temp[i]; }
+				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
+				{
+					sumLast10 += temp[i];
+				}
 			}
 			ImGui::PlotLines("", temp, numberOfTimeSteps - 1, 0, "Temperature [K]", min, max, ImVec2(1700, 480));
+			printStatistics(min, max, sumLast10);
 		}
 		if (ImGui::CollapsingHeader("Total energy"))
 		{
 			float totEn[5000];
 			float max = -1E5;
 			float min = 1E5;
+			float sumLast10 = 0;
 
 			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
-				totEn[i] = static_cast<float>(_totalEnergy[i + 1]);
-				if (totEn[i] > max) { max = totEn[i]; printf("Vi kom in! nuvarande max: %f tot en: %f \n", max, totEn[i]); }
+				totEn[i] = static_cast<float>(_totalEnergy[i + 1]) /  _elementaryCharge;
+				if (totEn[i] > max) { max = totEn[i]; }
 				else if (totEn[i] < min) { min = totEn[i]; }
+				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
+				{
+					sumLast10 += totEn[i];
+				}
 			}
 			//printf("Min: %f Max: %f", min, max);
 
-			ImGui::PlotLines("", totEn, numberOfTimeSteps - 1, 0, "Total energy [J]", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", totEn, numberOfTimeSteps - 1, 0, "Total energy [eV]", min, max, ImVec2(1700, 480));
+			printStatistics(min, max, sumLast10);
 		}
 
 

@@ -30,6 +30,7 @@ private:
 	bool _saveResultWindow;
 	bool _loadResultWindow;
 	bool _simulationWindow;
+	float _elementaryCharge = 1.602176620898e-19;
 	
 
 	bool _unableToOpenFile;
@@ -53,6 +54,8 @@ private:
 	double _collisionPercentage;
 
 	bool _simulate;
+
+	void printStatistics(double, double, double);
 	
 public:
 	Gui();
