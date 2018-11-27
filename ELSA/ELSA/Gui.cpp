@@ -607,7 +607,6 @@ void Gui::handlePlots()
 					sumLast10 += potEnD[i];
 				}
 			}
-			sumLast10 = sumLast10 / 10.0;
 
 			ImGui::PlotLines("", potEnD, numberOfTimeSteps - 1, 0, "Potential energy [eV]", min, max, ImVec2(1700, 480));
 

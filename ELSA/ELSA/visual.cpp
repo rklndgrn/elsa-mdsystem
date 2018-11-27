@@ -287,48 +287,24 @@ void visual::mainLoopVisual(double*** pos, int time, int maxTime, double lattice
 		}
 
 		for (int i = 0; i < _numberOfParticles; i++) {
-			//_particlesContainer[i].speed = glm::vec3(0.001,0.001,0.001);
-			//_particlesContainer[i].pos += _particlesContainer[i].speed;
-			_particlesContainer[i].pos = glm::vec3(positionsF[i][0], positionsF[i][1], positionsF[i][2]);
 
-			//_particlesContainer[i].pos = glm::vec3(0, 1, 2);
-			//printf("Pos x: %e y: %e z: %e\n", pos[0][i][0], pos[0][i][1], pos[0][i][2]);
-			//printf("PPos x: %e y: %e z: %e\n", _particlesContainer[i].pos.x, _particlesContainer[i].pos.y, _particlesContainer[i].pos.z);
+			_particlesContainer[i].pos = glm::vec3(positionsF[i][0], positionsF[i][1], positionsF[i][2]);
 
 			_particlesContainer[i].cameradistance = glm::length(_particlesContainer[i].pos - CameraPosition);
 
 			// Fill the GPU buffer
-			//if (positionsF[i][0] > 0.1 -2.5 && positionsF[i][0] < 4.9 -2.5 && positionsF[i][1] > 0.1 -2.5 && positionsF[i][1] < 4.9 -2.5 &&positionsF[i][2] > 0.1-2.5 && positionsF[i][2] < 4.9-2.5)
-			//{
 			_gParticulePositionSizeData[4 * ParticlesCount + 0] = _particlesContainer[i].pos.x;
 			_gParticulePositionSizeData[4 * ParticlesCount + 1] = _particlesContainer[i].pos.y;
 			_gParticulePositionSizeData[4 * ParticlesCount + 2] = _particlesContainer[i].pos.z;
 
 			_gParticulePositionSizeData[4 * ParticlesCount + 3] = _particlesContainer[i].size;
-			if (i == 103)
-			{
-				setParticleColor(i, glm::vec4(50, 255, 255, 255));
-			}
-			else if (i < 400)
-			{
-				setParticleColor(i, glm::vec4(255, 30, 50, 255));
-			}
 
-			else if (i > 3600)
-			{
-				setParticleColor(i, glm::vec4(50, 255, 50, 255));
-			}
-			else
-			{
-				setParticleColor(i, glm::vec4(50, 30, 255, 255));
-			}
 			_gParticuleColorData[4 * ParticlesCount + 0] = _particlesContainer[i].r;
 			_gParticuleColorData[4 * ParticlesCount + 1] = _particlesContainer[i].g;
 			_gParticuleColorData[4 * ParticlesCount + 2] = _particlesContainer[i].b;
 			_gParticuleColorData[4 * ParticlesCount + 3] = _particlesContainer[i].a;
 
 			ParticlesCount++;
-			//}
 
 
 		}
