@@ -74,7 +74,9 @@ int main()
 				myGui.getTemperature(),
 				myGui.getCollisionPercentage(),
 				myGui.isThermostat(),
+				myGui.isUseLastSimulationState(),
 				myGui.is2D(),
+				myGui.getLastStateFileName(),
 				myMaterial);
 
 			World myWorld(myParameters, myGui.getNumberOfThreads());

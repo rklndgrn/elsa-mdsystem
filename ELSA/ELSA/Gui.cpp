@@ -22,6 +22,8 @@ Gui::Gui()
 	_temperature = 10;
 	_collisionPercentage = 0.2;
 	_thermostat = false;
+	_useLastSimulationState = false;
+	_lastStateFileName = "lastState.txt";
 	_2D = false;
 }
 
@@ -124,6 +126,11 @@ bool Gui::isThermostat()
 	return _thermostat;
 }
 
+bool Gui::isUseLastSimulationState()
+{
+	return _useLastSimulationState;
+}
+
 bool Gui::is2D()
 {
 	return _2D;
@@ -177,6 +184,11 @@ int Gui::getNumberOfThreads()
 double Gui::getCollisionPercentage()
 {
 	return _collisionPercentage;
+}
+
+char* Gui::getLastStateFileName()
+{
+	return _lastStateFileName;
 }
 
 bool Gui::showCrystalSelector(const char* label)
@@ -758,6 +770,9 @@ void Gui::handleConfigurationHeader()
 											
 		ImGui::Checkbox("Anderson thermostat", &_thermostat);
 		ImGui::Checkbox("2D simulation", &_2D);
+		ImGui::Checkbox("Init from end of last simulation", &_useLastSimulationState);
+		ImGui::SameLine();
+		ImGui::InputText("", _lastStateFileName, 100);
 	}
 
 }

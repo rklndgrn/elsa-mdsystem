@@ -40,6 +40,7 @@ private:
 	double _timeStep;
 	double _simulationTime;
 	bool _thermostat;
+	bool _useLastSimulationState;
 	bool _2D;
 	double _latticeConstant;
 	double _epsilon;
@@ -52,6 +53,7 @@ private:
 	int _numberOfUnitCellsY;
 	int _numberOfUnitCellsZ;
 	double _collisionPercentage;
+	char* _lastStateFileName;
 
 	bool _simulate;
 
@@ -80,6 +82,7 @@ public:
 	double getTimeStep();
 	double getSimulationTime();
 	bool isThermostat();
+	bool isUseLastSimulationState();
 	bool is2D();
 	int getNumberOfUnitCellsX();
 	int getNumberOfUnitCellsY();
@@ -91,6 +94,8 @@ public:
 	double getCutOffDistance();
 	double getMass();
 	double getCollisionPercentage();
+	char* getLastStateFileName();
+
 	int _counter;
 
 	double* _cohesiveEnergy;

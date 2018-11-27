@@ -275,13 +275,13 @@ void World::generateAtomsAtScLattice(double latticeConstant, unsigned int nOfUni
 void World::initializeAtoms()
 {
 	//omp_set_num_threads(numberOfThreads);
-	bool useLastStates = false;
+	bool useLastStates = _myParameters.getIsUseLastSimulationState();
 
 	if (useLastStates)
 	{
 		double K{ 0 }, T{ 0 };
 
-		ifstream inFile("lastState.txt", ios::in);
+		ifstream inFile(_myParameters.getLastStateFileName(), ios::in);
 		double num;
 		Atom* a = getAtomInAtomList(0);
 
