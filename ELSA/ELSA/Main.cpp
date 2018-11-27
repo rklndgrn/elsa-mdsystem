@@ -23,6 +23,10 @@ int main()
 	int count = 0;
 	int visualTime = 0;
 	int maxVisualTime = 1;
+	double latticeConstant = 1.0;
+	int unitCellsX = 1;
+	int unitCellsY = 1;
+	int unitCellsZ = 1;
 	while ((glfwGetKey(myVis.getWindow(), GLFW_KEY_ESCAPE) != GLFW_PRESS &&
 		glfwWindowShouldClose(myVis.getWindow()) == 0))// || myGui.exitPressed() )
 	{
@@ -46,7 +50,7 @@ int main()
 			myVis.setAtomsVisible(false);
 			visualTime = 0;
 		}
-		myVis.mainLoopVisual(myGui._pos, visualTime, maxVisualTime);
+		myVis.mainLoopVisual(myGui._pos, visualTime, maxVisualTime, latticeConstant, unitCellsX, unitCellsY, unitCellsZ);
 
 		
 		// -------------------------------- MENU -----------------------------------------
@@ -160,6 +164,11 @@ int main()
 			myGui._temp = *tempArray;
 			myGui._totalEnergy = *totArray;
 			maxVisualTime = (int)round(myParameters.getSimulationTime() / myParameters.getTimeStep());
+			latticeConstant = myParameters.getChosenMaterial().getLatticeConstant();
+			unitCellsX = myParameters.getNumberOfUnitCellsX();
+			unitCellsY = myParameters.getNumberOfUnitCellsY();
+			unitCellsZ = myParameters.getNumberOfUnitCellsZ();
+
 			myVis.setNumberOfParticles(myParameters.getNumberOfAtoms());
 		}
 

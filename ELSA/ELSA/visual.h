@@ -86,7 +86,7 @@ public:
 	void initGLEW();
 	void initOpenGL();
 
-	void mainLoopVisual(double***, int, int);
+	void mainLoopVisual(double***, int, int, double, int, int, int);
 
 	GLuint getTexture();
 	GLuint getBillboardVertexBuffer();

@@ -254,23 +254,12 @@ Gui visual::getGui()
 	return _theGui;
 }
 
-void visual::mainLoopVisual(double*** pos, int time, int maxTime)
+void visual::mainLoopVisual(double*** pos, int time, int maxTime, double latticeConstant, int numberOfUnitCellsX, int numberOfUnitCellsY, int numberOfUnitCellsZ)
 {
 	// Clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	if (glfwGetKey(getWindow(), GLFW_KEY_SPACE) == GLFW_PRESS)
-	{
-		glfwSetCursorPos(getWindow(),
-			glfwGetVideoMode(glfwGetPrimaryMonitor())->width / 2,
-			glfwGetVideoMode(glfwGetPrimaryMonitor())->height / 2);
-		glfwSetInputMode(getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-		computeMatricesFromInputs(getWindow());
-	}
-	else
-	{
-		glfwSetInputMode(getWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-	}
+	computeMatricesFromInputs(getWindow());
 
 	glm::mat4 ProjectionMatrix = getProjectionMatrix();
 	glm::mat4 ViewMatrix = getViewMatrix();
@@ -288,14 +277,13 @@ void visual::mainLoopVisual(double*** pos, int time, int maxTime)
 	int ParticlesCount = 0;
 	
 	float positionsF[_maxParticles][3];
-	float latticeConstant = 408.53e-12;
 	if (pos != NULL && time < maxTime)
 	{
 		for (int i = 0; i < _numberOfParticles; i++)
 		{
-				positionsF[i][0] = static_cast<float>(pos[time][i][0]) / latticeConstant - 2.5;
-				positionsF[i][1] = static_cast<float>(pos[time][i][1]) / latticeConstant - 2.5;
-				positionsF[i][2] = static_cast<float>(pos[time][i][2]) / latticeConstant - 2.5;
+				positionsF[i][0] = static_cast<float>(pos[time][i][0]) / latticeConstant - numberOfUnitCellsX / 2.0;
+				positionsF[i][1] = static_cast<float>(pos[time][i][1]) / latticeConstant - numberOfUnitCellsY / 2.0;
+				positionsF[i][2] = static_cast<float>(pos[time][i][2]) / latticeConstant - numberOfUnitCellsZ / 2.0;
 		}
 
 		for (int i = 0; i < _numberOfParticles; i++) {

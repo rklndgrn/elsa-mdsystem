@@ -34,7 +34,8 @@ float mouseSpeed = 0.005f;
 
 
 
-void computeMatricesFromInputs(GLFWwindow * window){
+void computeMatricesFromInputs(GLFWwindow * window)
+{
 
 	// glfwGetTime is called only once, the first time this function is called
 	static double lastTime = glfwGetTime();
@@ -43,33 +44,22 @@ void computeMatricesFromInputs(GLFWwindow * window){
 	double currentTime = glfwGetTime();
 	float deltaTime = float(currentTime - lastTime);
 
-	// Get mouse position
-	double xpos, ypos;
-	glfwGetCursorPos(window, &xpos, &ypos);
-
-	// Reset mouse position for next frame
-	glfwSetCursorPos(window, 
-		glfwGetVideoMode(glfwGetPrimaryMonitor())->width /2, 
-		glfwGetVideoMode(glfwGetPrimaryMonitor())->height /2);
-
-	// Compute new orientation
-	horizontalAngle += mouseSpeed * float(glfwGetVideoMode(glfwGetPrimaryMonitor())->width /2 - xpos );
-	verticalAngle   += mouseSpeed * float(glfwGetVideoMode(glfwGetPrimaryMonitor())->height /2 - ypos );
-
 	//rotation matrices
 	glm::mat3 horizontalRotationPos(cos(mouseSpeed), 0, -sin(mouseSpeed), 0, 1, 0, sin(mouseSpeed), 0, cos(mouseSpeed));
 	glm::mat3 horizontalRotationNeg(cos(mouseSpeed), 0, -sin(-mouseSpeed), 0, 1, 0, sin(-mouseSpeed), 0, cos(-mouseSpeed));
 
+	glm::mat3 horizontalBackward(cos(-horizontalAngle), 0, -sin(-horizontalAngle), 0, 1, 0, sin(-horizontalAngle), 0, cos(-horizontalAngle));
+	glm::mat3 horizontalForward(cos(horizontalAngle), 0, -sin(horizontalAngle), 0, 1, 0, sin(horizontalAngle), 0, cos(horizontalAngle));
 	glm::mat3 verticalRotationPos(1, 0, 0, 0, cos(mouseSpeed), sin(mouseSpeed), 0, -sin(mouseSpeed), cos(mouseSpeed));
 	glm::mat3 verticalRotationNeg(1, 0, 0, 0, cos(-mouseSpeed), sin(-mouseSpeed), 0, -sin(-mouseSpeed), cos(-mouseSpeed));
 
 
-	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
 	{
 		horizontalAngle -= mouseSpeed;
 		position = horizontalRotationNeg * position;
 	}
-	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
 	{
 		horizontalAngle += mouseSpeed;
 		position = horizontalRotationPos * position;
@@ -78,12 +68,12 @@ void computeMatricesFromInputs(GLFWwindow * window){
 	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
 	{
 		verticalAngle -= mouseSpeed;
-		position = verticalRotationPos * position;
+		position = horizontalForward * verticalRotationPos * horizontalBackward * position;
 	}
 	if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
 	{
 		verticalAngle += mouseSpeed;
-		position = verticalRotationNeg * position;
+		position = horizontalForward * verticalRotationNeg * horizontalBackward * position;
 	}
 
 	// Direction : Spherical coordinates to Cartesian coordinates conversion
@@ -103,14 +93,22 @@ void computeMatricesFromInputs(GLFWwindow * window){
 	// Up vector
 	glm::vec3 up = glm::cross( right, direction );
 
-	// Move forward
-	if ((glfwGetKey( window, GLFW_KEY_UP ) == GLFW_PRESS) ||
-	(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)){
+	//Strafe up
+	if ((glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) ||
+		(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)) {
+		position += up * speed;
+	}
+	// Strafe down
+	if ((glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) ||
+		(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)) {
+		position -= up * speed;
+	}
+	// Zoom in
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS){
 		position += direction  * speed;
 	}
-	// Move backward
-	if ((glfwGetKey( window, GLFW_KEY_DOWN ) == GLFW_PRESS) ||
-		(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)) {
+	// Zoom out
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
 		position -= direction * speed;
 	}
 	// Strafe right
