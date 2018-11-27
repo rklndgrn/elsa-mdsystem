@@ -213,10 +213,7 @@ void World::distributeInitialVelocities(double desiredTemperature)
 //Populate an FCC lattice with atoms.
 void World::generateAtomsAtFccLattice(double latticeConstant, unsigned int nOfUnitCellsX, unsigned int nOfUnitCellsY, unsigned int nOfUnitCellsZ)
 {
-
-	double offset = _myParameters.getChosenMaterial().getCellSize() / 4.0;
-	offset = 0.0;
-
+	double offset =  latticeConstant / 4.0;
 	
 	unsigned int atomId{ 0 };
 	for (unsigned int z = 0; z < nOfUnitCellsZ; z++)
@@ -254,6 +251,7 @@ void World::generateAtomsAtFccLattice(double latticeConstant, unsigned int nOfUn
 //Populate an SC lattice with atoms.
 void World::generateAtomsAtScLattice(double latticeConstant, unsigned int nOfUnitCellsX, unsigned int nOfUnitCellsY, unsigned int nOfUnitCellsZ)
 {
+	double offset = latticeConstant / 4.0;
 	unsigned int atomId{ 0 };
 	double xPos{ 0 }, yPos{ 0 }, zPos{ 0 };
 	for (unsigned int z = 0; z < nOfUnitCellsZ; z++)
@@ -262,9 +260,9 @@ void World::generateAtomsAtScLattice(double latticeConstant, unsigned int nOfUni
 		{
 			for (unsigned int x = 0; x < nOfUnitCellsX; x++)
 			{
-				xPos = x * latticeConstant;
-				yPos = y * latticeConstant;
-				zPos = z * latticeConstant;
+				xPos = x * latticeConstant + offset;
+				yPos = y * latticeConstant + offset;
+				zPos = z * latticeConstant + offset;
 				Atom* a = new Atom(atomId, xPos, yPos, zPos);
 				addAtomToAtomList(a);
 				_myResults.setPositions(xPos, yPos, zPos, 0, atomId);
