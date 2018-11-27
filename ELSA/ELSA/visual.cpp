@@ -18,6 +18,10 @@ visual::visual(const int maxPart)//:_maxParticles(maxPart)
 	initVisual();
 }
 
+void visual::setNumberOfParticles(int number)
+{
+	_numberOfParticles = number;
+}
 
 std::array<visual::_particle, _maxParticles> visual::getParticlesContainer()
 {
@@ -282,18 +286,19 @@ void visual::mainLoopVisual(double*** pos, int time, int maxTime)
 
 	// Simulate all particles
 	int ParticlesCount = 0;
+	
 	float positionsF[_maxParticles][3];
 	float latticeConstant = 408.53e-12;
 	if (pos != NULL && time < maxTime)
 	{
-		for (int i = 0; i < _maxParticles; i++)
+		for (int i = 0; i < _numberOfParticles; i++)
 		{
-			positionsF[i][0] = static_cast<float>(pos[time][i][0]) / latticeConstant -2.5;
-			positionsF[i][1] = static_cast<float>(pos[time][i][1]) / latticeConstant -2.5;
-			positionsF[i][2] = static_cast<float>(pos[time][i][2]) / latticeConstant -2.5;
+				positionsF[i][0] = static_cast<float>(pos[time][i][0]) / latticeConstant - 2.5;
+				positionsF[i][1] = static_cast<float>(pos[time][i][1]) / latticeConstant - 2.5;
+				positionsF[i][2] = static_cast<float>(pos[time][i][2]) / latticeConstant - 2.5;
 		}
 
-		for (int i = 0; i < _maxParticles; i++) {
+		for (int i = 0; i < _numberOfParticles; i++) {
 			//_particlesContainer[i].speed = glm::vec3(0.001,0.001,0.001);
 			//_particlesContainer[i].pos += _particlesContainer[i].speed;
 			_particlesContainer[i].pos = glm::vec3(positionsF[i][0], positionsF[i][1], positionsF[i][2]);

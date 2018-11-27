@@ -160,7 +160,7 @@ int main()
 			myGui._temp = *tempArray;
 			myGui._totalEnergy = *totArray;
 			maxVisualTime = (int)round(myParameters.getSimulationTime() / myParameters.getTimeStep());
-
+			myVis.setNumberOfParticles(myParameters.getNumberOfAtoms());
 		}
 
 		//myGui.handlePlots();// , kinenen, totenen, tempen);

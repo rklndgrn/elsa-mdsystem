@@ -713,7 +713,7 @@ void Gui::handleConfigurationHeader()
 	{
 		ImGuiIO& io = ImGui::GetIO();
 
-		if (showThreadSelector("Thread Selector"))
+		if (showThreadSelector("Number of threads"))
 			showThreadSelector("th");
 
 		//if (showCrystalSelector("CrystalSelector"))
