@@ -18,7 +18,7 @@
 //#include "imgui-master\imgui_plot.h"
 
 #pragma once
-
+#define _maxTimeSteps 7500
 class Gui
 {
 private:
@@ -56,8 +56,11 @@ private:
 	char* _lastStateFileName;
 
 	bool _simulate;
+	bool _isVisualisationPause = false;
+	int _saveSpeed = 1;
 
 	void printStatistics(double, double, double);
+	void printTimeForVisualisation(int*, int);
 	
 public:
 	Gui();
@@ -119,7 +122,7 @@ public:
 	void saveResultsWindow();
 	void loadResultsWindow();
 
-	void handleMenu(double, double);
+	void handleMenu(double, double, int*, int, int*);
 
 	void handleCollapsingHeaders();
 	void handleConfigurationHeader();
@@ -130,7 +133,7 @@ public:
 	void simulateButtonHandler();
 	void stopButtonHandler();
 
-	void Gui::visualWindow();
+	void Gui::visualWindow(int*, int, int*);
 
 	void simulationWindow(double elapsedTime, double totalTime);
 

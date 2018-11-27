@@ -217,13 +217,13 @@ bool Gui::showMaterialSelector(const char* label)
 		{
 			// Data for Silver
 		case 0: _latticeConstant = 408.53e-12;
-				_epsilon = 0.34*(1.6021766208E-19);
+				_epsilon = 0.34*_elementaryCharge;
 				_sigma = 2.65e-10;
 				_mass = 107.8682*(1.660539040e-27);
 				break;
 			// Data for Argon
 		case 1: _latticeConstant = 525.6e-12;
-				_epsilon = 0.0104*(1.6021766208E-19);
+				_epsilon = 0.0104*_elementaryCharge;
 				_sigma = 3.40e-10;
 				_mass = 39.948*(1.660539040e-27);
 				break;
@@ -273,7 +273,7 @@ void Gui::handleFrame()
 	ImGui::NewFrame();
 }
 
-void Gui::handleMenu(double elapsedTime, double totalTime)
+void Gui::handleMenu(double elapsedTime, double totalTime, int* visualisationTime, int maxVisualTime, int* speed)
 {
 	//Menu
 	if (ImGui::BeginMainMenuBar())
@@ -329,7 +329,7 @@ void Gui::handleMenu(double elapsedTime, double totalTime)
 		handleCollapsingHeaders();
 		simulateButtonHandler();
 		stopButtonHandler();
-
+		
 		//if (_simulate)
 		//{
 			//ImGui::Text("Simulating...");// , _counter);
@@ -341,11 +341,11 @@ void Gui::handleMenu(double elapsedTime, double totalTime)
 	handlePlots();
 	saveResultsWindow();
 	loadResultsWindow();
-	visualWindow();
+	visualWindow(visualisationTime, maxVisualTime, speed);
 	simulationWindow(elapsedTime, totalTime);
 }
 
-void Gui::visualWindow()
+void Gui::visualWindow(int* visualisationTime, int maxVisualTime, int* speed)
 {
 	bool auto_resize = false;
 	//ImGuiWindowFlags window_flags = 0;
@@ -354,10 +354,27 @@ void Gui::visualWindow()
 	if (_visualVisible)
 	{
 		ImGui::Begin("Visualization", &_visualVisible, flags);
-		ImGui::SetWindowSize(ImVec2(400, 50));
-		ImGui::Text("Enable moving camera by holding space");
+		ImGui::SetWindowSize(ImVec2(1200, 150));
 		ImGui::Text("Strafe by using w,a,s & d");
-		ImGui::Text("Rotate by using up,left,down & right");
+		ImGui::Text("Zoom by using q & e");
+		ImGui::Text("Rotate by using i, j, k & l");
+		ImGui::SliderInt(" ", visualisationTime, 0, maxVisualTime, "Time: %d");
+		ImGui::SliderInt("", speed, 0, 8, "Speed: %d");
+		ImGui::SameLine();
+
+		//if (ImGui::Button("Pause"))
+		//{
+		//	_isVisualisationPause = !_isVisualisationPause;
+		//}
+		//if (_isVisualisationPause)
+		//{
+		//	_saveSpeed = *speed;
+		//	*speed = 1000;
+		//}
+		//else
+		//{
+		//	*speed = _saveSpeed;
+		//}
 		ImGui::End();
 	}
 
@@ -484,7 +501,7 @@ void Gui::handlePlots()
 
 		if (ImGui::CollapsingHeader("Cohesive energy"))
 		{
-			float cohEnEnD[5000];
+			float cohEnEnD[_maxTimeSteps];
 			float max = -1E15;
 			float min = 1E15;
 			float sumLast10 = 0;
@@ -505,7 +522,7 @@ void Gui::handlePlots()
 		}
 		if (ImGui::CollapsingHeader("Debye Temperature"))
 		{
-			float debyeTempEnD[5000];
+			float debyeTempEnD[_maxTimeSteps];
 			float max = -1E15;
 			float min = 1E15;
 			float sumLast10 = 0;
@@ -527,7 +544,7 @@ void Gui::handlePlots()
 		}
 		if (ImGui::CollapsingHeader("Internal pressure"))
 		{
-			float pressureEnD[5000];
+			float pressureEnD[_maxTimeSteps];
 			float max = -1E15;
 			float min = 1E15;
 			float sumLast10 = 0;
@@ -549,7 +566,7 @@ void Gui::handlePlots()
 		}
 		if (ImGui::CollapsingHeader("Kinetic energy"))
 		{
-			float kinEnD[5000];
+			float kinEnD[_maxTimeSteps];
 			float max = -1E15;
 			float min = 1E15;
 			float sumLast10 = 0;
@@ -569,7 +586,7 @@ void Gui::handlePlots()
 		}
 		if (ImGui::CollapsingHeader("Mean square displacement"))
 		{
-			float msdEnD[5000];
+			float msdEnD[_maxTimeSteps];
 			float max = -1E15;
 			float min = 1E15;
 			float sumLast10 = 0;
@@ -591,7 +608,7 @@ void Gui::handlePlots()
 		}
 		if (ImGui::CollapsingHeader("Potential energy"))
 		{
-			float potEnD[5000];
+			float potEnD[_maxTimeSteps];
 			float max = -1E15;
 			float min = 1E15;
 			float sumLast10 = 0;
@@ -614,7 +631,7 @@ void Gui::handlePlots()
 		}
 		if (ImGui::CollapsingHeader("Self diffusion coefficient"))
 		{
-			float selfDiffEnD[5000];
+			float selfDiffEnD[_maxTimeSteps];
 			float max = -1E15;
 			float min = 1E15;
 			float sumLast10 = 0;
@@ -636,7 +653,7 @@ void Gui::handlePlots()
 		}
 		if (ImGui::CollapsingHeader("Specific heat"))
 		{
-			float specHeatEnD[5000];
+			float specHeatEnD[_maxTimeSteps];
 			float max = -1E15;
 			float min = 1E15;
 			float sumLast10 = 0;
@@ -659,7 +676,7 @@ void Gui::handlePlots()
 
 		if (ImGui::CollapsingHeader("Temperature"))
 		{
-			float temp[5000];
+			float temp[_maxTimeSteps];
 			float max = -1E15;
 			float min = 1E15;
 			float sumLast10 = 0;
@@ -679,7 +696,7 @@ void Gui::handlePlots()
 		}
 		if (ImGui::CollapsingHeader("Total energy"))
 		{
-			float totEn[5000];
+			float totEn[_maxTimeSteps];
 			float max = -1E5;
 			float min = 1E5;
 			float sumLast10 = 0;
@@ -860,6 +877,7 @@ void Gui::stopButtonHandler()
 	ImGui::PopStyleColor(3);
 	ImGui::PopID();
 }
+
 
 bool Gui::VisualVisible() const
 {

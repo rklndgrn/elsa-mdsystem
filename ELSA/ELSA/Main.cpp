@@ -23,6 +23,7 @@ int main()
 	int count = 0;
 	int visualTime = 0;
 	int maxVisualTime = 1;
+	int speed = 8;
 	double latticeConstant = 1.0;
 	int unitCellsX = 1;
 	int unitCellsY = 1;
@@ -36,7 +37,11 @@ int main()
 		{
 			myVis.setAtomsVisible(true);
 			count++;
-			if (count % 1 == 0)
+			if (speed == 0)
+			{
+
+			}
+			else if (count % (9 - speed) == 0)
 			{
 				visualTime++;
 			}
@@ -55,7 +60,7 @@ int main()
 		
 		// -------------------------------- MENU -----------------------------------------
 
-		myGui.handleMenu(0,1); //1,1 does nothing
+		myGui.handleMenu(0, 1, &visualTime, maxVisualTime, &speed); //1,1 does nothing
 		
 
 		if (myGui.simulate())
@@ -131,7 +136,7 @@ int main()
 					//printf("\n");
 
 					myGui.handleFrame();
-					myGui.handleMenu(t, myParameters.getSimulationTime());
+					myGui.handleMenu(t, myParameters.getSimulationTime(), &visualTime, maxVisualTime, &speed);
 				}
 
 			}
@@ -174,8 +179,8 @@ int main()
 
 		//myGui.handlePlots();// , kinenen, totenen, tempen);
 
-		/*bool tesr = false;
-		ImGui::ShowDemoWindow(&tesr);*/
+		//bool tesr = false;
+		//ImGui::ShowDemoWindow(&tesr);
 
 		// Rendering
 		glUseProgram(0);
