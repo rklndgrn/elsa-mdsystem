@@ -641,7 +641,30 @@ void Gui::handlePlots()
 			printStatistics(min, max, sumLast10);
 
 		}
-		if (ImGui::CollapsingHeader("Potential energy"))
+		if (ImGui::CollapsingHeader("Potential energy vector"))
+		{
+			std::vector<float> potentialVector;
+			float max = -1E15;
+			float min = 1E15;
+			float sumLast10 = 0;
+
+			for (int i = 0; i < numberOfTimeSteps - 1; i++)
+			{
+				potentialVector.push_back(static_cast<float>(_potentialEnergy[i + 1]) / _elementaryCharge);
+
+				if(potentialVector.at(i) > max) { max = potentialVector.at(i); }
+				else if (potentialVector.at(i) < min) { min = potentialVector.at(i); }
+
+				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
+				{
+					sumLast10 += potentialVector.at(i);
+				}
+			}
+
+			ImGui::PlotLines("", &potentialVector, numberOfTimeSteps - 1, 0, "Potential energy [eV]", min, max, ImVec2(1700, 480));
+			printStatistics(min, max, sumLast10);
+		}
+		if (ImGui::CollapsingHeader("Potential energy array"))
 		{
 			float potEnD[_maxTimeSteps];
 			float max = -1E15;
