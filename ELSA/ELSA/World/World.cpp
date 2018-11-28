@@ -72,7 +72,6 @@ void World::calcPotentialAndForce(double elapsedTime)
 
 			// Returns the distance as a homogeneous vector
 			r = _mySimulation.calcDistance(a1, a2, _myParameters.getLengthX(), _myParameters.getLengthY(), _myParameters.getLengthZ(), _myParameters.getIs2D());
-
 			
 			force = _mySimulation.calcForce(r[0]);
 			potential = _mySimulation.calcLJPotential(r[0]);
