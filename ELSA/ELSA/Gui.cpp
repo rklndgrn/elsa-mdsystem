@@ -23,7 +23,7 @@ Gui::Gui()
 	_collisionPercentage = 0.2;
 	_thermostat = false;
 	_useLastSimulationState = false;
-	_lastStateFileName = "lastState.txt";
+	_lastStateFileName = "./SaveData/lastState.txt";
 	_2D = false;
 }
 
