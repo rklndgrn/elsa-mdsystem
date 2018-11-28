@@ -23,7 +23,7 @@ Gui::Gui()
 	_collisionPercentage = 0.2;
 	_thermostat = false;
 	_useLastSimulationState = false;
-	_lastStateFileName = "lastState.txt";
+	_lastStateFileName = "./SaveData/lastState.txt";
 	_2D = false;
 }
 
@@ -436,18 +436,21 @@ void Gui::loadResultsWindow()
 	//ImGuiWindowFlags window_flags = 0;
 	ImGuiWindowFlags flags = auto_resize ? ImGuiWindowFlags_AlwaysAutoResize : 0;
 	flags |= ImGuiWindowFlags_NoResize;
-	if (_loadResultWindow)
+	if (_loadResultWindow && !simulate())
 	{
 		ImGui::Begin("Load results file...", &_loadResultWindow, flags);
 		ImGui::SetWindowSize(ImVec2(500, 110));
 		ImGui::Text("Enter the name of the file you want to open:");
-		static char buf1[64] = "./SaveData/"; ImGui::InputText(".txt", buf1, 64);
-		if (ImGui::Button("Load")) {
+		static char buf1[64] = "./SaveData/"; 
+		ImGui::InputText(".txt", buf1, 64);
+		if (ImGui::Button("Load")) 
+		{
 			strcat(buf1, ".txt");
 			std::ifstream myFile;
 			myFile.open(buf1); 
 			if (!myFile.is_open()) { _unableToOpenFile = true; }
-			else {
+			else 
+			{
 				std::string dummy;
 				int sizeOfFile{ 0 }, i{ 0 };
 				while (!myFile.eof()) { getline(myFile, dummy); sizeOfFile++; }
@@ -483,7 +486,7 @@ void Gui::saveResultsWindow()
 	//ImGuiWindowFlags window_flags = 0;
 	ImGuiWindowFlags flags = auto_resize ? ImGuiWindowFlags_AlwaysAutoResize : 0;
 	flags |= ImGuiWindowFlags_NoResize;
-	if (_saveResultWindow)
+	if (_saveResultWindow && !simulate())
 	{
 		ImGui::Begin("Save results file...", &_saveResultWindow, flags);
 		ImGui::SetWindowSize(ImVec2(500, 110));
@@ -794,7 +797,7 @@ void Gui::handleConfigurationHeader()
 		//Cut off distance
 		ImGui::InputDouble("Cut off distance [m]", &_cutOffDistance, 0.0f, 0.0f, "%e");
 		ImGui::SameLine();
-		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");
+		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n This should be greater than the lattice constant. \n");
 
 		//ImGui::Text("Number of unit cells x: ");
 		//ImGui::SameLine();
