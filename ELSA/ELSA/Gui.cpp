@@ -353,7 +353,7 @@ void Gui::handleMenu(double elapsedTime, double totalTime, int* visualisationTim
 	}
 	ImGuiWindowFlags window_flags = 0;
 	//window_flags |= ImGuiWindowFlags_MenuBar;
-	if (_mainVisible)
+	if (_mainVisible && !simulate())
 	{
 		ImGui::Begin("ELSA MD-system", &_mainVisible, window_flags);
 		ImGui::SetWindowSize(ImVec2(560, 640));
