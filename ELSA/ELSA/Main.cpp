@@ -65,6 +65,7 @@ int main()
 
 		if (myGui.simulate())
 		{
+			myGui.setMainVisible(false);
 			myGui._initializing = true;
 			Material myMaterial(
 				myGui.getCrystalType(),
@@ -141,6 +142,7 @@ int main()
 
 			}
 			myGui.stopSimulate();
+			myGui.setMainVisible(true);
 
 			Atom* a;
 			ofstream saveLastState;

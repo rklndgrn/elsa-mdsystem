@@ -131,6 +131,11 @@ bool Gui::isUseLastSimulationState()
 	return _useLastSimulationState;
 }
 
+void Gui::setMainVisible(bool vis)
+{
+	_mainVisible = vis;
+}
+
 bool Gui::is2D()
 {
 	return _2D;
@@ -262,7 +267,7 @@ bool Gui::showMaterialSelector(const char* label)
 
 bool Gui::showThreadSelector(const char* label)
 {
-	static int style_idx = 0;
+	static int style_idx = _numberOfThreads;
 	const char* items[] = {"1", "2", "3", "4", "5", "6", "7", "8"};
 	//const char* items = items_tmp;
 	if (ImGui::Combo(label, &style_idx, items, IM_ARRAYSIZE(items)))
@@ -355,7 +360,7 @@ void Gui::handleMenu(double elapsedTime, double totalTime, int* visualisationTim
 		ImGui::SetWindowPos(ImVec2(60, 140));
 		handleCollapsingHeaders();
 		simulateButtonHandler();
-		stopButtonHandler();
+		//stopButtonHandler();
 		
 		//if (_simulate)
 		//{
@@ -809,7 +814,7 @@ void Gui::handleConfigurationHeader()
 		/*ImGui::SameLine();
 		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");*/
 
-		ImGui::Checkbox("Visualization", &_visualization);      // Edit bools storing our window open/close state
+		//ImGui::Checkbox("Visualization", &_visualization);      // Edit bools storing our window open/close state
 											
 		ImGui::Checkbox("Anderson thermostat", &_thermostat);
 		ImGui::Checkbox("2D simulation", &_2D);

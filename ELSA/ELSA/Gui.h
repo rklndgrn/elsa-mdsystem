@@ -86,6 +86,7 @@ public:
 	double getSimulationTime();
 	bool isThermostat();
 	bool isUseLastSimulationState();
+	void setMainVisible(bool vis);
 	bool is2D();
 	int getNumberOfUnitCellsX();
 	int getNumberOfUnitCellsY();
