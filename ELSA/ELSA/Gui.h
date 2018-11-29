@@ -56,6 +56,8 @@ private:
 	double _collisionPercentage;
 	char* _lastStateFileName;
 
+	int _numberOfTimeStepsPlot;
+
 	bool _simulate;
 	bool _isVisualisationPause = false;
 	int _saveSpeed = 1;
@@ -142,6 +144,8 @@ public:
 	bool VisualVisible() const;
 
 	bool exitPressed() const;
+
+	void setNumberOfTimeStepsPlot(int);
 
 	void handlePlots();// const float* kinEn, const float* totEn, const float* temp);
 };

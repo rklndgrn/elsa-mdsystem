@@ -147,7 +147,7 @@ int main()
 
 			Atom* a;
 			ofstream saveLastState;
-			saveLastState.open("lastState.txt");
+			saveLastState.open("./SaveData/lastState.txt");
 
 			for(unsigned int i = 0; i < myParameters.getNumberOfAtoms(); i++)
 			{
@@ -171,6 +171,8 @@ int main()
 			myGui._specificHeat = *specificHeatArray;
 			myGui._temp = *tempArray;
 			myGui._totalEnergy = *totArray;
+			myGui.setNumberOfTimeStepsPlot((int)round(myParameters.getSimulationTime()/myParameters.getTimeStep()));
+
 			maxVisualTime = (int)round(myParameters.getSimulationTime() / myParameters.getTimeStep());
 			latticeConstant = myParameters.getChosenMaterial().getLatticeConstant();
 			unitCellsX = myParameters.getNumberOfUnitCellsX();

@@ -455,22 +455,40 @@ void Gui::loadResultsWindow()
 				int sizeOfFile{ 0 }, i{ 0 };
 				while (!myFile.eof()) { getline(myFile, dummy); sizeOfFile++; }
 				myFile.close(); myFile.open(buf1);
-				if (_temp == NULL) { _temp = new double[sizeOfFile]; }
-				if (_totalEnergy == NULL) { _totalEnergy = new double[sizeOfFile]; }
-				if (_potentialEnergy == NULL) { _potentialEnergy = new double[sizeOfFile]; }
-				if (_kineticEnergy == NULL) { _kineticEnergy = new double[sizeOfFile]; }
+
+				 _cohesiveEnergy = new double[sizeOfFile];
+				 _debyeTemperature = new double[sizeOfFile];
+				 _kineticEnergy = new double[sizeOfFile];
+				 _meanSquareDisplacement = new double[sizeOfFile];
+				 _potentialEnergy = new double[sizeOfFile];
+				 _pressure = new double[sizeOfFile];
+				 _selfDiffusionCoeff = new double[sizeOfFile];
+				 _specificHeat = new double[sizeOfFile];
+				 _temp = new double[sizeOfFile];
+				 _totalEnergy = new double[sizeOfFile];
+
 				std::getline(myFile, dummy);
+				std::getline(myFile, dummy);
+
 				while (!myFile.eof())
 				{
-					myFile >> _temp[i];
-					myFile >> _totalEnergy[i];
-					myFile >> _potentialEnergy[i];
-					myFile >> _kineticEnergy[i];
+					myFile >>  _cohesiveEnergy[i];
+					myFile >>  _debyeTemperature[i];
+					myFile >>  _kineticEnergy[i];
+					myFile >>  _meanSquareDisplacement[i];
+					myFile >>  _potentialEnergy[i];
+					myFile >>  _pressure[i];
+					myFile >>  _selfDiffusionCoeff[i];
+					myFile >>  _specificHeat[i];
+					myFile >>  _temp[i];
+					myFile >>  _totalEnergy[i];
+
 					i++;
 				}
 				myFile.close();
 				_loadResultWindow = false;
 				_unableToOpenFile = false;
+				_numberOfTimeStepsPlot = i-1;
 			}
 		}
 		ImGui::SameLine();
@@ -497,13 +515,26 @@ void Gui::saveResultsWindow()
 			std::ofstream myFile;
 			myFile.open(buf1);
 
+
+
 			myFile << "Temperature [K] " << "Total energy [J] " << "Potential energy [J] " << "Kinetic energy [J] " << std::endl;
-				for (int i = 0; i < (int)(floor(_simulationTime / _timeStep)); i++)
-				{
-					myFile << _temp[i] << " " << _totalEnergy[i] << " " << _potentialEnergy[i] << " " << _kineticEnergy[i] << std::endl;
-				}
-				myFile.close();
-				_saveResultWindow = false;
+
+			for (int i = 0; i < _numberOfTimeStepsPlot; i++)
+			{
+
+				myFile << _cohesiveEnergy[i] << " "
+					<< _debyeTemperature[i] << " "
+					<< _kineticEnergy[i] << " "
+					<< _meanSquareDisplacement[i] << " "
+					<< _potentialEnergy[i] << " "
+					<< _pressure[i] << " "
+					<< _selfDiffusionCoeff[i] << " "
+					<< _specificHeat[i] << " "
+					<< _temp[i] << " "
+					<< _totalEnergy[i] << std::endl;
+			}
+			myFile.close();
+			_saveResultWindow = false;
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Cancel")) { _saveResultWindow = false; };
@@ -514,7 +545,7 @@ void Gui::saveResultsWindow()
 void Gui::handlePlots()
 {
 	bool auto_resize = false;
-	int numberOfTimeSteps = (int)round(_simulationTime / _timeStep);
+	int numberOfTimeSteps = _numberOfTimeStepsPlot;
 	//ImGuiWindowFlags window_flags = 0;
 	ImGuiWindowFlags flags = auto_resize ? ImGuiWindowFlags_AlwaysAutoResize : 0;
 	flags |= ImGuiWindowFlags_NoResize;
@@ -939,3 +970,7 @@ void Gui::handleCollapsingHeaders()
 	handleSettingsHeader();
 }
 
+void Gui::setNumberOfTimeStepsPlot(int number)
+{
+	_numberOfTimeStepsPlot = number;
+}
