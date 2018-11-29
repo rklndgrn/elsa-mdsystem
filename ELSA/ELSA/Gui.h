@@ -7,6 +7,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <vector>
 
 // Include GLFW
 #include <GLFW/glfw3.h>
@@ -18,7 +19,7 @@
 //#include "imgui-master\imgui_plot.h"
 
 #pragma once
-#define _maxTimeSteps 7500
+
 class Gui
 {
 private:
