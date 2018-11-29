@@ -70,15 +70,15 @@ private:
 
 public:
 	visual();
-	visual(const int);
+	visual(const int maxPart);
 	~visual() = default;
 
 
 	std::array<_particle, _maxParticles> getParticlesContainer();
-	void setParticleCameraDist(int, float);
-	void setParticlePosition(int, glm::vec3);
-	void setParticleColor(int, glm::vec4);
-	void setParticleSize(int, float);
+	void setParticleCameraDist(int id, float dist);
+	void setParticlePosition(int id, glm::vec3 pos);
+	void setParticleColor(int id, glm::vec4 color);
+	void setParticleSize(int id, float size);
 	int initGLFW();
 	void openWindow();
 	void sortParticles();
@@ -86,14 +86,14 @@ public:
 	void initGLEW();
 	void initOpenGL();
 
-	void mainLoopVisual(std::vector<std::vector<std::array<double, 3>>>, int, int, double, int, int, int);
+	void mainLoopVisual(double***, int, int, double, int, int, int);
 
 	GLuint getTexture();
 	GLuint getBillboardVertexBuffer();
 	GLuint getParticlesPositionBuffer();
 	GLuint getParticlesColorBuffer();
 
-	void setAtomsVisible(bool);
+	void setAtomsVisible(bool visibility);
 	void setNumberOfParticles(int);
 
 	GLFWwindow* getWindow();

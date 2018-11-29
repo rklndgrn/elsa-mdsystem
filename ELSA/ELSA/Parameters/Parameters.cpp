@@ -72,12 +72,7 @@ Parameters::Parameters(
 
 }
 
-/*
-Parameters::~Parameters()
-{
-	delete _lastStateFileName;
-}
-*/
+
 
 //Getters
 unsigned int Parameters::getNumberOfAtoms() const

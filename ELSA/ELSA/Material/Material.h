@@ -22,7 +22,7 @@ private:
 public:
 	Material();
 	Material(std::string, double, double, double, double, double);
-	~Material() = default;
+	~Material();
 
 	//getters
 	double getCellSize() const;

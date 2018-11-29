@@ -254,7 +254,7 @@ Gui visual::getGui()
 	return _theGui;
 }
 
-void visual::mainLoopVisual(std::vector<std::vector<std::array<double, 3>>> pos, int time, int maxTime, double latticeConstant, int numberOfUnitCellsX, int numberOfUnitCellsY, int numberOfUnitCellsZ)
+void visual::mainLoopVisual(double*** pos, int time, int maxTime, double latticeConstant, int numberOfUnitCellsX, int numberOfUnitCellsY, int numberOfUnitCellsZ)
 {
 	// Clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -276,15 +276,14 @@ void visual::mainLoopVisual(std::vector<std::vector<std::array<double, 3>>> pos,
 	// Simulate all particles
 	int ParticlesCount = 0;
 	
-	//float positionsF[_maxParticles][3];
-	std::vector<std::array<float, 3>> positionsF(_numberOfParticles);
-	if (pos.size() != 0 && time < maxTime)
+	float positionsF[_maxParticles][3];
+	if (pos != NULL && time < maxTime)
 	{
 		for (int i = 0; i < _numberOfParticles; i++)
 		{
-			positionsF[i][0] = static_cast<float>(pos[time][i][0]) / latticeConstant - numberOfUnitCellsX / 2.0;
-			positionsF[i][1] = static_cast<float>(pos[time][i][1]) / latticeConstant - numberOfUnitCellsY / 2.0;
-			positionsF[i][2] = static_cast<float>(pos[time][i][2]) / latticeConstant - numberOfUnitCellsZ / 2.0;
+				positionsF[i][0] = static_cast<float>(pos[time][i][0]) / latticeConstant - numberOfUnitCellsX / 2.0;
+				positionsF[i][1] = static_cast<float>(pos[time][i][1]) / latticeConstant - numberOfUnitCellsY / 2.0;
+				positionsF[i][2] = static_cast<float>(pos[time][i][2]) / latticeConstant - numberOfUnitCellsZ / 2.0;
 		}
 
 		for (int i = 0; i < _numberOfParticles; i++) {

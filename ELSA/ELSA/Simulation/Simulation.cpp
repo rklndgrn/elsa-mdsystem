@@ -50,7 +50,7 @@ double Simulation::calcLJPotential(double dist) const
 }
 
 //Calculate the average deviation from the atoms' initial positions.
-double Simulation::calcMeanSquareDisplacement(vector<array<double, 3>> currentPositionArray, vector<array<double, 3>> initPositionArray, unsigned int numberOfAtoms, double lengthX, double lengthY, double lengthZ, bool is2D)
+double Simulation::calcMeanSquareDisplacement(double** currentPositionArray, double** initPositionArray, unsigned int numberOfAtoms, double lengthX, double lengthY, double lengthZ, bool is2D)
 {
 	array<double, 3> currPos;
 	array<double, 3> initPos;
@@ -72,7 +72,7 @@ double Simulation::calcMeanSquareDisplacement(vector<array<double, 3>> currentPo
 }
 
 //Calculate the self-diffusion coefficient by comparing the MSD at 2 different points in time.
-double Simulation::calcSelfDiffusionCoefficient(vector<vector<array<double, 3>>> positionsArray, double t1, double t2, double timeStep, unsigned int numberOfAtoms, double lengthX, double lengthY, double lengthZ, bool is2D)
+double Simulation::calcSelfDiffusionCoefficient(double*** positionsArray, double t1, double t2, double timeStep, unsigned int numberOfAtoms, double lengthX, double lengthY, double lengthZ, bool is2D)
 {
 	double msd1 = calcMeanSquareDisplacement(positionsArray[(int) round(t1/timeStep)], positionsArray[0],
 												numberOfAtoms, lengthX, lengthY, lengthZ, is2D);
@@ -83,7 +83,7 @@ double Simulation::calcSelfDiffusionCoefficient(vector<vector<array<double, 3>>>
 }
 
 //Calculate the specific heat from the mean of the temperature and the square of the temperature.
-double Simulation::calcSpecificHeat(unsigned int numberOfAtoms, double kB, double numberOfTimeSteps, vector<double> tempArray)
+double Simulation::calcSpecificHeat(unsigned int numberOfAtoms, double kB, double numberOfTimeSteps, double* tempArray)
 {
 	double expT{ 0 }, expT2{ 0 }, tmp{ 0 };
 	for (int i{ (int)round(numberOfTimeSteps) }; i > (int)floor(numberOfTimeSteps * 0.7); --i)

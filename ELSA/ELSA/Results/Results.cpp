@@ -4,10 +4,9 @@ using namespace std;
 
 Results::Results(double simulationTime, double timeStep, unsigned int numberOfParticles)
 {
-	_vectorLength = (int) round(simulationTime/timeStep);
+	_arrayLength = (int) round(simulationTime/timeStep);
 	_numberOfAtoms = numberOfParticles;
 
-	/*
 	_cohesiveEnergy = new double[_arrayLength];
 	_debyeTemperature = new double[_arrayLength];
 	_diffusionConstant = new double[_arrayLength];
@@ -18,85 +17,86 @@ Results::Results(double simulationTime, double timeStep, unsigned int numberOfPa
 	_specificHeat = new double[_arrayLength];
 	_temperature = new double[_arrayLength];
 	_totalEnergy = new double[_arrayLength];
-	*/
-	_cohesiveEnergy.resize(_vectorLength);
-	_debyeTemperature.resize(_vectorLength);
-	_diffusionConstant.resize(_vectorLength);
-	_internalPressure.resize(_vectorLength);
-	_kineticEnergy.resize(_vectorLength);
-	_meanSquareDisplacement.resize(_vectorLength);
-	_potentialEnergy.resize(_vectorLength);
-	_specificHeat.resize(_vectorLength);;
-	_temperature.resize(_vectorLength);
-	_totalEnergy.resize(_vectorLength);
 
 	//Create a 3D array for positions for each atom over time.
-	_positions.resize(_vectorLength);
-	for (unsigned int i = 0; i < _vectorLength; i++)
+	_positions = new double**[_arrayLength];
+	for (unsigned int i = 0; i < _arrayLength; i++)
 	{
-		_positions[i].resize(numberOfParticles);
-		for (int j = 0; j < numberOfParticles; j++)
+		_positions[i] = new double*[numberOfParticles];
+		for (unsigned int j = 0; j < numberOfParticles; j++)
 		{
-			_positions[i][j][0] = 0;
-			_positions[i][j][1] = 0;
-			_positions[i][j][2] = 0;
+			_positions[i][j] = new double[3];
 		}
 	}
-
 }
 
+//For testing the 3D array. Delete if unnecessary.
+void Results::printPositions()
+{
+	for (unsigned int t = 0; t < _arrayLength; t++)
+	{
+		cout << "At time step " << t << ":" << endl;
+		for (unsigned int n = 0; n < _numberOfAtoms; n++)
+		{
+			cout << "   Atom " << n << " has position: (" << _positions[t][n][0] << ", " << _positions[t][n][1] << ", " << _positions[t][n][2] << ")!" << endl;
+		}
+		cout << endl;
+	}
+}
+
+
 //getters
-std::vector<double>*  Results::getCohesiveEnergy()
+double** Results::getCohesiveEnergy()
 {
 	return &_cohesiveEnergy;
 }
 
-std::vector<double>*  Results::getDebyeTemperature()
+double** Results::getDebyeTemperature()
 {
 	return &_debyeTemperature;
 }
 
-std::vector<double>*  Results::getDiffusionConstant()
+double** Results::getDiffusionConstant()
 {
 	return &_diffusionConstant;
 }
 
-std::vector<double>*  Results::getInternalPressure()
+double** Results::getInternalPressure()
 {
 	return &_internalPressure;
 }
 
-std::vector<double>*  Results::getKineticEnergy()
+double** Results::getKineticEnergy()
 {
 	return &_kineticEnergy;
 }
 
-std::vector<double>*  Results::getMeanSquareDisplacement()
+double** Results::getMeanSquareDisplacement()
 {
 	return &_meanSquareDisplacement;
 }
 
-std::vector<std::vector<std::array<double, 3>>>* Results::getPositions()
+double**** Results::getPositions()
 {
 	return &_positions;
 }
 
-std::vector<double>*  Results::getPotentialEnergy()
+double** Results::getPotentialEnergy()
 {
 	return &_potentialEnergy;
 }
 
-std::vector<double>*  Results::getSpecificHeat()
+double** Results::getSpecificHeat()
 {
 	return &_specificHeat;
 }
 
-std::vector<double>*  Results::getTemperature()
+double** Results::getTemperature()
 {
 	return &_temperature;
 }
 
-std::vector<double>*  Results::getTotalEnergy()
+double** Results::getTotalEnergy()
 {
 	return &_totalEnergy;
 }
