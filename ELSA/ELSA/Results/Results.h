@@ -23,7 +23,7 @@ private:
 	double* _specificHeat;
 	double* _temperature;
 	double* _totalEnergy;
-	//ICE:
+
 	/*
 	std::vector<double> _cohesiveEnergy;
 	std::vector<double> _debyeTemperature;
@@ -31,7 +31,7 @@ private:
 	std::vector<double> _internalPressure;
 	std::vector<double> _kineticEnergy;
 	std::vector<double> _meanSquareDisplacement;
-	std::vector<std::vector<std::vector<double>>> _positions;
+	std::vector<std::vector<std::array<double, 3>>> _positions;
 	std::vector<double> _potentialEnergy;
 	std::vector<double> _specificHeat;
 	std::vector<double> _temperature;
@@ -41,9 +41,7 @@ private:
 public:
 	Results() = default;
 	Results(double, double, unsigned int);
-	~Results();
-
-	void printPositions();
+	~Results() = default;
 
 	//Getters.
 	double** getCohesiveEnergy();
@@ -57,6 +55,20 @@ public:
 	double** getSpecificHeat();
 	double** getTemperature();
 	double** getTotalEnergy();
+
+	/*
+	std::vector<double>* getCohesiveEnergy();
+	std::vector<double>* getDebyeTemperature();
+	std::vector<double>* getDiffusionConstant();
+	std::vector<double>* getInternalPressure();
+	std::vector<double>* getKineticEnergy();
+	std::vector<double>* getMeanSquareDisplacement();
+	std::vector<std::vector<std::array<double, 3>>>* getPositions();
+	std::vector<double>* getPotentialEnergy();
+	std::vector<double>* getSpecificHeat();
+	std::vector<double>* getTemperature();
+	std::vector<double>* getTotalEnergy();
+	*/
 
 	//Setters.
 	void setCohesiveEnergy(int);

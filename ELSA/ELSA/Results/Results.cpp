@@ -30,47 +30,6 @@ Results::Results(double simulationTime, double timeStep, unsigned int numberOfPa
 	}
 }
 
-
-Results::~Results()
-{
-	delete _cohesiveEnergy;
-	delete _debyeTemperature;
-	delete _diffusionConstant;
-	delete _internalPressure;
-	delete _kineticEnergy;
-	delete _meanSquareDisplacement;
-	delete _potentialEnergy;
-	delete _specificHeat;
-	delete _temperature;
-	delete _totalEnergy;
-
-	for (int t = 0; t < _arrayLength; t++)
-	{
-		for (int n = 0; n < _numberOfAtoms; n++)
-		{
-			delete _positions[t][n];
-		}
-		delete _positions[t];
-	}
-	delete _positions;
-}
-
-
-//For testing the 3D array. Delete if unnecessary.
-void Results::printPositions()
-{
-	for (unsigned int t = 0; t < _arrayLength; t++)
-	{
-		cout << "At time step " << t << ":" << endl;
-		for (unsigned int n = 0; n < _numberOfAtoms; n++)
-		{
-			cout << "   Atom " << n << " has position: (" << _positions[t][n][0] << ", " << _positions[t][n][1] << ", " << _positions[t][n][2] << ")!" << endl;
-		}
-		cout << endl;
-	}
-}
-
-
 //getters
 double** Results::getCohesiveEnergy()
 {
