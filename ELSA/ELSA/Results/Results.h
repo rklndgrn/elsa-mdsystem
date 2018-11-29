@@ -23,11 +23,25 @@ private:
 	double* _specificHeat;
 	double* _temperature;
 	double* _totalEnergy;
+	//ICE:
+	/*
+	std::vector<double> _cohesiveEnergy;
+	std::vector<double> _debyeTemperature;
+	std::vector<double> _diffusionConstant;
+	std::vector<double> _internalPressure;
+	std::vector<double> _kineticEnergy;
+	std::vector<double> _meanSquareDisplacement;
+	std::vector<std::vector<std::vector<double>>> _positions;
+	std::vector<double> _potentialEnergy;
+	std::vector<double> _specificHeat;
+	std::vector<double> _temperature;
+	std::vector<double> _totalEnergy;
+	*/
 
 public:
 	Results() = default;
 	Results(double, double, unsigned int);
-	~Results() = default;
+	~Results();
 
 	void printPositions();
 

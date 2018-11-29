@@ -89,6 +89,7 @@ int main()
 				myGui.getLastStateFileName(),
 				myMaterial);
 
+
 			World myWorld(myParameters, myGui.getNumberOfThreads());
 
 			double deltaT = myParameters.getTimeStep();
@@ -179,7 +180,6 @@ int main()
 
 			myVis.setNumberOfParticles(myParameters.getNumberOfAtoms());
 			myWorld.~World();
-			
 		}
 
 		//myGui.handlePlots();// , kinenen, totenen, tempen);

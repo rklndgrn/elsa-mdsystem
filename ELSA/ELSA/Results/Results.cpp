@@ -30,7 +30,7 @@ Results::Results(double simulationTime, double timeStep, unsigned int numberOfPa
 	}
 }
 
-/*
+
 Results::~Results()
 {
 	delete _cohesiveEnergy;
@@ -54,7 +54,6 @@ Results::~Results()
 	}
 	delete _positions;
 }
-*/
 
 
 //For testing the 3D array. Delete if unnecessary.
