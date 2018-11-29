@@ -29,7 +29,7 @@ int main()
 	int unitCellsY = 1;
 	int unitCellsZ = 1;
 	while ((glfwGetKey(myVis.getWindow(), GLFW_KEY_ESCAPE) != GLFW_PRESS &&
-		glfwWindowShouldClose(myVis.getWindow()) == 0))// || myGui.exitPressed() )
+		glfwWindowShouldClose(myVis.getWindow()) == 0) && !myGui.exitPressed() )
 	{
 		myGui.handleFrame();
 
