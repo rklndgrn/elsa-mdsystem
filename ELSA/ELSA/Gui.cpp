@@ -535,7 +535,7 @@ void Gui::handlePlots()
 {
 	bool auto_resize = false;
 	int numberOfTimeSteps = (int)round(_simulationTime / _timeStep);
-	_temp.resize(numberOfTimeSteps);
+	//_temp.resize(numberOfTimeSteps);
 	//ImGuiWindowFlags window_flags = 0;
 	ImGuiWindowFlags flags = auto_resize ? ImGuiWindowFlags_AlwaysAutoResize : 0;
 	flags |= ImGuiWindowFlags_NoResize;
