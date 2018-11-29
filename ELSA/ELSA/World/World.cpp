@@ -778,9 +778,9 @@ World::~World()
 	{
 		delete c;
 	}
-	//_myResults.~Results();
-	//_myParameters.~Parameters();
-	//_mySimulation.~Simulation();
+	_myResults.~Results();
+	_myParameters.~Parameters();
+	_mySimulation.~Simulation();
 }
 
 //Get atom from the atom list at index
