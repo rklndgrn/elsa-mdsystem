@@ -19,7 +19,7 @@
 //#include "imgui-master\imgui_plot.h"
 
 #pragma once
-#define _maxTimeSteps 7500
+
 class Gui
 {
 private:

@@ -536,243 +536,229 @@ void Gui::handlePlots()
 
 		if (ImGui::CollapsingHeader("Cohesive energy"))
 		{
-			float cohEnEnD[_maxTimeSteps];
+			std::vector<float>* cohesiveVector = new std::vector<float>;
 			float max = -1E15;
 			float min = 1E15;
 			float sumLast10 = 0;
 
 			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
-				cohEnEnD[i] = static_cast<float>(_cohesiveEnergy[i + 1]) / _elementaryCharge;
-				if (cohEnEnD[i] > max) { max = cohEnEnD[i]; }
-				else if (cohEnEnD[i] < min) { min = cohEnEnD[i]; }
+				cohesiveVector->push_back(static_cast<float>(_cohesiveEnergy[i + 1]) / _elementaryCharge);
+
+				if (cohesiveVector->at(i) > max) { max = cohesiveVector->at(i); }
+				else if (cohesiveVector->at(i) < min) { min = cohesiveVector->at(i); }
+
 				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
 				{
-					sumLast10 += cohEnEnD[i];
+					sumLast10 += cohesiveVector->at(i);
 				}
 			}
 
-			ImGui::PlotLines("", cohEnEnD, numberOfTimeSteps - 1, 0, "Cohesive energy [eV]", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", cohesiveVector, numberOfTimeSteps - 1, 0, "Cohesive energy [eV]", min, max, ImVec2(1700, 480));
 			printStatistics(min, max, sumLast10);
+			delete cohesiveVector;
 		}
 		if (ImGui::CollapsingHeader("Debye Temperature"))
 		{
-			float debyeTempEnD[_maxTimeSteps];
+			std::vector<float>* debyeTempVector = new std::vector<float>;
 			float max = -1E15;
 			float min = 1E15;
 			float sumLast10 = 0;
 
 			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
-				debyeTempEnD[i] = static_cast<float>(_debyeTemperature[i + 1]);
-				if (debyeTempEnD[i] > max) { max = debyeTempEnD[i]; }
-				else if (debyeTempEnD[i] < min) { min = debyeTempEnD[i]; }
+				debyeTempVector->push_back(static_cast<float>(_debyeTemperature[i + 1]));
+				if (debyeTempVector->at(i) > max) { max = debyeTempVector->at(i); }
+				else if (debyeTempVector->at(i) < min) { min = debyeTempVector->at(i); }
 				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
 				{
-					sumLast10 += debyeTempEnD[i];
+					sumLast10 += debyeTempVector->at(i);
 				}
 			}
 
-			ImGui::PlotLines("", debyeTempEnD, numberOfTimeSteps - 1, 0, "Debye Temperature [K]", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", debyeTempVector, numberOfTimeSteps - 1, 0, "Debye Temperature [K]", min, max, ImVec2(1700, 480));
 			printStatistics(min, max, sumLast10);
+			delete debyeTempVector;
 
 		}
 		if (ImGui::CollapsingHeader("Internal pressure"))
 		{
-			float pressureEnD[_maxTimeSteps];
+			std::vector<float>* pressureVector = new std::vector<float>;
 			float max = -1E15;
 			float min = 1E15;
 			float sumLast10 = 0;
 
 			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
-				pressureEnD[i] = static_cast<float>(_pressure[i + 1]);
-				if (pressureEnD[i] > max) { max = pressureEnD[i]; }
-				else if (pressureEnD[i] < min) { min = pressureEnD[i]; }
+				pressureVector->push_back(static_cast<float>(_pressure[i + 1]));
+				if (pressureVector->at(i) > max) { max = pressureVector->at(i); }
+				else if (pressureVector->at(i) < min) { min = pressureVector->at(i); }
 				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
 				{
-					sumLast10 += pressureEnD[i];
+					sumLast10 += pressureVector->at(i);
 				}
 			}
 
-			ImGui::PlotLines("", pressureEnD, numberOfTimeSteps - 1, 0, "Internal pressure [Pa]", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", pressureVector, numberOfTimeSteps - 1, 0, "Internal pressure [Pa]", min, max, ImVec2(1700, 480));
 			printStatistics(min, max, sumLast10);
-
+			delete pressureVector;
 		}
 		if (ImGui::CollapsingHeader("Kinetic energy"))
 		{
-			float kinEnD[_maxTimeSteps];
+			std::vector<float>* kineticVector = new std::vector<float>;
 			float max = -1E15;
 			float min = 1E15;
 			float sumLast10 = 0;
 
 			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
-				kinEnD[i] = static_cast<float>(_kineticEnergy[i + 1]) / _elementaryCharge;
-				if (kinEnD[i] > max) { max = kinEnD[i]; }
-				else if (kinEnD[i] < min) { min = kinEnD[i]; }
+				kineticVector->push_back(static_cast<float>(_kineticEnergy[i + 1]) / _elementaryCharge);
+				if (kineticVector->at(i) > max) { max = kineticVector->at(i); }
+				else if (kineticVector->at(i) < min) { min = kineticVector->at(i); }
 				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
 				{
-					sumLast10 += kinEnD[i];
+					sumLast10 += kineticVector->at(i);
 				}
 			}
-			ImGui::PlotLines("", kinEnD, numberOfTimeSteps - 1, 0, "Kinetic energy [eV]", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", kineticVector, numberOfTimeSteps - 1, 0, "Kinetic energy [eV]", min, max, ImVec2(1700, 480));
 			printStatistics(min, max, sumLast10);
+			delete kineticVector;
 		}
 		if (ImGui::CollapsingHeader("Mean square displacement"))
 		{
-			float msdEnD[_maxTimeSteps];
+			std::vector<float>* meanSquareVector = new std::vector<float>;
 			float max = -1E15;
 			float min = 1E15;
 			float sumLast10 = 0;
 
 			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
-				msdEnD[i] = 1e20*static_cast<float>(_meanSquareDisplacement[i + 1]);
-				if (msdEnD[i] > max) { max = msdEnD[i]; }
-				else if (msdEnD[i] < min) { min = msdEnD[i]; }
+				meanSquareVector->push_back(1e20*static_cast<float>(_meanSquareDisplacement[i + 1]));
+				if (meanSquareVector->at(i) > max) { max = meanSquareVector->at(i); }
+				else if (meanSquareVector->at(i) < min) { min = meanSquareVector->at(i); }
 				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
 				{
-					sumLast10 += msdEnD[i];
+					sumLast10 += meanSquareVector->at(i);
 				}
 			}
 
-			ImGui::PlotLines("", msdEnD, numberOfTimeSteps - 1, 0, "Mean square displacement [Angstrom^2]", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", meanSquareVector, numberOfTimeSteps - 1, 0, "Mean square displacement [Angstrom^2]", min, max, ImVec2(1700, 480));
 			printStatistics(min, max, sumLast10);
-
+			delete meanSquareVector;
 		}
-		if (ImGui::CollapsingHeader("Potential energy vector"))
+		if (ImGui::CollapsingHeader("Potential energy"))
 		{
-			std::vector<float> potentialVector;
+			std::vector<float>* potentialVector = new std::vector<float>;
 			float max = -1E15;
 			float min = 1E15;
 			float sumLast10 = 0;
 
 			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
-				potentialVector.push_back(static_cast<float>(_potentialEnergy[i + 1]) / _elementaryCharge);
+				potentialVector->push_back(static_cast<float>(_potentialEnergy[i + 1]) / _elementaryCharge);
 
-				if(potentialVector.at(i) > max) { max = potentialVector.at(i); }
-				else if (potentialVector.at(i) < min) { min = potentialVector.at(i); }
-
-				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
-				{
-					sumLast10 += potentialVector.at(i);
-				}
-			}
-
-			ImGui::PlotLines("", &potentialVector, numberOfTimeSteps - 1, 0, "Potential energy [eV]", min, max, ImVec2(1700, 480));
-			printStatistics(min, max, sumLast10);
-		}
-		if (ImGui::CollapsingHeader("Potential energy array"))
-		{
-			float potEnD[_maxTimeSteps];
-			float max = -1E15;
-			float min = 1E15;
-			float sumLast10 = 0;
-
-			for (int i = 0; i < numberOfTimeSteps - 1; i++)
-			{
-				potEnD[i] = static_cast<float>(_potentialEnergy[i + 1]) / _elementaryCharge;
-				if (potEnD[i] > max) { max = potEnD[i]; }
-				else if (potEnD[i] < min) { min = potEnD[i]; }
+				if(potentialVector->at(i) > max) { max = potentialVector->at(i); }
+				else if (potentialVector->at(i) < min) { min = potentialVector->at(i); }
 
 				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
 				{
-					sumLast10 += potEnD[i];
+					sumLast10 += potentialVector->at(i);
 				}
 			}
 
-			ImGui::PlotLines("", potEnD, numberOfTimeSteps - 1, 0, "Potential energy [eV]", min, max, ImVec2(1700, 480));
-
+			ImGui::PlotLines("", potentialVector, numberOfTimeSteps - 1, 0, "Potential energy [eV]", min, max, ImVec2(1700, 480));
 			printStatistics(min, max, sumLast10);
+			delete potentialVector;
 		}
 		if (ImGui::CollapsingHeader("Self diffusion coefficient"))
 		{
-			float selfDiffEnD[_maxTimeSteps];
+			std::vector<float>* selfDiffVector = new std::vector<float>;
 			float max = -1E15;
 			float min = 1E15;
 			float sumLast10 = 0;
 
 			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
-				selfDiffEnD[i] = static_cast<float>(_selfDiffusionCoeff[i + 1]);
-				if (selfDiffEnD[i] > max) { max = selfDiffEnD[i]; }
-				else if (selfDiffEnD[i] < min) { min = selfDiffEnD[i]; }
+				selfDiffVector->push_back(static_cast<float>(_selfDiffusionCoeff[i + 1]));
+				if (selfDiffVector->at(i) > max) { max = selfDiffVector->at(i); }
+				else if (selfDiffVector->at(i) < min) { min = selfDiffVector->at(i); }
 				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
 				{
-					sumLast10 += selfDiffEnD[i];
+					sumLast10 += selfDiffVector->at(i);
 				}
 			}
 
-			ImGui::PlotLines("", selfDiffEnD, numberOfTimeSteps - 1, 0, "Self diffusion coefficient [m^2 s^-1]", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", selfDiffVector, numberOfTimeSteps - 1, 0, "Self diffusion coefficient [m^2 s^-1]", min, max, ImVec2(1700, 480));
 			printStatistics(min, max, sumLast10);
+			delete selfDiffVector;
 
 		}
 		if (ImGui::CollapsingHeader("Specific heat"))
 		{
-			float specHeatEnD[_maxTimeSteps];
+			std::vector<float>* specificHeatVector = new std::vector<float>;
 			float max = -1E15;
 			float min = 1E15;
 			float sumLast10 = 0;
 
 			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
-				specHeatEnD[i] = static_cast<float>(_specificHeat[i + 1]);
-				if (specHeatEnD[i] > max) { max = specHeatEnD[i]; }
-				else if (specHeatEnD[i] < min) { min = specHeatEnD[i]; }
+				specificHeatVector->push_back(static_cast<float>(_specificHeat[i + 1]));
+				if (specificHeatVector->at(i) > max) { max = specificHeatVector->at(i); }
+				else if (specificHeatVector->at(i) < min) { min = specificHeatVector->at(i); }
 				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
 				{
-					sumLast10 += specHeatEnD[i];
+					sumLast10 += specificHeatVector->at(i);
 				}
 			}
 
-			ImGui::PlotLines("", specHeatEnD, numberOfTimeSteps - 1, 0, "Specific heat [J K^-1]", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", specificHeatVector, numberOfTimeSteps - 1, 0, "Specific heat [J K^-1]", min, max, ImVec2(1700, 480));
 			printStatistics(min, max, sumLast10);
-
+			delete specificHeatVector;
 		}
 
 		if (ImGui::CollapsingHeader("Temperature"))
 		{
-			float temp[_maxTimeSteps];
+			std::vector<float>* temperatureVector = new std::vector<float>;
 			float max = -1E15;
 			float min = 1E15;
 			float sumLast10 = 0;
 
 			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
-				temp[i] = static_cast<float>(_temp[i + 1]);
-				if (temp[i] > max) { max = temp[i]; }
-				else if (temp[i] < min) { min = temp[i]; }
+				temperatureVector->push_back(static_cast<float>(_temp[i + 1]));
+				if (temperatureVector->at(i) > max) { max = temperatureVector->at(i); }
+				else if (temperatureVector->at(i) < min) { min = temperatureVector->at(i); }
 				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
 				{
-					sumLast10 += temp[i];
+					sumLast10 += temperatureVector->at(i);
 				}
 			}
-			ImGui::PlotLines("", temp, numberOfTimeSteps - 1, 0, "Temperature [K]", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", temperatureVector, numberOfTimeSteps - 1, 0, "Temperature [K]", min, max, ImVec2(1700, 480));
 			printStatistics(min, max, sumLast10);
+			delete temperatureVector;
 		}
 		if (ImGui::CollapsingHeader("Total energy"))
 		{
-			float totEn[_maxTimeSteps];
+			std::vector<float>* totalEnergyVector = new std::vector<float>;
 			float max = -1E5;
 			float min = 1E5;
 			float sumLast10 = 0;
 
 			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
-				totEn[i] = static_cast<float>(_totalEnergy[i + 1]) /  _elementaryCharge;
-				if (totEn[i] > max) { max = totEn[i]; }
-				else if (totEn[i] < min) { min = totEn[i]; }
+				totalEnergyVector->push_back(static_cast<float>(_totalEnergy[i + 1]) /  _elementaryCharge);
+				if (totalEnergyVector->at(i) > max) { max = totalEnergyVector->at(i); }
+				else if (totalEnergyVector->at(i) < min) { min = totalEnergyVector->at(i); }
 				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
 				{
-					sumLast10 += totEn[i];
+					sumLast10 += totalEnergyVector->at(i);
 				}
 			}
 			//printf("Min: %f Max: %f", min, max);
 
-			ImGui::PlotLines("", totEn, numberOfTimeSteps - 1, 0, "Total energy [eV]", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", totalEnergyVector, numberOfTimeSteps - 1, 0, "Total energy [eV]", min, max, ImVec2(1700, 480));
 			printStatistics(min, max, sumLast10);
+			delete totalEnergyVector;
 		}
 
 
