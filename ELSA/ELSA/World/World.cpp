@@ -642,8 +642,8 @@ void World::setupSystem(Parameters p)
 //Update the results arrays.
 void World::updateResults(double elapsedTime, double T)
 {
-	double**** positionsArray = _myResults.getPositions();
-	double*** positions = *positionsArray;
+	//double*** positions = *positionsArray;
+	std::vector<std::vector<std::array<double, 3>>> positions = *_myResults.getPositions();
 	int index = (int)round(elapsedTime / _myParameters.getTimeStep());
 	int N = _myParameters.getNumberOfAtoms();
 

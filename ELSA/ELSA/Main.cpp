@@ -94,17 +94,19 @@ int main()
 
 			double deltaT = myParameters.getTimeStep();
 
-			double** cohesiveEnergyArray = myWorld.getResults().getCohesiveEnergy();
-			double** debyeTempArray = myWorld.getResults().getDebyeTemperature();
-			double** kinArray = myWorld.getResults().getKineticEnergy();
-			double** msdArray = myWorld.getResults().getMeanSquareDisplacement();
-			double**** posArray = myWorld.getResults().getPositions();
-			double** potArray = myWorld.getResults().getPotentialEnergy();
-			double** pressureArray = myWorld.getResults().getInternalPressure();
-			double** selfDiffArray = myWorld.getResults().getDiffusionConstant();
-			double** specificHeatArray = myWorld.getResults().getSpecificHeat();
-			double** tempArray = myWorld.getResults().getTemperature();
-			double** totArray = myWorld.getResults().getTotalEnergy();
+			/*
+			vector<double>* cohesiveEnergyArray = myWorld.getResults().getCohesiveEnergy();
+			std::vector<double>* debyeTempArray = myWorld.getResults().getDebyeTemperature();
+			std::vector<double>* kinArray = myWorld.getResults().getKineticEnergy();
+			std::vector<double>* msdArray = myWorld.getResults().getMeanSquareDisplacement();
+			std::vector<std::vector<std::array<double, 3>>>* posArray = myWorld.getResults().getPositions();
+			std::vector<double>* potArray = myWorld.getResults().getPotentialEnergy();
+			std::vector<double>* pressureArray = myWorld.getResults().getInternalPressure();
+			std::vector<double>* selfDiffArray = myWorld.getResults().getDiffusionConstant();
+			std::vector<double>* specificHeatArray = myWorld.getResults().getSpecificHeat();
+			std::vector<double>* tempArray = myWorld.getResults().getTemperature();
+			std::vector<double>* totArray = myWorld.getResults().getTotalEnergy();
+			*/
 
 			int index{ 0 };
 
@@ -161,17 +163,17 @@ int main()
 
 			saveLastState.close();
 
-			myGui._cohesiveEnergy = *cohesiveEnergyArray;
-			myGui._debyeTemperature = *debyeTempArray;
-			myGui._kineticEnergy = *kinArray;
-			myGui._meanSquareDisplacement = *msdArray;
-			myGui._pos = *posArray;
-			myGui._potentialEnergy = *potArray;
-			myGui._pressure = *pressureArray;
-			myGui._selfDiffusionCoeff = *selfDiffArray;
-			myGui._specificHeat = *specificHeatArray;
-			myGui._temp = *tempArray;
-			myGui._totalEnergy = *totArray;
+			myGui._cohesiveEnergy = *(myWorld.getResults().getCohesiveEnergy());
+			myGui._debyeTemperature = *(myWorld.getResults().getDebyeTemperature());
+			myGui._kineticEnergy = *(myWorld.getResults().getKineticEnergy());
+			myGui._meanSquareDisplacement = *(myWorld.getResults().getMeanSquareDisplacement());
+			myGui._pos = *(myWorld.getResults().getPositions());
+			myGui._potentialEnergy = *(myWorld.getResults().getPotentialEnergy());
+			myGui._pressure = *(myWorld.getResults().getInternalPressure());
+			myGui._selfDiffusionCoeff = *(myWorld.getResults().getDiffusionConstant());
+			myGui._specificHeat = *(myWorld.getResults().getSpecificHeat());
+			myGui._temp = *(myWorld.getResults().getTemperature());
+			myGui._totalEnergy = *(myWorld.getResults().getTotalEnergy());
 			maxVisualTime = (int)round(myParameters.getSimulationTime() / myParameters.getTimeStep());
 			latticeConstant = myParameters.getChosenMaterial().getLatticeConstant();
 			unitCellsX = myParameters.getNumberOfUnitCellsX();
@@ -179,7 +181,6 @@ int main()
 			unitCellsZ = myParameters.getNumberOfUnitCellsZ();
 
 			myVis.setNumberOfParticles(myParameters.getNumberOfAtoms());
-			myWorld.~World();
 		}
 
 		//myGui.handlePlots();// , kinenen, totenen, tempen);

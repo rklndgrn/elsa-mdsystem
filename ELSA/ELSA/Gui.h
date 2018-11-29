@@ -7,6 +7,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <vector>
 
 // Include GLFW
 #include <GLFW/glfw3.h>
@@ -102,17 +103,17 @@ public:
 
 	int _counter;
 
-	double* _cohesiveEnergy;
-	double* _debyeTemperature;
-	double* _kineticEnergy;
-	double* _meanSquareDisplacement;
-	double*** _pos;
-	double* _potentialEnergy;
-	double* _pressure;
-	double* _selfDiffusionCoeff;
-	double* _specificHeat;
-	double* _temp;
-	double* _totalEnergy;
+	std::vector<double> _cohesiveEnergy;
+	std::vector<double> _debyeTemperature;
+	std::vector<double> _kineticEnergy;
+	std::vector<double> _meanSquareDisplacement;
+	std::vector<std::vector<std::array<double, 3>>> _pos;
+	std::vector<double> _potentialEnergy;
+	std::vector<double> _pressure;
+	std::vector<double> _selfDiffusionCoeff;
+	std::vector<double> _specificHeat;
+	std::vector<double> _temp;
+	std::vector<double> _totalEnergy;
 
 	bool showCrystalSelector(const char* label);
 	bool showMaterialSelector(const char* label);

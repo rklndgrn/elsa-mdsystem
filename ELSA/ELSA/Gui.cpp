@@ -453,12 +453,32 @@ void Gui::loadResultsWindow()
 			{
 				std::string dummy;
 				int sizeOfFile{ 0 }, i{ 0 };
-				while (!myFile.eof()) { getline(myFile, dummy); sizeOfFile++; }
+				while (!myFile.eof()) 
+				{ 
+					getline(myFile, dummy); sizeOfFile++; 
+				}
 				myFile.close(); myFile.open(buf1);
-				if (_temp == NULL) { _temp = new double[sizeOfFile]; }
-				if (_totalEnergy == NULL) { _totalEnergy = new double[sizeOfFile]; }
-				if (_potentialEnergy == NULL) { _potentialEnergy = new double[sizeOfFile]; }
-				if (_kineticEnergy == NULL) { _kineticEnergy = new double[sizeOfFile]; }
+				//if (_temp == NULL) { _temp = new double[sizeOfFile]; }
+				//if (_totalEnergy == NULL) { _totalEnergy = new double[sizeOfFile]; }
+				//if (_potentialEnergy == NULL) { _potentialEnergy = new double[sizeOfFile]; }
+				//if (_kineticEnergy == NULL) { _kineticEnergy = new double[sizeOfFile]; }
+				printf("Size of file: %f", sizeOfFile);
+				if (_temp.size() == 0)
+				{
+					_temp.resize(sizeOfFile);
+				}
+				if (_totalEnergy.size() == 0)
+				{
+					_totalEnergy.resize(sizeOfFile);
+				}
+				if (_potentialEnergy.size() == 0)
+				{
+					_potentialEnergy.resize(sizeOfFile);
+				}
+				if (_kineticEnergy.size() == 0)
+				{
+					_kineticEnergy.resize(sizeOfFile);
+				}
 				std::getline(myFile, dummy);
 				while (!myFile.eof())
 				{
@@ -515,16 +535,16 @@ void Gui::handlePlots()
 {
 	bool auto_resize = false;
 	int numberOfTimeSteps = (int)round(_simulationTime / _timeStep);
+	_temp.resize(numberOfTimeSteps);
 	//ImGuiWindowFlags window_flags = 0;
 	ImGuiWindowFlags flags = auto_resize ? ImGuiWindowFlags_AlwaysAutoResize : 0;
 	flags |= ImGuiWindowFlags_NoResize;
 
-	if (_plotVisible)
+if (_plotVisible)
 	{
 		ImGui::Begin("Results", &_plotVisible, flags);
 		ImGui::SetWindowSize(ImVec2(glfwGetVideoMode(glfwGetPrimaryMonitor())->width, glfwGetVideoMode(glfwGetPrimaryMonitor())->height - 22));
 		ImGui::SetWindowPos(ImVec2(0, 22));
-
 
 		ImGui::Text("Potential energy: \n %E", _potentialEnergy[numberOfTimeSteps - 1]);
 		ImGui::SameLine();
@@ -536,7 +556,7 @@ void Gui::handlePlots()
 
 		if (ImGui::CollapsingHeader("Cohesive energy"))
 		{
-			float cohEnEnD[_maxTimeSteps];
+			float* cohEnEnD = new float[numberOfTimeSteps];
 			float max = -1E15;
 			float min = 1E15;
 			float sumLast10 = 0;
@@ -554,10 +574,11 @@ void Gui::handlePlots()
 
 			ImGui::PlotLines("", cohEnEnD, numberOfTimeSteps - 1, 0, "Cohesive energy [eV]", min, max, ImVec2(1700, 480));
 			printStatistics(min, max, sumLast10);
+			delete[] cohEnEnD;
 		}
 		if (ImGui::CollapsingHeader("Debye Temperature"))
 		{
-			float debyeTempEnD[_maxTimeSteps];
+			float* debyeTempEnD = new float[numberOfTimeSteps];
 			float max = -1E15;
 			float min = 1E15;
 			float sumLast10 = 0;
@@ -575,11 +596,11 @@ void Gui::handlePlots()
 
 			ImGui::PlotLines("", debyeTempEnD, numberOfTimeSteps - 1, 0, "Debye Temperature [K]", min, max, ImVec2(1700, 480));
 			printStatistics(min, max, sumLast10);
-
+			delete[] debyeTempEnD;
 		}
 		if (ImGui::CollapsingHeader("Internal pressure"))
 		{
-			float pressureEnD[_maxTimeSteps];
+			float* pressureEnD = new float[numberOfTimeSteps];
 			float max = -1E15;
 			float min = 1E15;
 			float sumLast10 = 0;
@@ -597,11 +618,11 @@ void Gui::handlePlots()
 
 			ImGui::PlotLines("", pressureEnD, numberOfTimeSteps - 1, 0, "Internal pressure [Pa]", min, max, ImVec2(1700, 480));
 			printStatistics(min, max, sumLast10);
-
+			delete[] pressureEnD;
 		}
 		if (ImGui::CollapsingHeader("Kinetic energy"))
 		{
-			float kinEnD[_maxTimeSteps];
+			float* kinEnD = new float[numberOfTimeSteps];
 			float max = -1E15;
 			float min = 1E15;
 			float sumLast10 = 0;
@@ -618,10 +639,11 @@ void Gui::handlePlots()
 			}
 			ImGui::PlotLines("", kinEnD, numberOfTimeSteps - 1, 0, "Kinetic energy [eV]", min, max, ImVec2(1700, 480));
 			printStatistics(min, max, sumLast10);
+			delete[] kinEnD;
 		}
 		if (ImGui::CollapsingHeader("Mean square displacement"))
 		{
-			float msdEnD[_maxTimeSteps];
+			float* msdEnD = new float[numberOfTimeSteps];
 			float max = -1E15;
 			float min = 1E15;
 			float sumLast10 = 0;
@@ -639,11 +661,11 @@ void Gui::handlePlots()
 
 			ImGui::PlotLines("", msdEnD, numberOfTimeSteps - 1, 0, "Mean square displacement [Angstrom^2]", min, max, ImVec2(1700, 480));
 			printStatistics(min, max, sumLast10);
-
+			delete[] msdEnD;
 		}
 		if (ImGui::CollapsingHeader("Potential energy"))
 		{
-			float potEnD[_maxTimeSteps];
+			float* potEnD = new float[numberOfTimeSteps];
 			float max = -1E15;
 			float min = 1E15;
 			float sumLast10 = 0;
@@ -663,10 +685,11 @@ void Gui::handlePlots()
 			ImGui::PlotLines("", potEnD, numberOfTimeSteps - 1, 0, "Potential energy [eV]", min, max, ImVec2(1700, 480));
 
 			printStatistics(min, max, sumLast10);
+			delete[] potEnD;
 		}
 		if (ImGui::CollapsingHeader("Self diffusion coefficient"))
 		{
-			float selfDiffEnD[_maxTimeSteps];
+			float* selfDiffEnD = new float[numberOfTimeSteps];
 			float max = -1E15;
 			float min = 1E15;
 			float sumLast10 = 0;
@@ -684,11 +707,11 @@ void Gui::handlePlots()
 
 			ImGui::PlotLines("", selfDiffEnD, numberOfTimeSteps - 1, 0, "Self diffusion coefficient [m^2 s^-1]", min, max, ImVec2(1700, 480));
 			printStatistics(min, max, sumLast10);
-
+			delete[] selfDiffEnD;
 		}
 		if (ImGui::CollapsingHeader("Specific heat"))
 		{
-			float specHeatEnD[_maxTimeSteps];
+			float* specHeatEnD = new float[numberOfTimeSteps];
 			float max = -1E15;
 			float min = 1E15;
 			float sumLast10 = 0;
@@ -706,12 +729,12 @@ void Gui::handlePlots()
 
 			ImGui::PlotLines("", specHeatEnD, numberOfTimeSteps - 1, 0, "Specific heat [J kg^-1 K^-1]", min, max, ImVec2(1700, 480));
 			printStatistics(min, max, sumLast10);
-
+			delete[] specHeatEnD;
 		}
 
 		if (ImGui::CollapsingHeader("Temperature"))
 		{
-			float temp[_maxTimeSteps];
+			float* temp = new float[numberOfTimeSteps];
 			float max = -1E15;
 			float min = 1E15;
 			float sumLast10 = 0;
@@ -728,10 +751,11 @@ void Gui::handlePlots()
 			}
 			ImGui::PlotLines("", temp, numberOfTimeSteps - 1, 0, "Temperature [K]", min, max, ImVec2(1700, 480));
 			printStatistics(min, max, sumLast10);
+			delete[] temp;
 		}
 		if (ImGui::CollapsingHeader("Total energy"))
 		{
-			float totEn[_maxTimeSteps];
+			float* totEn = new float[numberOfTimeSteps];
 			float max = -1E5;
 			float min = 1E5;
 			float sumLast10 = 0;
@@ -750,6 +774,7 @@ void Gui::handlePlots()
 
 			ImGui::PlotLines("", totEn, numberOfTimeSteps - 1, 0, "Total energy [eV]", min, max, ImVec2(1700, 480));
 			printStatistics(min, max, sumLast10);
+			delete[] totEn;
 		}
 
 
