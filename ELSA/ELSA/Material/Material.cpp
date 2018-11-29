@@ -37,10 +37,6 @@ Material::Material(
 }
 
 
-Material::~Material()
-{}
-
-
 //getters
 double Material::getCellSize() const
 {

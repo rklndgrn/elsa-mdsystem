@@ -59,7 +59,7 @@ private:
 public:
 	World() = default;
 	World(Parameters, int);
-	~World() = default;
+	~World();
 
 	Results getResults();
 

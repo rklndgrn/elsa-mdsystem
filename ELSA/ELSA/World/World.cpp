@@ -642,8 +642,8 @@ void World::setupSystem(Parameters p)
 //Update the results arrays.
 void World::updateResults(double elapsedTime, double T)
 {
-	double**** positionsArray = _myResults.getPositions();
-	double*** positions = *positionsArray;
+	//double*** positions = *positionsArray;
+	std::vector<std::vector<std::array<double, 3>>> positions = *_myResults.getPositions();
 	int index = (int)round(elapsedTime / _myParameters.getTimeStep());
 	int N = _myParameters.getNumberOfAtoms();
 
@@ -763,6 +763,24 @@ World::World(Parameters p, int n)
 {
 	setNumberOfThreads(n);
 	setupSystem(p);
+}
+
+
+//Destructor.
+World::~World()
+{
+	for (Atom* a : _atomList)
+	{
+		delete a;
+	}
+	_atomList.clear();
+	for (Cell* c : _cellList)
+	{
+		delete c;
+	}
+	_myResults.~Results();
+	_myParameters.~Parameters();
+	_mySimulation.~Simulation();
 }
 
 //Get atom from the atom list at index
