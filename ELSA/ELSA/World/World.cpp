@@ -765,6 +765,37 @@ World::World(Parameters p, int n)
 	setupSystem(p);
 }
 
+
+//Destructor.
+World::~World()
+{
+	int arrayLength = (int) round(_myParameters.getSimulationTime()/_myParameters.getTimeStep());
+	delete *_myResults.getCohesiveEnergy();
+	delete *_myResults.getDebyeTemperature();
+	delete *_myResults.getDiffusionConstant();
+	delete *_myResults.getInternalPressure();
+	delete *_myResults.getKineticEnergy();
+	delete *_myResults.getMeanSquareDisplacement();
+	delete *_myResults.getPotentialEnergy();
+	delete *_myResults.getSpecificHeat();
+	delete *_myResults.getTemperature();
+	delete *_myResults.getTotalEnergy();
+	double**** posArray = _myResults.getPositions();
+	for (int t = 0; t < arrayLength; t++)
+	{
+		for (int n = 0; n < _myParameters.getNumberOfAtoms(); n++)
+		{
+			delete (*posArray)[t][n];
+		}
+		delete (*posArray)[t];
+	}
+	delete *posArray;
+	delete posArray;
+	_myResults.~Results();
+	_myParameters.~Parameters();
+	_mySimulation.~Simulation();
+}
+
 //Get atom from the atom list at index
 Atom* World::getAtomInAtomList(unsigned int index)
 {

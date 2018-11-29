@@ -178,6 +178,8 @@ int main()
 			unitCellsZ = myParameters.getNumberOfUnitCellsZ();
 
 			myVis.setNumberOfParticles(myParameters.getNumberOfAtoms());
+			myWorld.~World();
+			
 		}
 
 		//myGui.handlePlots();// , kinenen, totenen, tempen);
