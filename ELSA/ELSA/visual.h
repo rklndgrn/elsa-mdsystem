@@ -42,6 +42,7 @@ private:
 	std::array<_particle, _maxParticles> _particlesContainer;
 
 	bool _atomsVisible = false;
+	bool _is2D = false;
 
 	int _numberOfParticles;
 
@@ -103,6 +104,7 @@ public:
 	void mainLoopVisual(double***, int, int, double, int, int, int);
 	void openWindow();
 	void setAtomsVisible(bool visibility);
+	void setIs2D(bool);
 	void setNumberOfParticles(int);
 	void setParticleCameraDist(int id, float dist);
 	void setParticlePosition(int id, glm::vec3 pos);

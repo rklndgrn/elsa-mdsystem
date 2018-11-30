@@ -18,7 +18,10 @@ visual::~visual()
 	delete _gParticuleColorData;
 }
 
+
 // Public functions
+
+
 
 std::array<visual::_particle, _maxParticles> visual::getParticlesContainer()
 {
@@ -238,6 +241,15 @@ void visual::mainLoopVisual(double*** pos, int time, int maxTime, double lattice
 
 			_gParticulePositionSizeData[4 * ParticlesCount + 3] = _particlesContainer[i].size;
 
+			if (_is2D && (i < numberOfUnitCellsX*numberOfUnitCellsY * 4 || i > _numberOfParticles - numberOfUnitCellsX * numberOfUnitCellsY * 4))
+			{
+				setParticleColor(i, glm::vec4(255, 96, 4, 255));
+			}
+			else
+			{
+				setParticleColor(i, glm::vec4(4, 155, 255, 255));
+			}
+
 			_gParticuleColorData[4 * ParticlesCount + 0] = _particlesContainer[i].r;
 			_gParticuleColorData[4 * ParticlesCount + 1] = _particlesContainer[i].g;
 			_gParticuleColorData[4 * ParticlesCount + 2] = _particlesContainer[i].b;
@@ -340,6 +352,11 @@ void visual::openWindow()
 void visual::setAtomsVisible(bool visibility)
 {
 	_atomsVisible = visibility;
+}
+
+void visual::setIs2D(bool value)
+{
+	_is2D = value;
 }
 
 void visual::setNumberOfParticles(int number)

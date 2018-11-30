@@ -181,6 +181,7 @@ int main()
 			unitCellsZ = myParameters.getNumberOfUnitCellsZ();
 
 			myVis.setNumberOfParticles(myParameters.getNumberOfAtoms());
+			myVis.setIs2D(myParameters.getIs2D());
 		}
 
 		//myGui.handlePlots();// , kinenen, totenen, tempen);
