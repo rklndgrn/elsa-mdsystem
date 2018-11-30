@@ -13,6 +13,9 @@ private:
 public:
 	Simulation() = default;
 	Simulation(Material &);
+	//Simulation(Simulation const&); //Copy constructor.
+	//Simulation & operator = (Simulation const&); //Copy allocation.
+
 
 	~Simulation() = default;
 
@@ -32,5 +35,7 @@ public:
 	std::array<double, 3> calcPosition(std::array<double, 3>, std::array<double, 3>, std::array<double, 3>, double);
 	std::array<double, 3> calcVelocity(std::array<double, 3>, std::array<double, 3>, std::array<double, 3>, double);
 	std::array<double, 3> generateGaussianVelocity(double);
+
+	Material getMaterial() const;
 
 };

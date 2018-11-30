@@ -9,6 +9,22 @@ Simulation::Simulation(Material & mat) :
 	_mat{mat}
 {};
 
+/*
+//Copy constructor, e.g. m2{m}.
+Simulation::Simulation(Simulation const& other)
+{
+	_mat = other.getMaterial();
+}
+
+
+//Copy allocation, e.g. m2 = m.
+Simulation & Simulation::operator = (Simulation const& other)
+{
+	_mat = other.getMaterial();
+
+	return *this;
+}
+*/
 
 //Get debye temperature
 double Simulation::calcDebyeTemperature(double hBar, double T, double m, double kB, double MSD)
@@ -272,6 +288,12 @@ array<double, 3> Simulation::generateGaussianVelocity(double variance)
 	}
 
 	return v;
+}
+
+//Getters
+Material Simulation::getMaterial() const
+{
+	return _mat;
 }
 
 

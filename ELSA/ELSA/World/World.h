@@ -58,20 +58,22 @@ private:
 
 public:
 	World() = default;
-	World(Parameters &, Simulation &, int);
+	World(Parameters, int);
 	~World() = default;
-	/*
 	World(World const&); //Copy constructor.
 	World & operator = (World const&); //Copy allocation.
+	/*
 	World(World &&); //Move constructor.s
 	World & operator = (World &&); //Move allocation.
 	*/
 
-	Results getResults();
+	Parameters getParameters() const;
+	Results getResults() const;
+	Simulation getSimulation() const;
 
-	Atom* getAtomInAtomList(unsigned int);
+	Atom* getAtomInAtomList(unsigned int) const;
 
-	Cell* getCellInCellList(unsigned int, unsigned int, unsigned int);
+	Cell* getCellInCellList(unsigned int, unsigned int, unsigned int) const;
 
 	int getNumberOfThreads() const;
 

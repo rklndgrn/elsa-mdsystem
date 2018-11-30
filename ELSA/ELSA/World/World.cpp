@@ -756,24 +756,81 @@ void World::velocityVerletStep2(double elapsedTime)
 
 /* PUBLIC */
 //Constructor.
-World::World(Parameters & p, Simulation & s, int n)
+World::World(Parameters p, int n)
 {
 	_myParameters = p;
+	_mySimulation = Simulation(p.getChosenMaterial());
 	_myResults = Results(_myParameters.getSimulationTime(), _myParameters.getTimeStep(), _myParameters.getNumberOfAtoms());
-	_mySimulation = s;
 
 	setNumberOfThreads(n);
 	setupSystem(_myParameters);
 }
 
+//Copy constructor, e.g. r2{r].
+World::World(World const& other)
+{
+	_myParameters = other.getParameters();
+	_myResults = other.getResults();
+	_mySimulation = other.getSimulation();
+	_pressureRFSum = other._pressureRFSum;
+
+	setNumberOfThreads(other.getNumberOfThreads());
+
+	for (int i = 0; i < _myParameters.getNumberOfAtoms(); i++)
+	{
+		_atomList.push_back(other.getAtomInAtomList(i));
+	}
+	for (int k = 0; k < _myParameters.getNumberOfCellsK(); k++)
+	{
+		for (int j = 0; j < _myParameters.getNumberOfCellsJ(); j++)
+		{
+			for (int i = 0; i < _myParameters.getNumberOfCellsI(); i++)
+			{
+				_cellList.push_back(other.getCellInCellList(i, j, k));
+			}
+		}
+	}
+}
+
+//Copy allocation, t.ex. r = r2{other}.
+World & World::operator = (World const& other)
+{
+	_myParameters = other.getParameters();
+	_myResults = other.getResults();
+	_mySimulation = other.getSimulation();
+	_pressureRFSum = other._pressureRFSum;
+
+	setNumberOfThreads(other.getNumberOfThreads());
+	_atomList.clear();
+	_cellList.clear();
+	
+
+	for (int i = 0; i < _myParameters.getNumberOfAtoms(); i++)
+	{
+		_atomList.push_back(other.getAtomInAtomList(i));
+	}
+	for (int k = 0; k < _myParameters.getNumberOfCellsK(); k++)
+	{
+		for (int j = 0; j < _myParameters.getNumberOfCellsJ(); j++)
+		{
+			for (int i = 0; i < _myParameters.getNumberOfCellsI(); i++)
+			{
+				_cellList.push_back(other.getCellInCellList(i, j, k));
+			}
+		}
+	}
+
+	return *this;
+}
+
 //Get atom from the atom list at index
-Atom* World::getAtomInAtomList(unsigned int index)
+Atom* World::getAtomInAtomList(unsigned int index) const
 {
 	return _atomList.at(index);
 }
 
 //Get cell from the cell list at index i, j, k
-Cell* World::getCellInCellList(unsigned int i, unsigned int j, unsigned int k)
+Cell* World::getCellInCellList(unsigned int i, unsigned int j, unsigned int k) const
 {
 	unsigned int index = i + j * _myParameters.getNumberOfCellsI() + k * _myParameters.getNumberOfCellsI()*_myParameters.getNumberOfCellsJ();
 	return _cellList.at(index);
@@ -784,10 +841,20 @@ int World::getNumberOfThreads() const
 	return numberOfThreads;
 }
 
+Parameters World::getParameters() const
+{
+	return _myParameters;
+}
+
 //Returns results object
-Results World::getResults()
+Results World::getResults() const
 {
 	return _myResults;
+}
+
+Simulation World::getSimulation() const
+{
+	return _mySimulation;
 }
 
 //Gets the volume of the simulation box

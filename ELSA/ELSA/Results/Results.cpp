@@ -6,7 +6,7 @@ using namespace std;
 
 Results::Results(double simulationTime, double timeStep, unsigned int numberOfParticles)
 {
-	cout << "ctor " << this << endl;
+	//cout << "Results ctor " << this << endl;
 	_arrayLength = (int) round(simulationTime/timeStep);
 	_numberOfAtoms = numberOfParticles;
 
@@ -36,6 +36,7 @@ Results::Results(double simulationTime, double timeStep, unsigned int numberOfPa
 //Copy constructor, e.g. r2{r].
 Results::Results(Results const& other)
 {
+	//cout << "Results copy constructor " << this << endl;
 	_arrayLength = other.getArrayLength();
 	_numberOfAtoms = other.getNumberOfAtoms();
 
@@ -86,6 +87,7 @@ Results::Results(Results const& other)
 //Copy allocation, t.ex. r = r2{other}.
 Results & Results::operator = (Results const& other)
 {
+	//cout << "Results copy allocator " << this << endl;
 	//Delete everything.
 	delete[] _cohesiveEnergy;
 	delete[] _debyeTemperature;
@@ -159,8 +161,8 @@ Results & Results::operator = (Results const& other)
 
 Results::~Results()
 {
+	//cout << "Results dtor " << this << endl;
 	delete [] _cohesiveEnergy;
-	cout << "dtor " << this << endl;
 	delete [] _debyeTemperature;
 	delete [] _diffusionConstant;
 	delete [] _internalPressure;

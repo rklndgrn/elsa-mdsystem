@@ -21,7 +21,7 @@ Material::Material() :
 	_sigma{0},
 	_cutOffDistance{0},
 	_mass{0}
-{}
+{};
 
 Material::Material(
 	std::string crystalStructure,
@@ -39,30 +39,6 @@ Material::Material(
 {
 	//Calculate cell size from cut off distance
 	_cellSize = ceil(cutOffDistance / latticeConstant)*latticeConstant;
-}
-
-//Copy constructor, e.g. m2{m}.
-Material::Material(Material const& other)
-{
-	_cutOffDistance = other.getCutOffDistance();
-	double _cellSize = other.getCellSize();
-	double _epsilon = other.getEpsilon();
-	double _latticeConstant = other.getLatticeConstant();
-	double _mass = other.getMass();
-	double _sigma = other.getSigma();
-}
-
-//Copy allocation, e.g. m2 = m.
-Material & Material::operator = (Material const& other)
-{
-	_cutOffDistance = other.getCutOffDistance();
-	double _cellSize = other.getCellSize();
-	double _epsilon = other.getEpsilon();
-	double _latticeConstant = other.getLatticeConstant();
-	double _mass = other.getMass();
-	double _sigma = other.getSigma();
-
-	return *this;
 }
 
 //getters

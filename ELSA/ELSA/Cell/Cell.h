@@ -15,6 +15,8 @@ public:
 	Cell() = default;
 	Cell(unsigned int, unsigned int, unsigned int);
 	~Cell() = default;
+	Cell(Cell const&); //Copy constructor.
+	Cell & operator = (Cell const&); //Copy allocation.
 
 	void addAtomToCellList(Atom* newAtom);
 	void clearAtomsInCellList();
