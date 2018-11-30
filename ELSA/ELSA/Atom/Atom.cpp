@@ -29,13 +29,9 @@ Atom::Atom(Atom const& other)
 	_force[1] = other.getForceY();
 	_force[2] = other.getForceZ();
 
-	Atom* a;
 	for (int i = 0; other.getNeighbourList().size(); i++)
-	{
-		a = new Atom;
-		a = other.getNeighbourList().at(i);
-		
-		_neighbourList.push_back(a);
+	{		
+		_neighbourList.push_back(other.getNeighbourList().at(i));
 	}
 
 	_position[0] = other.getPositionX();
@@ -50,10 +46,12 @@ Atom::Atom(Atom const& other)
 //Copy allocation, t.ex. r = r2{other}.
 Atom & Atom::operator = (Atom const& other)
 {
+	/*
 	for (Atom* a: _neighbourList)
 	{
 		delete a;
 	}
+	*/
 	_neighbourList.clear();
 
 	_id = other.getID();
@@ -90,6 +88,25 @@ Atom & Atom::operator = (Atom const& other)
 
 	return *this;
 }
+
+/*
+//Destructor
+Atom::~Atom()
+{
+	cout << _id << " dtor " << this << endl;
+	if (_neighbourList.size() > 0)
+	{
+		for (Atom* a : _neighbourList)
+		{
+			if (a != nullptr)
+			{
+				delete a;
+			}
+		}
+	}
+	_neighbourList.clear();
+}
+*/
 
 
 //Append atom to neighbour list

@@ -14,25 +14,32 @@ using namespace std;
 
 int main()
 {
-	Atom r1(0, 0, 0, 0);
-	Atom r2{r1};
-	Atom r3{1, 5, 5, 5};
-	r1.addToNeighbourList(&r3);
-	Atom r4 = r3;
+	cout << "Hello!" << endl;
 
-	cout << "ID for r1: " << r1.getID() << endl;
-	cout << "ID for r2: " << r2.getID() << endl;
+	if (true)
+	{
+		Atom r1(0, 0, 0, 0);
+		Atom r2{ r1 };
+		Atom r3{ 1, 5, 5, 5 };
+		r1.addToNeighbourList(&r3);
+		r2.addToNeighbourList(&r3);
+		Atom r4 = r3;
 
-	cout << "Neighbour list size for r1: " << r1.getNeighbourList().size() << endl;
-	cout << "Neighbour list size for r2: " << r2.getNeighbourList().size() << endl;
+		cout << "ID for r1: " << r1.getID() << endl;
+		cout << "ID for r2: " << r2.getID() << endl;
 
-	cout << "Array length for r3: " << r3.getID() << endl;
-	cout << "Array length for r4: " << r4.getID() << endl;
+		cout << "Neighbour list size for r1: " << r1.getNeighbourList().size() << endl;
+		cout << "Neighbour list size for r2: " << r2.getNeighbourList().size() << endl;
 
-	cout << "Neighbour list size for r3: " << r3.getNeighbourList().size() << endl;
-	cout << "Neighbour list size for r4: " << r4.getNeighbourList().size() << endl;
+		cout << "Array length for r3: " << r3.getID() << endl;
+		cout << "Array length for r4: " << r4.getID() << endl;
 
-	cout << "ID for element in r1s neighbour list: " << r1.getNeighbourList().at(0)->getID() << endl;
+		cout << "Neighbour list size for r3: " << r3.getNeighbourList().size() << endl;
+		cout << "Neighbour list size for r4: " << r4.getNeighbourList().size() << endl;
+
+		cout << "ID for element in r1s neighbour list: " << &r1.getNeighbourList().at(0) << endl;
+		cout << "ID for element in r2s neighbour list: " << &r2.getNeighbourList().at(0) << endl;
+	}
 
 	char c;
 

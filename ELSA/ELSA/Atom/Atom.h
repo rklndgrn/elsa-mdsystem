@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <vector>
 #include <array>
+#include <iostream>
 
 class Atom
 {
