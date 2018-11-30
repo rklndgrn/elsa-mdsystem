@@ -19,7 +19,7 @@ Gui::Gui()
 	_numberOfUnitCellsX = 10;
 	_numberOfUnitCellsY = 10;
 	_numberOfUnitCellsZ = 10;
-	_temperature = 10;
+	_initialTemperature = 10;
 	_collisionPercentage = 0.2;
 	_thermostat = false;
 	_useLastSimulationState = false;
@@ -27,65 +27,7 @@ Gui::Gui()
 	_2D = false;
 }
 
-void Gui::setupGui(GLFWwindow *window)
-{
-
-	const char* glsl_version = "#version 330";
-
-	//Setup Dear ImGui context
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
-
-	// Setup Platform/Renderer bindings
-	ImGui_ImplGlfw_InitForOpenGL(window, true);
-	ImGui_ImplOpenGL3_Init(glsl_version);
-
-	ImGui::StyleColorsLight();
-
-	io.Fonts->AddFontFromFileTTF("imgui-master/misc/fonts/Roboto-Medium.ttf", 16.0f);
-}
-
-void Gui::show()
-{
-	_visible = true;
-}
-
-bool Gui::visible() const
-{
-	return _visible;
-}
-
-bool Gui::simulate() const
-{
-	return _simulate;
-}
-
-void Gui::stopSimulate()
-{
-	_simulate = false;
-	_simulationWindow = false;
-	_plotVisible = true;
-}
-
-void Gui::hide()
-{
-	_visible = false;
-}
-
-void Gui::showHelpMarker(const char* desc)
-{
-	ImGui::TextDisabled("(?)");
-	if (ImGui::IsItemHovered())
-	{
-		ImGui::BeginTooltip();
-		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-		ImGui::TextUnformatted(desc);
-		ImGui::PopTextWrapPos();
-		ImGui::EndTooltip();
-	}
-}
+// Private functions
 
 void Gui::printStatistics(double min, double max, double sumLast10)
 {
@@ -101,24 +43,21 @@ void Gui::printStatistics(double min, double max, double sumLast10)
 	ImGui::Text(buf);
 }
 
-std::string Gui::getCrystalType()
+// Public functions
+
+bool Gui::exitPressed() const
 {
-	return _crystalType;
+	return _exitPressed;
 }
 
-double Gui::getTemperature()
+bool Gui::isInitializing() const
 {
-	return _temperature;
+	return _initializing;
 }
 
-double Gui::getTimeStep()
+bool Gui::is2D()
 {
-	return _timeStep;
-}
-
-double Gui::getSimulationTime()
-{
-	return _simulationTime;
+	return _2D;
 }
 
 bool Gui::isThermostat()
@@ -129,71 +68,6 @@ bool Gui::isThermostat()
 bool Gui::isUseLastSimulationState()
 {
 	return _useLastSimulationState;
-}
-
-void Gui::setMainVisible(bool vis)
-{
-	_mainVisible = vis;
-}
-
-bool Gui::is2D()
-{
-	return _2D;
-}
-
-int Gui::getNumberOfUnitCellsX()
-{
-	return _numberOfUnitCellsX;
-}
-
-int Gui::getNumberOfUnitCellsY()
-{
-	return _numberOfUnitCellsY;
-}
-
-int Gui::getNumberOfUnitCellsZ()
-{
-	return _numberOfUnitCellsZ;
-}
-
-double Gui::getLatticeConstant()
-{
-	return _latticeConstant;
-}
-
-double Gui::getEpsilon()
-{
-	return _epsilon;
-}
-
-double Gui::getSigma()
-{
-	return _sigma;
-}
-
-double Gui::getCutOffDistance()
-{
-	return _cutOffDistance;
-}
-
-double Gui::getMass()
-{
-	return _mass;
-}
-
-int Gui::getNumberOfThreads()
-{
-	return _numberOfThreads;
-}
-
-double Gui::getCollisionPercentage()
-{
-	return _collisionPercentage;
-}
-
-char* Gui::getLastStateFileName()
-{
-	return _lastStateFileName;
 }
 
 bool Gui::showCrystalSelector(const char* label)
@@ -215,7 +89,7 @@ bool Gui::showCrystalSelector(const char* label)
 bool Gui::showMaterialSelector(const char* label)
 {
 	static int style_idx = 0;
-	const char* items[] = { "Ag: Silver", "Ar: Argon", "He: Helium", "Kr: Krypton", "Ne: Neon", "Xe: Xenon"};
+	const char* items[] = { "Ag: Silver", "Ar: Argon", "He: Helium", "Kr: Krypton", "Ne: Neon", "Xe: Xenon" };
 	double boltzmann = 1.38064852e-23;
 	double unitMass = (1.660539040e-27);
 	if (ImGui::Combo(label, &style_idx, items, IM_ARRAYSIZE(items)))
@@ -268,14 +142,14 @@ bool Gui::showMaterialSelector(const char* label)
 bool Gui::showThreadSelector(const char* label)
 {
 	static int style_idx = _numberOfThreads;
-	const char* items[] = {"1", "2", "3", "4", "5", "6", "7", "8"};
+	const char* items[] = { "1", "2", "3", "4", "5", "6", "7", "8" };
 	//const char* items = items_tmp;
 	if (ImGui::Combo(label, &style_idx, items, IM_ARRAYSIZE(items)))
 	{
 		switch (style_idx)
 		{
 		case 1: _numberOfThreads = 1;
-				break;
+			break;
 		case 2: _numberOfThreads = 2;
 			break;
 		case 3: _numberOfThreads = 3;
@@ -297,6 +171,213 @@ bool Gui::showThreadSelector(const char* label)
 	return false;
 }
 
+bool Gui::simulate() const
+{
+	return _simulate;
+}
+
+bool Gui::visible() const
+{
+	return _visible;
+}
+
+bool Gui::VisualVisible() const
+{
+	return _visualVisible;
+}
+
+char* Gui::getLastStateFileName()
+{
+	return _lastStateFileName;
+}
+
+double Gui::getCollisionPercentage()
+{
+	return _collisionPercentage;
+}
+
+double Gui::getCutOffDistance()
+{
+	return _cutOffDistance;
+}
+
+double Gui::getEpsilon()
+{
+	return _epsilon;
+}
+
+double Gui::getLatticeConstant()
+{
+	return _latticeConstant;
+}
+
+double Gui::getMass()
+{
+	return _mass;
+}
+
+double Gui::getSigma()
+{
+	return _sigma;
+}
+
+double Gui::getSimulationTime()
+{
+	return _simulationTime;
+}
+
+double Gui::getTemperature()
+{
+	return _initialTemperature;
+}
+
+double Gui::getTimeStep()
+{
+	return _timeStep;
+}
+
+double* Gui::getCohesiveEnergy() const
+{
+	return _cohesiveEnergy;
+}
+
+double* Gui::getDebyeTemperature() const
+{
+	return _debyeTemperature;
+}
+
+double* Gui::getKineticEnergy() const
+{
+	return _kineticEnergy;
+}
+
+double* Gui::getMeanSquareDisplacement() const
+{
+	return _meanSquareDisplacement;
+}
+
+double* Gui::getPotentialEnergy() const
+{
+	return _potentialEnergy;
+}
+
+double* Gui::getPressure() const
+{
+	return _pressure;
+}
+
+double* Gui::getSelfDiffusionCoefficient() const
+{
+	return _selfDiffusionCoefficient;
+}
+
+double* Gui::getSpecificHeat() const
+{
+	return _specificHeat;
+}
+
+double* Gui::getSimulatedTemperature() const
+{
+	return _simulatedTemperature;
+}
+
+double* Gui::getTotalEnergy() const
+{
+	return _totalEnergy;
+}
+
+double*** Gui::getPositions() const
+{
+	return _positions;
+}
+
+int Gui::getNumberOfUnitCellsX()
+{
+	return _numberOfUnitCellsX;
+}
+
+int Gui::getNumberOfUnitCellsY()
+{
+	return _numberOfUnitCellsY;
+}
+
+int Gui::getNumberOfUnitCellsZ()
+{
+	return _numberOfUnitCellsZ;
+}
+
+int Gui::getNumberOfThreads()
+{
+	return _numberOfThreads;
+}
+
+void Gui::showHelpMarker(const char* desc)
+{
+	ImGui::TextDisabled("(?)");
+	if (ImGui::IsItemHovered())
+	{
+		ImGui::BeginTooltip();
+		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+		ImGui::TextUnformatted(desc);
+		ImGui::PopTextWrapPos();
+		ImGui::EndTooltip();
+	}
+}
+
+std::string Gui::getCrystalType()
+{
+	return _crystalType;
+}
+
+void Gui::handleCollapsingHeaders()
+{
+	handleConfigurationHeader();
+	handleSettingsHeader();
+}
+
+void Gui::handleConfigurationHeader()
+{
+
+	if (ImGui::CollapsingHeader("Simulation parameters"))
+	{
+		ImGuiIO& io = ImGui::GetIO();
+
+		if (showThreadSelector("Number of threads"))
+			showThreadSelector("th");
+
+		ImGui::InputDouble("Temperature [K]", &_initialTemperature, 0.0f, 0.0f, "%e");
+		ImGui::SameLine();
+		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");
+
+		ImGui::InputDouble("Time step length [s]", &_timeStep, 0.0f, 0.0f, "%e");
+		ImGui::SameLine();
+		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");
+
+		ImGui::InputDouble("Simulation time [s]", &_simulationTime, 0.0f, 0.0f, "%e");
+		ImGui::SameLine();
+		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");
+
+		ImGui::InputDouble("Collision probabilty [1]", &_collisionPercentage, 0.0f, 0.0f, "%e");
+		ImGui::SameLine();
+		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");
+
+		ImGui::InputDouble("Cut off distance [m]", &_cutOffDistance, 0.0f, 0.0f, "%e");
+		ImGui::SameLine();
+		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n This should be greater than the lattice constant. \n");
+
+		ImGui::InputInt("Number of unit cells x [1]", &_numberOfUnitCellsX);
+		ImGui::InputInt("Number of unit cells y [1]", &_numberOfUnitCellsY);
+		ImGui::InputInt("Number of unit cells z [1]", &_numberOfUnitCellsZ);
+
+		ImGui::Checkbox("Anderson thermostat", &_thermostat);
+		ImGui::Checkbox("2D simulation", &_2D);
+		ImGui::Checkbox("Init from end of last simulation", &_useLastSimulationState);
+		ImGui::SameLine();
+		ImGui::InputText("", _lastStateFileName, 100);
+	}
+
+}
+
 void Gui::handleFrame()
 {
 	//Start the Dear ImGui frame
@@ -307,21 +388,20 @@ void Gui::handleFrame()
 
 void Gui::handleMenu(double elapsedTime, double totalTime, int* visualisationTime, int maxVisualTime, int* speed)
 {
-	//Menu
+	//The main menu in top of the window
 	if (ImGui::BeginMainMenuBar())
 	{
 		if (ImGui::BeginMenu("File"))
 		{
 			ImGui::MenuItem("Open result file", NULL, &_loadResultWindow);
 			ImGui::MenuItem("Save result file", NULL, &_saveResultWindow);
-	
+
 			if (ImGui::MenuItem("Exit", NULL)) { _exitPressed = true; }
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("View"))
 		{
 			ImGui::MenuItem("Main window", NULL, &_mainVisible);
-			//ImGui::MenuItem("Visualization window", NULL, &show_visual_window);
 			ImGui::MenuItem("Plot window", NULL, &_plotVisible);
 			ImGui::MenuItem("Visualization", NULL, &_visualVisible);
 			ImGui::EndMenu();
@@ -330,17 +410,17 @@ void Gui::handleMenu(double elapsedTime, double totalTime, int* visualisationTim
 		{
 			if (ImGui::BeginMenu("Style"))
 			{
-				if (ImGui::MenuItem("Light", "Ctrl+L"))
+				if (ImGui::MenuItem("Light"))//, "Ctrl+L"))
 				{
 					ImGui::StyleColorsLight();
 					glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
 				}
-				if (ImGui::MenuItem("Dark", "Ctrl+D"))
+				if (ImGui::MenuItem("Dark"))//, "Ctrl+D"))
 				{
 					ImGui::StyleColorsDark();
 					glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 				}
-				if (ImGui::MenuItem("Classic", "Ctrl+C"))
+				if (ImGui::MenuItem("Classic"))//, "Ctrl+C"))
 				{
 					ImGui::StyleColorsClassic();
 					glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
@@ -360,14 +440,6 @@ void Gui::handleMenu(double elapsedTime, double totalTime, int* visualisationTim
 		ImGui::SetWindowPos(ImVec2(60, 140));
 		handleCollapsingHeaders();
 		simulateButtonHandler();
-		//stopButtonHandler();
-		
-		//if (_simulate)
-		//{
-			//ImGui::Text("Simulating...");// , _counter);
-			//handleProgressBar(elapsedTime, totalTime);
-			
-		//}
 		ImGui::End();
 	}
 	handlePlots();
@@ -375,171 +447,6 @@ void Gui::handleMenu(double elapsedTime, double totalTime, int* visualisationTim
 	loadResultsWindow();
 	visualWindow(visualisationTime, maxVisualTime, speed);
 	simulationWindow(elapsedTime, totalTime);
-}
-
-void Gui::visualWindow(int* visualisationTime, int maxVisualTime, int* speed)
-{
-	bool auto_resize = false;
-	//ImGuiWindowFlags window_flags = 0;
-	ImGuiWindowFlags flags = auto_resize ? ImGuiWindowFlags_AlwaysAutoResize : 0;
-	flags |= ImGuiWindowFlags_NoResize;
-	if (_visualVisible)
-	{
-		ImGui::Begin("Visualization", &_visualVisible, flags);
-		ImGui::SetWindowSize(ImVec2(1200, 150));
-		ImGui::Text("Strafe by using w,a,s & d");
-		ImGui::Text("Zoom by using q & e");
-		ImGui::Text("Rotate by using i, j, k & l");
-		ImGui::SliderInt(" ", visualisationTime, 0, maxVisualTime, "Time: %d");
-		ImGui::SliderInt("", speed, 0, 8, "Speed: %d");
-		ImGui::SameLine();
-
-		//if (ImGui::Button("Pause"))
-		//{
-		//	_isVisualisationPause = !_isVisualisationPause;
-		//}
-		//if (_isVisualisationPause)
-		//{
-		//	_saveSpeed = *speed;
-		//	*speed = 1000;
-		//}
-		//else
-		//{
-		//	*speed = _saveSpeed;
-		//}
-		ImGui::End();
-	}
-
-
-}
-
-void Gui::simulationWindow(double elapsedTime, double totalTime)
-{
-	bool auto_resize = false;
-	//ImGuiWindowFlags window_flags = 0;
-	ImGuiWindowFlags flags = auto_resize ? ImGuiWindowFlags_AlwaysAutoResize : 0;
-	flags |= ImGuiWindowFlags_NoResize;
-	if (_simulationWindow)
-	{
-		ImGui::Begin("Simulation running...", &_simulationWindow, flags);
-		ImGui::SetWindowSize(ImVec2(900, 60));
-		handleProgressBar(elapsedTime, totalTime);
-		stopButtonHandler();
-		//if (!_simulate) { _simulationWindow = false; _simulate = false; }
-		ImGui::End();
-	}
-}
-
-void Gui::loadResultsWindow()
-{
-	bool auto_resize = false;
-	//ImGuiWindowFlags window_flags = 0;
-	ImGuiWindowFlags flags = auto_resize ? ImGuiWindowFlags_AlwaysAutoResize : 0;
-	flags |= ImGuiWindowFlags_NoResize;
-	if (_loadResultWindow && !simulate())
-	{
-		ImGui::Begin("Load results file...", &_loadResultWindow, flags);
-		ImGui::SetWindowSize(ImVec2(500, 110));
-		ImGui::Text("Enter the name of the file you want to open:");
-		static char buf1[64] = "./SaveData/"; 
-		ImGui::InputText(".txt", buf1, 64);
-		if (ImGui::Button("Load")) 
-		{
-			strcat(buf1, ".txt");
-			std::ifstream myFile;
-			myFile.open(buf1); 
-			if (!myFile.is_open()) { _unableToOpenFile = true; }
-			else 
-			{
-				std::string dummy;
-				int sizeOfFile{ 0 }, i{ 0 };
-				while (!myFile.eof()) { getline(myFile, dummy); sizeOfFile++; }
-				myFile.close(); myFile.open(buf1);
-
-				 _cohesiveEnergy = new double[sizeOfFile];
-				 _debyeTemperature = new double[sizeOfFile];
-				 _kineticEnergy = new double[sizeOfFile];
-				 _meanSquareDisplacement = new double[sizeOfFile];
-				 _potentialEnergy = new double[sizeOfFile];
-				 _pressure = new double[sizeOfFile];
-				 _selfDiffusionCoeff = new double[sizeOfFile];
-				 _specificHeat = new double[sizeOfFile];
-				 _temp = new double[sizeOfFile];
-				 _totalEnergy = new double[sizeOfFile];
-
-				std::getline(myFile, dummy);
-				std::getline(myFile, dummy);
-
-				while (!myFile.eof())
-				{
-					myFile >>  _cohesiveEnergy[i];
-					myFile >>  _debyeTemperature[i];
-					myFile >>  _kineticEnergy[i];
-					myFile >>  _meanSquareDisplacement[i];
-					myFile >>  _potentialEnergy[i];
-					myFile >>  _pressure[i];
-					myFile >>  _selfDiffusionCoeff[i];
-					myFile >>  _specificHeat[i];
-					myFile >>  _temp[i];
-					myFile >>  _totalEnergy[i];
-
-					i++;
-				}
-				myFile.close();
-				_loadResultWindow = false;
-				_unableToOpenFile = false;
-				_numberOfTimeStepsPlot = i-1;
-			}
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Cancel")) { _loadResultWindow = false; };
-		if(_unableToOpenFile) { ImGui::Text("Unable to open file..."); }
-		ImGui::End();
-	}
-}
-
-void Gui::saveResultsWindow()
-{
-	bool auto_resize = false;
-	//ImGuiWindowFlags window_flags = 0;
-	ImGuiWindowFlags flags = auto_resize ? ImGuiWindowFlags_AlwaysAutoResize : 0;
-	flags |= ImGuiWindowFlags_NoResize;
-	if (_saveResultWindow && !simulate())
-	{
-		ImGui::Begin("Save results file...", &_saveResultWindow, flags);
-		ImGui::SetWindowSize(ImVec2(500, 110));
-		ImGui::Text("Enter the name of the file you want to save to:");
-		static char buf1[64] = "./SaveData/"; ImGui::InputText(".txt", buf1, 64);
-		if (ImGui::Button("Save")) {
-			strcat(buf1, ".txt");
-			std::ofstream myFile;
-			myFile.open(buf1);
-
-
-
-			myFile << "Temperature [K] " << "Total energy [J] " << "Potential energy [J] " << "Kinetic energy [J] " << std::endl;
-
-			for (int i = 0; i < _numberOfTimeStepsPlot; i++)
-			{
-
-				myFile << _cohesiveEnergy[i] << " "
-					<< _debyeTemperature[i] << " "
-					<< _kineticEnergy[i] << " "
-					<< _meanSquareDisplacement[i] << " "
-					<< _potentialEnergy[i] << " "
-					<< _pressure[i] << " "
-					<< _selfDiffusionCoeff[i] << " "
-					<< _specificHeat[i] << " "
-					<< _temp[i] << " "
-					<< _totalEnergy[i] << std::endl;
-			}
-			myFile.close();
-			_saveResultWindow = false;
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Cancel")) { _saveResultWindow = false; };
-		ImGui::End();
-	}
 }
 
 void Gui::handlePlots()
@@ -563,7 +470,7 @@ void Gui::handlePlots()
 		ImGui::SameLine();
 		ImGui::Text("Total energy: \n %E", _totalEnergy[numberOfTimeSteps - 1]);
 		ImGui::SameLine();
-		ImGui::Text("Temperature: \n %E", _temp[numberOfTimeSteps - 1]);
+		ImGui::Text("Temperature: \n %E", _simulatedTemperature[numberOfTimeSteps - 1]);
 
 		if (ImGui::CollapsingHeader("Cohesive energy"))
 		{
@@ -688,7 +595,7 @@ void Gui::handlePlots()
 			{
 				potentialVector->push_back(static_cast<float>(_potentialEnergy[i + 1]) / _elementaryCharge);
 
-				if(potentialVector->at(i) > max) { max = potentialVector->at(i); }
+				if (potentialVector->at(i) > max) { max = potentialVector->at(i); }
 				else if (potentialVector->at(i) < min) { min = potentialVector->at(i); }
 
 				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
@@ -710,7 +617,7 @@ void Gui::handlePlots()
 
 			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
-				selfDiffVector->push_back(static_cast<float>(_selfDiffusionCoeff[i + 1]));
+				selfDiffVector->push_back(static_cast<float>(_selfDiffusionCoefficient[i + 1]));
 				if (selfDiffVector->at(i) > max) { max = selfDiffVector->at(i); }
 				else if (selfDiffVector->at(i) < min) { min = selfDiffVector->at(i); }
 				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
@@ -756,7 +663,7 @@ void Gui::handlePlots()
 
 			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
-				temperatureVector->push_back(static_cast<float>(_temp[i + 1]));
+				temperatureVector->push_back(static_cast<float>(_simulatedTemperature[i + 1]));
 				if (temperatureVector->at(i) > max) { max = temperatureVector->at(i); }
 				else if (temperatureVector->at(i) < min) { min = temperatureVector->at(i); }
 				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
@@ -777,7 +684,7 @@ void Gui::handlePlots()
 
 			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
-				totalEnergyVector->push_back(static_cast<float>(_totalEnergy[i + 1]) /  _elementaryCharge);
+				totalEnergyVector->push_back(static_cast<float>(_totalEnergy[i + 1]) / _elementaryCharge);
 				if (totalEnergyVector->at(i) > max) { max = totalEnergyVector->at(i); }
 				else if (totalEnergyVector->at(i) < min) { min = totalEnergyVector->at(i); }
 				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
@@ -797,76 +704,21 @@ void Gui::handlePlots()
 	}
 }
 
-void Gui::handleConfigurationHeader()
+void Gui::handleProgressBar(double elapsedTime, double totalTime)
 {
+	// Animate a simple progress bar
+	static float progress = 0.0f, progress_dir = 1.0f;
+	float quota = static_cast<float>(elapsedTime / totalTime);
+	progress = progress_dir * quota;
 
-	if (ImGui::CollapsingHeader("Simulation parameters"))
-	{
-		ImGuiIO& io = ImGui::GetIO();
-
-		if (showThreadSelector("Number of threads"))
-			showThreadSelector("th");
-
-		//if (showCrystalSelector("CrystalSelector"))
-		//	showCrystalSelector("cr");*/
-
-		//ImGui::Text("Temperature: ");
-		//ImGui::SameLine();
-		ImGui::InputDouble("Temperature [K]", &_temperature, 0.0f, 0.0f, "%e");
-		ImGui::SameLine();
-		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");
-
-		//ImGui::Text("Time step length: ");
-		//ImGui::SameLine();
-		ImGui::InputDouble("Time step length [s]", &_timeStep, 0.0f, 0.0f, "%e");
-		ImGui::SameLine();
-		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");
-
-		//ImGui::Text("Simulation time: ");
-		//ImGui::SameLine();
-		ImGui::InputDouble("Simulation time [s]", &_simulationTime, 0.0f, 0.0f, "%e");
-		ImGui::SameLine();
-		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");
-
-		//ImGui::Text("Collision frequency: ");
-		//ImGui::SameLine();
-		ImGui::InputDouble("Collision probabilty [1]", &_collisionPercentage, 0.0f, 0.0f, "%e");
-		ImGui::SameLine();
-		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");
-
-		//Cut off distance
-		ImGui::InputDouble("Cut off distance [m]", &_cutOffDistance, 0.0f, 0.0f, "%e");
-		ImGui::SameLine();
-		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n This should be greater than the lattice constant. \n");
-
-		//ImGui::Text("Number of unit cells x: ");
-		//ImGui::SameLine();
-		ImGui::InputInt("Number of unit cells x [1]", &_numberOfUnitCellsX);
-		/*ImGui::SameLine();
-		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");*/
-
-		//ImGui::Text("Number of unit cells y: ");
-		//ImGui::SameLine();
-		ImGui::InputInt("Number of unit cells y [1]", &_numberOfUnitCellsY);
-		/*ImGui::SameLine();
-		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");*/
-
-		//ImGui::Text("Number of unit cells z: ");
-		//ImGui::SameLine();
-		ImGui::InputInt("Number of unit cells z [1]", &_numberOfUnitCellsZ);
-		/*ImGui::SameLine();
-		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");*/
-
-		//ImGui::Checkbox("Visualization", &_visualization);      // Edit bools storing our window open/close state
-											
-		ImGui::Checkbox("Anderson thermostat", &_thermostat);
-		ImGui::Checkbox("2D simulation", &_2D);
-		ImGui::Checkbox("Init from end of last simulation", &_useLastSimulationState);
-		ImGui::SameLine();
-		ImGui::InputText("", _lastStateFileName, 100);
-	}
+	// Typically we would use ImVec2(-1.0f,0.0f) to use all available width, or ImVec2(width,0.0f) for a specified width. ImVec2(0.0f,0.0f) uses ItemWidth.
+	ImGui::ProgressBar(progress, ImVec2(0.0f, 0.0f));
+	ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
+	if (_simulate && !_initializing) { ImGui::Text("Simulating..."); }
+	else { ImGui::Text("Initializing..."); }
 
 }
+
 void Gui::handleSettingsHeader()
 {
 	if (ImGui::CollapsingHeader("Material parameters"))
@@ -879,60 +731,239 @@ void Gui::handleSettingsHeader()
 		if (showCrystalSelector("CrystalSelector"))
 			showCrystalSelector("cr");
 
-
-		//ImGui::Text("Lattice constant: ");
-		//ImGui::SameLine();
 		ImGui::InputDouble("Lattice constant [m]", &_latticeConstant, 0.0f, 0.0f, "%e");
 		ImGui::SameLine();
 		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");
 
-		//ImGui::Text("Epsilon: ");
-		//ImGui::SameLine();
 		ImGui::InputDouble("Epsilon [m]", &_epsilon, 0.0f, 0.0f, "%e");
 		ImGui::SameLine();
 		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");
 
-		//ImGui::Text("Sigma: ");
-		//ImGui::SameLine();
 		ImGui::InputDouble("Sigma [J]", &_sigma, 0.0f, 0.0f, "%e");
 		ImGui::SameLine();
 		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");
 
-		//ImGui::Text("Cut off distance: ");
-		//ImGui::SameLine();
-		/*ImGui::InputDouble("Cut off distance [m]", &_cutOffDistance, 0.0f, 0.0f, "%e");
-		ImGui::SameLine();
-		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");*/
-
-		//ImGui::Text("Mass: ");
-		//ImGui::SameLine();
 		ImGui::InputDouble("Mass [kg]", &_mass, 0.0f, 0.0f, "%e");
 		ImGui::SameLine();
 		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");
 	}
 }
 
-void Gui::handleProgressBar(double elapsedTime, double totalTime)
+void Gui::hide()
 {
-	// Animate a simple progress bar
-	static float progress = 0.0f, progress_dir = 1.0f;
+	_visible = false;
+}
 
-	float quota = static_cast<float>(elapsedTime / totalTime);
-	//printf("Progress: %f \n", quota);
+void Gui::loadResultsWindow()
+{
+	bool auto_resize = false;
+	//ImGuiWindowFlags window_flags = 0;
+	ImGuiWindowFlags flags = auto_resize ? ImGuiWindowFlags_AlwaysAutoResize : 0;
+	flags |= ImGuiWindowFlags_NoResize;
+	if (_loadResultWindow && !simulate())
+	{
+		ImGui::Begin("Load results file...", &_loadResultWindow, flags);
+		ImGui::SetWindowSize(ImVec2(500, 150));
+		ImGui::Text("Enter the name of the file you want to open:");
+		static char buf1[64] = "./SaveData/";
+		ImGui::InputText(".txt", buf1, 64);
+		if (ImGui::Button("Load"))
+		{
+			strcat(buf1, ".txt");
+			std::ifstream myFile;
+			myFile.open(buf1);
+			if (!myFile.is_open()) { _unableToOpenFile = true; }
+			else
+			{
+				std::string dummy;
+				int sizeOfFile{ 0 }, i{ 0 };
+				while (!myFile.eof()) { getline(myFile, dummy); sizeOfFile++; }
+				myFile.close(); myFile.open(buf1);
 
-	progress = progress_dir * quota;// *ImGui::GetIO().DeltaTime;
+				_cohesiveEnergy = new double[sizeOfFile];
+				_debyeTemperature = new double[sizeOfFile];
+				_kineticEnergy = new double[sizeOfFile];
+				_meanSquareDisplacement = new double[sizeOfFile];
+				_potentialEnergy = new double[sizeOfFile];
+				_pressure = new double[sizeOfFile];
+				_selfDiffusionCoefficient = new double[sizeOfFile];
+				_specificHeat = new double[sizeOfFile];
+				_simulatedTemperature = new double[sizeOfFile];
+				_totalEnergy = new double[sizeOfFile];
 
-	// Typically we would use ImVec2(-1.0f,0.0f) to use all available width, or ImVec2(width,0.0f) for a specified width. ImVec2(0.0f,0.0f) uses ItemWidth.
-	ImGui::ProgressBar(progress, ImVec2(0.0f, 0.0f));
-	ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
-	if (_simulate && !_initializing) { ImGui::Text("Simulating..."); }
-	else { ImGui::Text("Initializing..."); }
+				std::getline(myFile, dummy);
+				std::getline(myFile, dummy);
 
+				while (!myFile.eof())
+				{
+					myFile >> _cohesiveEnergy[i];
+					myFile >> _debyeTemperature[i];
+					myFile >> _kineticEnergy[i];
+					myFile >> _meanSquareDisplacement[i];
+					myFile >> _potentialEnergy[i];
+					myFile >> _pressure[i];
+					myFile >> _selfDiffusionCoefficient[i];
+					myFile >> _specificHeat[i];
+					myFile >> _simulatedTemperature[i];
+					myFile >> _totalEnergy[i];
+
+					i++;
+				}
+				myFile.close();
+				_loadResultWindow = false;
+				_unableToOpenFile = false;
+				_numberOfTimeStepsPlot = i - 1;
+			}
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel")) { _loadResultWindow = false; };
+		if (_unableToOpenFile) { ImGui::Text("Unable to open file..."); }
+		ImGui::End();
+	}
+}
+
+void Gui::saveResultsWindow()
+{
+	bool auto_resize = false;
+	//ImGuiWindowFlags window_flags = 0;
+	ImGuiWindowFlags flags = auto_resize ? ImGuiWindowFlags_AlwaysAutoResize : 0;
+	flags |= ImGuiWindowFlags_NoResize;
+	if (_saveResultWindow && !simulate())
+	{
+		ImGui::Begin("Save results file...", &_saveResultWindow, flags);
+		ImGui::SetWindowSize(ImVec2(500, 110));
+		ImGui::Text("Enter the name of the file you want to save to:");
+		static char buf1[64] = "./SaveData/"; ImGui::InputText(".txt", buf1, 64);
+		if (ImGui::Button("Save")) {
+			strcat(buf1, ".txt");
+			std::ofstream myFile;
+			myFile.open(buf1);
+
+
+
+			myFile << "Temperature [K] " << "Total energy [J] " << "Potential energy [J] " << "Kinetic energy [J] " << std::endl;
+
+			for (int i = 0; i < _numberOfTimeStepsPlot; i++)
+			{
+
+				myFile << _cohesiveEnergy[i] << " "
+					<< _debyeTemperature[i] << " "
+					<< _kineticEnergy[i] << " "
+					<< _meanSquareDisplacement[i] << " "
+					<< _potentialEnergy[i] << " "
+					<< _pressure[i] << " "
+					<< _selfDiffusionCoefficient[i] << " "
+					<< _specificHeat[i] << " "
+					<< _simulatedTemperature[i] << " "
+					<< _totalEnergy[i] << std::endl;
+			}
+			myFile.close();
+			_saveResultWindow = false;
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel")) { _saveResultWindow = false; };
+		ImGui::End();
+	}
+}
+
+void Gui::setCohesiveEnergy(double* newCohesiveEnergy)
+{
+	_cohesiveEnergy = newCohesiveEnergy;
+}
+
+void Gui::setDebyeTemperature(double* newDebyeTemperature)
+{
+	_debyeTemperature = newDebyeTemperature;
+}
+
+void Gui::setInitializing(bool newInitializing)
+{
+	_initializing = newInitializing;
+}
+
+void Gui::setKineticEnergy(double* newKineticEnergy)
+{
+	_kineticEnergy = newKineticEnergy;
+}
+
+void Gui::setMainVisible(bool vis)
+{
+	_mainVisible = vis;
+}
+
+void Gui::setMeanSquareDisplacement(double* newMeanSquareDisplacement)
+{
+	_meanSquareDisplacement = newMeanSquareDisplacement;
+}
+
+void Gui::setNumberOfTimeStepsPlot(int number)
+{
+	_numberOfTimeStepsPlot = number;
+}
+
+void Gui::setPositions(double*** newPositions)
+{
+	_positions = newPositions;
+}
+
+void Gui::setPotentialEnergy(double* newPotentialEnergy)
+{
+	_potentialEnergy = newPotentialEnergy;
+}
+
+void Gui::setPressure(double* newPressure)
+{
+	_pressure = newPressure;
+}
+
+void Gui::setSelfDiffusionCoefficient(double* newSelfDiffusionCoefficient)
+{
+	_selfDiffusionCoefficient = newSelfDiffusionCoefficient;
+}
+
+void Gui::setSpecificHeat(double* newSpecificHeat)
+{
+	_specificHeat = newSpecificHeat;
+}
+
+void Gui::setSimulatedTemperature(double* newTemperature)
+{
+	_simulatedTemperature = newTemperature;
+}
+
+void Gui::setTotalEnergy(double* newTotalEnergy)
+{
+	_totalEnergy = newTotalEnergy;
+}
+
+void Gui::setupGui(GLFWwindow *window)
+{
+
+	const char* glsl_version = "#version 330";
+
+	//Setup Dear ImGui context
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
+
+														   // Setup Platform/Renderer bindings
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init(glsl_version);
+
+	ImGui::StyleColorsLight();
+
+	io.Fonts->AddFontFromFileTTF("imgui-master/misc/fonts/Roboto-Medium.ttf", 16.0f);
+}
+
+void Gui::show()
+{
+	_visible = true;
 }
 
 void Gui::simulateButtonHandler()
 {
-	
+
 	if (ImGui::Button("Simulate"))
 	{
 		_simulationWindow = true;
@@ -941,11 +972,28 @@ void Gui::simulateButtonHandler()
 
 }
 
+void Gui::simulationWindow(double elapsedTime, double totalTime)
+{
+	bool auto_resize = false;
+	//ImGuiWindowFlags window_flags = 0;
+	ImGuiWindowFlags flags = auto_resize ? ImGuiWindowFlags_AlwaysAutoResize : 0;
+	flags |= ImGuiWindowFlags_NoResize;
+	if (_simulationWindow)
+	{
+		ImGui::Begin("Simulation running...", &_simulationWindow, flags);
+		ImGui::SetWindowSize(ImVec2(900, 60));
+		handleProgressBar(elapsedTime, totalTime);
+		stopButtonHandler();
+		//if (!_simulate) { _simulationWindow = false; _simulate = false; }
+		ImGui::End();
+	}
+}
+
 void Gui::stopButtonHandler()
 {
 	ImGui::SameLine();
 	ImGui::PushID(1);
-	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV( 0.0f, 1.f, 1.f));
+	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.0f, 1.f, 1.f));
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 1.0f, 0.9f));
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.0f, 1.0f, 0.8f));
 	if (ImGui::Button("Stop Simulation")) { _simulate = false; }
@@ -953,24 +1001,31 @@ void Gui::stopButtonHandler()
 	ImGui::PopID();
 }
 
-
-bool Gui::VisualVisible() const
+void Gui::stopSimulate()
 {
-	return _visualVisible;
+	_simulate = false;
+	_simulationWindow = false;
+	_plotVisible = true;
 }
 
-bool Gui::exitPressed() const
+// The window that is the visualisation control
+void Gui::visualWindow(int* visualisationTime, int maxVisualTime, int* speed)
 {
-	return _exitPressed;
+	bool auto_resize = false;
+	//ImGuiWindowFlags window_flags = 0;
+	ImGuiWindowFlags flags = auto_resize ? ImGuiWindowFlags_AlwaysAutoResize : 0;
+	flags |= ImGuiWindowFlags_NoResize;
+	if (_visualVisible)
+	{
+		ImGui::Begin("Visualization", &_visualVisible, flags);
+		ImGui::SetWindowSize(ImVec2(1200, 150));
+		ImGui::Text("Strafe by using w,a,s & d");
+		ImGui::Text("Zoom by using q & e");
+		ImGui::Text("Rotate by using i, j, k & l");
+		ImGui::SliderInt(" ", visualisationTime, 0, maxVisualTime, "Time: %d");
+		ImGui::SliderInt("", speed, 0, 8, "Speed: %d");
+		ImGui::SameLine();
+		ImGui::End();
+	}
 }
 
-void Gui::handleCollapsingHeaders()
-{
-	handleConfigurationHeader();
-	handleSettingsHeader();
-}
-
-void Gui::setNumberOfTimeStepsPlot(int number)
-{
-	_numberOfTimeStepsPlot = number;
-}

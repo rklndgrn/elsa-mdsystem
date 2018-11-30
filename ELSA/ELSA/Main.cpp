@@ -55,7 +55,7 @@ int main()
 			myVis.setAtomsVisible(false);
 			visualTime = 0;
 		}
-		myVis.mainLoopVisual(myGui._pos, visualTime, maxVisualTime, latticeConstant, unitCellsX, unitCellsY, unitCellsZ);
+		myVis.mainLoopVisual(myGui.getPositions(), visualTime, maxVisualTime, latticeConstant, unitCellsX, unitCellsY, unitCellsZ);
 
 		
 		// -------------------------------- MENU -----------------------------------------
@@ -66,7 +66,7 @@ int main()
 		if (myGui.simulate())
 		{
 			myGui.setMainVisible(false);
-			myGui._initializing = true;
+			myGui.setInitializing(true);
 			Material myMaterial(
 				myGui.getCrystalType(),
 				myGui.getLatticeConstant(),
@@ -107,7 +107,7 @@ int main()
 
 			int index{ 0 };
 
-			myGui._initializing = false;
+			myGui.setInitializing(false);
 
 			for (double t = deltaT; t < myParameters.getSimulationTime() - 0.5*deltaT; t += deltaT)
 			{
@@ -160,17 +160,18 @@ int main()
 
 			saveLastState.close();
 
-			myGui._cohesiveEnergy = *cohesiveEnergyArray;
-			myGui._debyeTemperature = *debyeTempArray;
-			myGui._kineticEnergy = *kinArray;
-			myGui._meanSquareDisplacement = *msdArray;
-			myGui._pos = *posArray;
-			myGui._potentialEnergy = *potArray;
-			myGui._pressure = *pressureArray;
-			myGui._selfDiffusionCoeff = *selfDiffArray;
-			myGui._specificHeat = *specificHeatArray;
-			myGui._temp = *tempArray;
-			myGui._totalEnergy = *totArray;
+			//myGui._cohesiveEnergy = *cohesiveEnergyArray;
+			myGui.setCohesiveEnergy(*cohesiveEnergyArray);
+			myGui.setDebyeTemperature(*debyeTempArray);
+			myGui.setKineticEnergy(*kinArray);
+			myGui.setMeanSquareDisplacement(*msdArray);
+			myGui.setPositions(*posArray);
+			myGui.setPotentialEnergy(*potArray);
+			myGui.setPressure(*pressureArray);
+			myGui.setSelfDiffusionCoefficient(*selfDiffArray);
+			myGui.setSpecificHeat(*specificHeatArray);
+			myGui.setSimulatedTemperature(*tempArray);
+			myGui.setTotalEnergy(*totArray);
 			myGui.setNumberOfTimeStepsPlot((int)round(myParameters.getSimulationTime()/myParameters.getTimeStep()));
 
 			maxVisualTime = (int)round(myParameters.getSimulationTime() / myParameters.getTimeStep());
