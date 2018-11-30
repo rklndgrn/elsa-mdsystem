@@ -14,6 +14,9 @@ using namespace std;
 
 int main()
 {
+	Material myMaterial;
+	Parameters myParameters;
+	World myWorld;
 
 	visual myVis;
 
@@ -65,11 +68,9 @@ int main()
 
 		if (myGui.simulate())
 		{
-			cout << "Here we go!" << endl;
-
 			myGui.setMainVisible(false);
 			myGui._initializing = true;
-			Material myMaterial(
+			myMaterial = Material(
 				myGui.getCrystalType(),
 				myGui.getLatticeConstant(),
 				myGui.getEpsilon(),
@@ -77,7 +78,7 @@ int main()
 				myGui.getCutOffDistance(),
 				myGui.getMass());
 
-			Parameters myParameters(
+			myParameters = Parameters(
 				myGui.getTimeStep(),
 				myGui.getSimulationTime(),
 				myGui.getNumberOfUnitCellsX(),
@@ -91,21 +92,10 @@ int main()
 				myGui.getLastStateFileName(),
 				myMaterial);
 
-			World myWorld(myParameters, myGui.getNumberOfThreads());
+			myWorld = World(myParameters, myGui.getNumberOfThreads());
+			cout << "Here we go!" << endl;
 
 			double deltaT = myParameters.getTimeStep();
-
-			double* cohesiveEnergyArray = myWorld.getResults().getCohesiveEnergy();
-			double* debyeTempArray = myWorld.getResults().getDebyeTemperature();
-			double* kinArray = myWorld.getResults().getKineticEnergy();
-			double* msdArray = myWorld.getResults().getMeanSquareDisplacement();
-			double*** posArray = myWorld.getResults().getPositions();
-			double* potArray = myWorld.getResults().getPotentialEnergy();
-			double* pressureArray = myWorld.getResults().getInternalPressure();
-			double* selfDiffArray = myWorld.getResults().getDiffusionConstant();
-			double* specificHeatArray = myWorld.getResults().getSpecificHeat();
-			double* tempArray = myWorld.getResults().getTemperature();
-			double* totArray = myWorld.getResults().getTotalEnergy();
 
 			int index{ 0 };
 
@@ -113,25 +103,25 @@ int main()
 
 			for (double t = deltaT; t < myParameters.getSimulationTime() - 0.5*deltaT; t += deltaT)
 			{
-				if (myGui.simulate())
-				{
-					glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-					glUseProgram(0);
-					ImGui::Render();
+				
+				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+				glUseProgram(0);
+				ImGui::Render();
 
 					//myGui.handleProgressBar(t,myParameters.getSimulationTime());
 
-					int display_w, display_h;
-					glfwMakeContextCurrent(myVis.getWindow());
-					glfwGetFramebufferSize(myVis.getWindow(), &display_w, &display_h);
-					glViewport(0, 0, display_w, display_h);
-					ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+				int display_w, display_h;
+				glfwMakeContextCurrent(myVis.getWindow());
+				glfwGetFramebufferSize(myVis.getWindow(), &display_w, &display_h);
+				glViewport(0, 0, display_w, display_h);
+				ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-					glfwPollEvents();
-					glfwSwapBuffers(myVis.getWindow());
+				glfwPollEvents();
+				glfwSwapBuffers(myVis.getWindow());
 
 					//Here's where the magic happens
-					myWorld.performSimulation(t, 10);
+				myWorld.performSimulation(t, 10);
+				cout << "Z-position of some random particle is " << myWorld.getResults().getPositions()[15][676][2] << endl;
 					//---//
 					//for each (Atom* a in myWorld.getAtomInAtomList(103)->getNeighbourList())
 					//{
@@ -139,9 +129,37 @@ int main()
 					//}
 					//printf("\n");
 
-					myGui.handleFrame();
-					myGui.handleMenu(t, myParameters.getSimulationTime(), &visualTime, maxVisualTime, &speed);
+				myGui.handleFrame();
+				myGui.handleMenu(t, myParameters.getSimulationTime(), &visualTime, maxVisualTime, &speed);
+
+				if (t >= myParameters.getSimulationTime() - deltaT && t < myParameters.getSimulationTime())
+				{
+					Results r = myWorld.getResults();
+					int aL = r.getArrayLength();
+					int N = myParameters.getNumberOfAtoms();
+					myGui.updateArrays(aL, N);
+					for (int x = 0; x < aL; x++)
+					{
+						myGui._cohesiveEnergy[x] = r.getCohesiveEnergy()[x];
+						myGui._debyeTemperature[x] = r.getDebyeTemperature()[x];
+						myGui._kineticEnergy[x] = r.getKineticEnergy()[x];
+						myGui._meanSquareDisplacement[x] = r.getMeanSquareDisplacement()[x];
+						myGui._potentialEnergy[x] = r.getPotentialEnergy()[x];
+						myGui._pressure[x] = r.getInternalPressure()[x];
+						myGui._selfDiffusionCoeff[x] = r.getDiffusionConstant()[x];
+						myGui._specificHeat[x] = r.getSpecificHeat()[x];
+						myGui._temp[x] = r.getTemperature()[x];
+						myGui._totalEnergy[x] = r.getTotalEnergy()[x];
+						for (int n = 0; n < N; n++)
+						{
+							myGui._pos[x][n][0] = r.getPositions()[x][n][0];
+							myGui._pos[x][n][1] = r.getPositions()[x][n][1];
+							myGui._pos[x][n][2] = r.getPositions()[x][n][2];
+						}
+					}
+					myGui.setNumberOfTimeStepsPlot((int)round(myParameters.getSimulationTime() / myParameters.getTimeStep()));
 				}
+
 
 			}
 			myGui.stopSimulate();
@@ -162,18 +180,22 @@ int main()
 
 			saveLastState.close();
 
-			myGui._cohesiveEnergy = cohesiveEnergyArray;
-			myGui._debyeTemperature = debyeTempArray;
-			myGui._kineticEnergy = kinArray;
-			myGui._meanSquareDisplacement = msdArray;
-			myGui._pos = posArray;
-			myGui._potentialEnergy = potArray;
-			myGui._pressure = pressureArray;
-			myGui._selfDiffusionCoeff = selfDiffArray;
-			myGui._specificHeat = specificHeatArray;
-			myGui._temp = tempArray;
-			myGui._totalEnergy = totArray;
+			/*
+			//cout << "RESULTS MUST NOT BE DESTROYED!" << endl;
+			myGui._cohesiveEnergy = myWorld.getResults().getCohesiveEnergy();
+			myGui._debyeTemperature = myWorld.getResults().getDebyeTemperature();
+			myGui._kineticEnergy = myWorld.getResults().getKineticEnergy();
+			myGui._meanSquareDisplacement = myWorld.getResults().getMeanSquareDisplacement();
+			myGui._pos = myWorld.getResults().getPositions();
+			//cout << "Z-position of some random particle is " << myGui._pos[15][676][2] << endl;
+			myGui._potentialEnergy = myWorld.getResults().getPotentialEnergy();
+			myGui._pressure = myWorld.getResults().getInternalPressure();
+			myGui._selfDiffusionCoeff = myWorld.getResults().getDiffusionConstant();
+			myGui._specificHeat = myWorld.getResults().getSpecificHeat();
+			myGui._temp = myWorld.getResults().getTemperature();
+			myGui._totalEnergy = myWorld.getResults().getTotalEnergy();
 			myGui.setNumberOfTimeStepsPlot((int)round(myParameters.getSimulationTime() / myParameters.getTimeStep()));
+			*/
 
 			maxVisualTime = (int)round(myParameters.getSimulationTime() / myParameters.getTimeStep());
 			latticeConstant = myParameters.getChosenMaterial().getLatticeConstant();
@@ -182,6 +204,7 @@ int main()
 			unitCellsZ = myParameters.getNumberOfUnitCellsZ();
 
 			myVis.setNumberOfParticles(myParameters.getNumberOfAtoms());
+			cout << "WE MADE IT!" << endl;
 		}
 
 		//myGui.handlePlots();// , kinenen, totenen, tempen);
@@ -204,6 +227,7 @@ int main()
 	}
 
 	// Cleanup
+	myGui.updateArrays(0, 0);
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();

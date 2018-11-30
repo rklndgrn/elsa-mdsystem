@@ -764,6 +764,7 @@ World::World(Parameters p, int n)
 
 	setNumberOfThreads(n);
 	setupSystem(_myParameters);
+	cout << "We made it through World's constructor!" << endl;
 }
 
 //Copy constructor, e.g. r2{r].

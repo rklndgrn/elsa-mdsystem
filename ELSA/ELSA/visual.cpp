@@ -275,15 +275,23 @@ void visual::mainLoopVisual(double*** pos, int time, int maxTime, double lattice
 
 	// Simulate all particles
 	int ParticlesCount = 0;
+	double p;
+
+	//printf("Size of pos is %f, %f, %f. Bigger than 0? %f\n", sizeof(pos) / sizeof(pos[0]), sizeof(pos[0]) / sizeof(pos[0][0]), sizeof(pos[0][0]) / sizeof(pos[0][0][0]), sizeof(pos) / sizeof(pos[0]) > 0.0);
+	//printf("Size of pos is %f", sizeof(pos[0][0][0]));
+
 	
 	float positionsF[_maxParticles][3];
-	if (pos != NULL && time < maxTime)
+	if (pos != nullptr && time < maxTime)
 	{
 		for (int i = 0; i < _numberOfParticles; i++)
 		{
-				positionsF[i][0] = static_cast<float>(pos[time][i][0]) / latticeConstant - numberOfUnitCellsX / 2.0;
-				positionsF[i][1] = static_cast<float>(pos[time][i][1]) / latticeConstant - numberOfUnitCellsY / 2.0;
-				positionsF[i][2] = static_cast<float>(pos[time][i][2]) / latticeConstant - numberOfUnitCellsZ / 2.0;
+			p = pos[time][i][0];
+			positionsF[i][0] = static_cast<float>(p) / latticeConstant - numberOfUnitCellsX / 2.0;
+			p = pos[time][i][1];
+			positionsF[i][1] = static_cast<float>(p) / latticeConstant - numberOfUnitCellsY / 2.0;
+			p = pos[time][i][2];
+			positionsF[i][2] = static_cast<float>(p) / latticeConstant - numberOfUnitCellsZ / 2.0;
 		}
 
 		for (int i = 0; i < _numberOfParticles; i++) {

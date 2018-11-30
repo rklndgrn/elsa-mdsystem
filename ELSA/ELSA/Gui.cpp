@@ -974,3 +974,67 @@ void Gui::setNumberOfTimeStepsPlot(int number)
 {
 	_numberOfTimeStepsPlot = number;
 }
+
+void Gui::updateArrays(int newArrayLength, int N)
+{
+	if (_arrayLength > 0 && newArrayLength == 0 && N == 0)
+	{
+		delete[] _cohesiveEnergy;
+		_cohesiveEnergy = nullptr;
+		delete[] _debyeTemperature;
+		_debyeTemperature = nullptr;
+		delete[] _kineticEnergy;
+		_kineticEnergy = nullptr;
+		delete[] _meanSquareDisplacement;
+		_meanSquareDisplacement = nullptr;
+		delete[] _potentialEnergy;
+		_potentialEnergy = nullptr;
+		delete[] _pressure;
+		_pressure = nullptr;
+		delete[] _selfDiffusionCoeff;
+		_selfDiffusionCoeff = nullptr;
+		delete[] _specificHeat;
+		_specificHeat = nullptr;
+		delete[] _temp;
+		_temp = nullptr;
+		delete[] _totalEnergy;
+		_totalEnergy = nullptr;
+			   
+		for (int t = 0; t < _arrayLength; t++)
+		{
+			for (int n = 0; n < N; n++)
+			{
+				delete[] _pos[t][n];
+				_pos[t][n] = nullptr;
+			}
+			delete[] _pos[t];
+			_pos[t] = nullptr;
+		}
+		delete[] _pos;
+		_pos = nullptr;
+	}
+
+	if (newArrayLength > 0)
+	{
+		_totalEnergy = new double[newArrayLength];
+		_potentialEnergy = new double[newArrayLength];
+		_temp = new double[newArrayLength];
+		_kineticEnergy = new double[newArrayLength];
+		_cohesiveEnergy = new double[newArrayLength];
+		_debyeTemperature = new double[newArrayLength];
+		_selfDiffusionCoeff = new double[newArrayLength];
+		_pressure = new double[newArrayLength];
+		_meanSquareDisplacement = new double[newArrayLength];
+		_specificHeat = new double[newArrayLength];
+
+		_pos = new double**[newArrayLength];
+		for (int t = 0; t < newArrayLength; t++)
+		{
+			_pos[t] = new double*[N];
+			for (int n = 0; n < N; n++)
+			{
+				_pos[t][n] = new double[3];
+			}
+		}
+	}
+}

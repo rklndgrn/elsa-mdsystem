@@ -73,7 +73,6 @@ public:
 	visual(const int maxPart);
 	~visual() = default;
 
-
 	std::array<_particle, _maxParticles> getParticlesContainer();
 	void setParticleCameraDist(int id, float dist);
 	void setParticlePosition(int id, glm::vec3 pos);

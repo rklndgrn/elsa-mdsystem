@@ -56,6 +56,7 @@ private:
 	double _collisionPercentage;
 	char* _lastStateFileName;
 
+	int _arrayLength{ -1 };
 	int _numberOfTimeStepsPlot;
 
 	bool _simulate;
@@ -80,6 +81,7 @@ public:
 	bool simulate() const;
 	void stopSimulate();
 	void hide();
+
 
 	static void showHelpMarker(const char* desc);
 
@@ -148,4 +150,6 @@ public:
 	void setNumberOfTimeStepsPlot(int);
 
 	void handlePlots();// const float* kinEn, const float* totEn, const float* temp);
+
+	void updateArrays(int, int);
 };
