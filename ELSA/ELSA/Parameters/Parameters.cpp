@@ -72,7 +72,66 @@ Parameters::Parameters(
 
 }
 
+//Copy constructor, e.g. m2{m}.
+Parameters::Parameters(Parameters const& other)
+{
+	_numberOfAtoms = other.getNumberOfAtoms();
+	_numberOfCellsI = other.getNumberOfCellsI();
+	_numberOfCellsJ = other.getNumberOfCellsJ();
+	_numberOfCellsK = other.getNumberOfCellsK();
+	_numberOfUnitCellsX = other.getNumberOfUnitCellsX();
+	_numberOfUnitCellsY = other.getNumberOfUnitCellsY();
+	_numberOfUnitCellsZ = other.getNumberOfUnitCellsZ();
 
+
+	_collisionFrequency = other.getCollisionFrequency();
+	_lengthX = other.getLengthX();
+	_lengthY = other.getLengthY();
+	_lengthZ = other.getLengthZ();
+	_simulationTime = other.getSimulationTime();
+	_temperature = other.getTemperature();
+	_timeStep = other.getTimeStep();
+
+	_isThermostatOn = other.getIsThermostatOn();
+	_isUseLastSimulationState = other.getIsUseLastSimulationState();
+	_is2D = other.getIs2D();
+
+	_lastStateFileName = other.getLastStateFileName();
+
+	_chosenMaterial = other.getChosenMaterial();
+}
+
+
+//Copy allocation, e.g. m2 = m.
+Parameters & Parameters::operator = (Parameters const& other)
+{
+	_numberOfAtoms = other.getNumberOfAtoms();
+	_numberOfCellsI = other.getNumberOfCellsI();
+	_numberOfCellsJ = other.getNumberOfCellsJ();
+	_numberOfCellsK = other.getNumberOfCellsK();
+	_numberOfUnitCellsX = other.getNumberOfUnitCellsX();
+	_numberOfUnitCellsY = other.getNumberOfUnitCellsY();
+	_numberOfUnitCellsZ = other.getNumberOfUnitCellsZ();
+
+
+	_collisionFrequency = other.getCollisionFrequency();
+	_lengthX = other.getLengthX();
+	_lengthY = other.getLengthY();
+	_lengthZ = other.getLengthZ();
+	_simulationTime = other.getSimulationTime();
+	_temperature = other.getTemperature();
+	_timeStep = other.getTimeStep();
+
+	_isThermostatOn = other.getIsThermostatOn();
+	_isUseLastSimulationState = other.getIsUseLastSimulationState();
+	_is2D = other.getIs2D();
+
+	_lastStateFileName = other.getLastStateFileName();
+
+	_chosenMaterial = other.getChosenMaterial();
+
+	return *this;
+}
 
 //Getters
 unsigned int Parameters::getNumberOfAtoms() const
@@ -170,7 +229,7 @@ bool Parameters::getIsUseLastSimulationState() const
 	return _isUseLastSimulationState;
 }
 
-char* Parameters::getLastStateFileName()
+char* Parameters::getLastStateFileName() const
 {
 	return _lastStateFileName;
 }

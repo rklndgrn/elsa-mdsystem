@@ -99,7 +99,7 @@ void World::calcPressure(double elapsedTime)
 	int timeSteps = (int)round(elapsedTime / _myParameters.getTimeStep());
 	int N = _myParameters.getNumberOfAtoms();
 	double V = getWorldVolume();
-	double T = (*_myResults.getTemperature())[timeSteps];
+	double T = _myResults.getTemperature()[timeSteps];
 	double meanRF = _pressureRFSum / (timeSteps);
 	double pressure = (N*_myParameters.getBoltzmann()*T / V) + meanRF / (6 * V);
 
@@ -213,7 +213,8 @@ void World::distributeInitialVelocities(double desiredTemperature)
 void World::generateAtomsAtFccLattice(double latticeConstant, unsigned int nOfUnitCellsX, unsigned int nOfUnitCellsY, unsigned int nOfUnitCellsZ)
 {
 	double offset =  latticeConstant / 4.0;
-	
+	Atom *a0, *ax, *ay, *az;
+
 	unsigned int atomId{ 0 };
 	for (unsigned int z = 0; z < nOfUnitCellsZ; z++)
 	{
@@ -222,10 +223,10 @@ void World::generateAtomsAtFccLattice(double latticeConstant, unsigned int nOfUn
 			for (unsigned int x = 0; x < nOfUnitCellsX; x++)
 			{
 				//Place atoms in the corner and in the middle of the neighbouring sides of the "dice."
-				Atom* a0 = new Atom(atomId++, offset + x*latticeConstant, offset + y*latticeConstant, offset + z*latticeConstant);
-				Atom* ax = new Atom(atomId++, offset + x*latticeConstant, offset + (y + 0.5)*latticeConstant, offset + (z + 0.5)*latticeConstant);
-				Atom* ay = new Atom(atomId++, offset + (x + 0.5)*latticeConstant, offset + y*latticeConstant, offset + (z + 0.5)*latticeConstant);
-				Atom* az = new Atom(atomId++, offset + (x + 0.5)*latticeConstant, offset + (y + 0.5)*latticeConstant, offset + z*latticeConstant);
+				a0 = new Atom(atomId++, offset + x*latticeConstant, offset + y*latticeConstant, offset + z*latticeConstant);
+				ax = new Atom(atomId++, offset + x*latticeConstant, offset + (y + 0.5)*latticeConstant, offset + (z + 0.5)*latticeConstant);
+				ay = new Atom(atomId++, offset + (x + 0.5)*latticeConstant, offset + y*latticeConstant, offset + (z + 0.5)*latticeConstant);
+				az = new Atom(atomId++, offset + (x + 0.5)*latticeConstant, offset + (y + 0.5)*latticeConstant, offset + z*latticeConstant);
 				
 				//Atom* a0 = new Atom(atomId++, x * latticeConstant, y * latticeConstant, z * latticeConstant);
 				//Atom* ax = new Atom(atomId++, x * latticeConstant, (y + 0.5)*latticeConstant, (z + 0.5)*latticeConstant);
@@ -350,7 +351,7 @@ void World::initializeAtoms()
 void World::initializeResults()
 {
 	_myResults.setTotalEnergy(0);
-	double T = (*_myResults.getTemperature())[0];
+	double T = _myResults.getTemperature()[0];
 	updateResults(0, T);
 }
 
@@ -612,10 +613,6 @@ void World::solveEquationsOfMotion(double elapsedTime)
 //Initialize the MD software by setting up the system and creating atoms, cells and neighbour lists.
 void World::setupSystem(Parameters p)
 {
-	_myParameters = p;
-	_myResults = Results{ p.getSimulationTime(), p.getTimeStep(), p.getNumberOfAtoms() };
-	_mySimulation = Simulation(p.getChosenMaterial());
-
 	unsigned int nOfUnitCellsX{ _myParameters.getNumberOfUnitCellsX() };
 	unsigned int nOfUnitCellsY{ _myParameters.getNumberOfUnitCellsY() };
 	unsigned int nOfUnitCellsZ{ _myParameters.getNumberOfUnitCellsZ() };
@@ -642,8 +639,8 @@ void World::setupSystem(Parameters p)
 //Update the results arrays.
 void World::updateResults(double elapsedTime, double T)
 {
-	double**** positionsArray = _myResults.getPositions();
-	double*** positions = *positionsArray;
+	//double**** positionsArray = _myResults.getPositions();
+	double*** positions = _myResults.getPositions();
 	int index = (int)round(elapsedTime / _myParameters.getTimeStep());
 	int N = _myParameters.getNumberOfAtoms();
 
@@ -663,13 +660,13 @@ void World::updateResults(double elapsedTime, double T)
 	_myResults.setDebyeTemperature(debyeTemperature, index);
 
 	//Self diffusion coefficient
-	double selfDiffusionCoefficient = _mySimulation.calcSelfDiffusionCoefficient(*(_myResults.getPositions()), 0, elapsedTime, _myParameters.getTimeStep(),
+	double selfDiffusionCoefficient = _mySimulation.calcSelfDiffusionCoefficient(_myResults.getPositions(), 0, elapsedTime, _myParameters.getTimeStep(),
 		N, _myParameters.getLengthX(), _myParameters.getLengthY(),
 		_myParameters.getLengthZ(), _myParameters.getIs2D());
 	_myResults.setDiffusionConstant(selfDiffusionCoefficient, index);
 
 	//Specific heat.
-	double specificHeat = _mySimulation.calcSpecificHeat(N, _myParameters.getBoltzmann(), index, *(_myResults.getTemperature()));
+	double specificHeat = _mySimulation.calcSpecificHeat(N, _myParameters.getBoltzmann(), index, _myResults.getTemperature());
 	_myResults.setSpecificHeat(specificHeat, index);
 }
 
@@ -759,10 +756,14 @@ void World::velocityVerletStep2(double elapsedTime)
 
 /* PUBLIC */
 //Constructor.
-World::World(Parameters p, int n)
+World::World(Parameters & p, Simulation & s, int n)
 {
+	_myParameters = p;
+	_myResults = Results(_myParameters.getSimulationTime(), _myParameters.getTimeStep(), _myParameters.getNumberOfAtoms());
+	_mySimulation = s;
+
 	setNumberOfThreads(n);
-	setupSystem(p);
+	setupSystem(_myParameters);
 }
 
 //Get atom from the atom list at index

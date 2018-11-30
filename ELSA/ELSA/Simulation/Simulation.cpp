@@ -5,7 +5,7 @@
 
 using namespace std;
 
-Simulation::Simulation(Material mat) :
+Simulation::Simulation(Material & mat) :
 	_mat{mat}
 {};
 

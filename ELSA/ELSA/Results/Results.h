@@ -4,6 +4,8 @@
 #include <array>
 #include <iostream>
 #include <math.h>
+#include <stdexcept>
+#include <utility>
 #include <vector>
 
 class Results
@@ -24,25 +26,34 @@ private:
 	double* _temperature;
 	double* _totalEnergy;
 
+	//void swap(Results &) noexcept;
+
 public:
 	Results() = default;
 	Results(double, double, unsigned int);
-	~Results() = default;
+	~Results();
+	Results(Results const&); //Copy constructor.
+	Results & operator = (Results const&); //Copy allocation.
+	//Results(Results &&); //Move constructor.
+	//Results & operator = (Results &&); //Move allocation.
 
 	void printPositions();
 
 	//Getters.
-	double** getCohesiveEnergy();
-	double** getDebyeTemperature();
-	double** getDiffusionConstant();
-	double** getInternalPressure();
-	double** getKineticEnergy();
-	double** getMeanSquareDisplacement();
-	double**** getPositions();
-	double** getPotentialEnergy();
-	double** getSpecificHeat();
-	double** getTemperature();
-	double** getTotalEnergy();
+	unsigned int getArrayLength() const;
+	unsigned int getNumberOfAtoms() const;
+
+	double* getCohesiveEnergy() const;
+	double* getDebyeTemperature() const;
+	double* getDiffusionConstant() const;
+	double* getInternalPressure() const;
+	double* getKineticEnergy() const;
+	double* getMeanSquareDisplacement() const;
+	double*** getPositions() const;
+	double* getPotentialEnergy() const;
+	double* getSpecificHeat() const;
+	double* getTemperature() const;
+	double* getTotalEnergy() const;
 
 	//Setters.
 	void setCohesiveEnergy(int);

@@ -22,7 +22,9 @@ private:
 public:
 	Material();
 	Material(std::string, double, double, double, double, double);
-	~Material();
+	~Material() = default;
+	Material(Material const&); //Copy constructor.
+	Material & operator = (Material const&); //Copy allocation.
 
 	//getters
 	double getCellSize() const;

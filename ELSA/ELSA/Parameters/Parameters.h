@@ -55,6 +55,9 @@ public:
 		bool,
 		char*,
 		Material);
+	Parameters(Parameters const&); //Copy constructor.
+	Parameters & operator = (Parameters const&); //Copy allocation.
+
 
 	//Getters.
 	unsigned int getNumberOfAtoms() const;
@@ -79,7 +82,7 @@ public:
 	bool getIsThermostatOn() const;
 	bool getIsUseLastSimulationState() const;
 
-	char* getLastStateFileName();
+	char* getLastStateFileName() const;
 
 	Material getChosenMaterial() const;
 

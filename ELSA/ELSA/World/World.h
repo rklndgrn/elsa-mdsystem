@@ -58,8 +58,14 @@ private:
 
 public:
 	World() = default;
-	World(Parameters, int);
+	World(Parameters &, Simulation &, int);
 	~World() = default;
+	/*
+	World(World const&); //Copy constructor.
+	World & operator = (World const&); //Copy allocation.
+	World(World &&); //Move constructor.s
+	World & operator = (World &&); //Move allocation.
+	*/
 
 	Results getResults();
 

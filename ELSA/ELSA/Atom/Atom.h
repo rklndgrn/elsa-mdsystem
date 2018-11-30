@@ -25,6 +25,8 @@ public:
 	Atom(int, double, double, double);
 	Atom() = default;
 	~Atom() = default;
+	Atom(Atom const&); //Copy constructor.
+	Atom & operator = (Atom const&); //Copy allocation.
 
 	void addToNeighbourList(Atom*);
 	void clearNeighbourList();

@@ -3,11 +3,16 @@
 	Date: 2018-11-06
 	This file contains the definition of the class Material
 */
+ 
 
 #include "Material.h"
 #include <string>
 
 using namespace std;
+
+/* PRIVATE */
+
+/* PUBLIC */
 
 Material::Material() : 
 	_crystalStructure{""},
@@ -36,10 +41,29 @@ Material::Material(
 	_cellSize = ceil(cutOffDistance / latticeConstant)*latticeConstant;
 }
 
+//Copy constructor, e.g. m2{m}.
+Material::Material(Material const& other)
+{
+	_cutOffDistance = other.getCutOffDistance();
+	double _cellSize = other.getCellSize();
+	double _epsilon = other.getEpsilon();
+	double _latticeConstant = other.getLatticeConstant();
+	double _mass = other.getMass();
+	double _sigma = other.getSigma();
+}
 
-Material::~Material()
-{}
+//Copy allocation, e.g. m2 = m.
+Material & Material::operator = (Material const& other)
+{
+	_cutOffDistance = other.getCutOffDistance();
+	double _cellSize = other.getCellSize();
+	double _epsilon = other.getEpsilon();
+	double _latticeConstant = other.getLatticeConstant();
+	double _mass = other.getMass();
+	double _sigma = other.getSigma();
 
+	return *this;
+}
 
 //getters
 double Material::getCellSize() const

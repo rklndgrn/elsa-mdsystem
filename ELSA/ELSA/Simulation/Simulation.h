@@ -12,14 +12,14 @@ private:
 	Material _mat;
 public:
 	Simulation() = default;
-	Simulation(Material mat);
+	Simulation(Material &);
 
 	~Simulation() = default;
 
 	double calcDebyeTemperature(double, double, double, double, double);
 	double calcForce(double) const;
 	double calcKineticEnergy(double, double, double);
-	double calcLJPotential(double dist) const;
+	double calcLJPotential(double) const;
 	double calcMeanSquareDisplacement(double**, double**, unsigned int, double, double, double, bool);
 	double calcSelfDiffusionCoefficient(double ***, double, double, double, unsigned int, double, double, double, bool);
 	double calcSpecificHeat(unsigned int, double, double, double*);

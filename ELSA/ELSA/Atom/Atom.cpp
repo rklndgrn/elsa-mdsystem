@@ -11,6 +11,86 @@ Atom::Atom(int newID, double newPosX, double newPosY, double newPosZ)
 	_position[2] = newPosZ;
 }
 
+//Copy constructor, e.g. r2{r}.
+Atom::Atom(Atom const& other)
+{
+	_id = other.getID();
+	_potential = other.getPotential();
+
+	_acceleration[0] = other.getAccelerationX();
+	_acceleration[1] = other.getAccelerationY();
+	_acceleration[2] = other.getAccelerationZ();
+
+	_cellIndex[0] = other.getCellIndex()[0];
+	_cellIndex[1] = other.getCellIndex()[1];
+	_cellIndex[2] = other.getCellIndex()[2];
+
+	_force[0] = other.getForceX();
+	_force[1] = other.getForceY();
+	_force[2] = other.getForceZ();
+
+	Atom* a;
+	for (int i = 0; other.getNeighbourList().size(); i++)
+	{
+		a = new Atom;
+		a = other.getNeighbourList().at(i);
+		
+		_neighbourList.push_back(a);
+	}
+
+	_position[0] = other.getPositionX();
+	_position[1] = other.getPositionY();
+	_position[2] = other.getPositionZ();
+
+	_velocity[0] = other.getVelocityX();
+	_velocity[1] = other.getVelocityY();
+	_velocity[2] = other.getVelocityZ();
+}
+
+//Copy allocation, t.ex. r = r2{other}.
+Atom & Atom::operator = (Atom const& other)
+{
+	for (Atom* a: _neighbourList)
+	{
+		delete a;
+	}
+	_neighbourList.clear();
+
+	_id = other.getID();
+	_potential = other.getPotential();
+
+	_acceleration[0] = other.getAccelerationX();
+	_acceleration[1] = other.getAccelerationY();
+	_acceleration[2] = other.getAccelerationZ();
+
+	_cellIndex[0] = other.getCellIndex()[0];
+	_cellIndex[1] = other.getCellIndex()[1];
+	_cellIndex[2] = other.getCellIndex()[2];
+
+	_force[0] = other.getForceX();
+	_force[1] = other.getForceY();
+	_force[2] = other.getForceZ();
+
+	Atom* a;
+	for (int i = 0; other.getNeighbourList().size(); i++)
+	{
+		a = new Atom;
+		a = other.getNeighbourList().at(i);
+
+		_neighbourList.push_back(a);
+	}
+
+	_position[0] = other.getPositionX();
+	_position[1] = other.getPositionY();
+	_position[2] = other.getPositionZ();
+
+	_velocity[0] = other.getVelocityX();
+	_velocity[1] = other.getVelocityY();
+	_velocity[2] = other.getVelocityZ();
+
+	return *this;
+}
+
 
 //Append atom to neighbour list
 void Atom::addToNeighbourList(Atom* a)
@@ -25,7 +105,6 @@ void Atom::clearNeighbourList()
 }
 
 //Getters
-
 unsigned int Atom::getID() const
 {
 	return _id;

@@ -14,10 +14,36 @@ using namespace std;
 
 int main()
 {
+	Atom r1(0, 0, 0, 0);
+	Atom r2{r1};
+	Atom r3{1, 5, 5, 5};
+	r1.addToNeighbourList(&r3);
+	Atom r4 = r3;
 
+	cout << "ID for r1: " << r1.getID() << endl;
+	cout << "ID for r2: " << r2.getID() << endl;
+
+	cout << "Neighbour list size for r1: " << r1.getNeighbourList().size() << endl;
+	cout << "Neighbour list size for r2: " << r2.getNeighbourList().size() << endl;
+
+	cout << "Array length for r3: " << r3.getID() << endl;
+	cout << "Array length for r4: " << r4.getID() << endl;
+
+	cout << "Neighbour list size for r3: " << r3.getNeighbourList().size() << endl;
+	cout << "Neighbour list size for r4: " << r4.getNeighbourList().size() << endl;
+
+	cout << "ID for element in r1s neighbour list: " << r1.getNeighbourList().at(0)->getID() << endl;
+
+	char c;
+
+	cin >> c;
+
+
+	/*
 	visual myVis;
 
 	Gui myGui;
+
 	myGui.setupGui(myVis.getWindow());
 
 	int count = 0;
@@ -28,6 +54,7 @@ int main()
 	int unitCellsX = 1;
 	int unitCellsY = 1;
 	int unitCellsZ = 1;
+	int hello{ 0 };
 	while ((glfwGetKey(myVis.getWindow(), GLFW_KEY_ESCAPE) != GLFW_PRESS &&
 		glfwWindowShouldClose(myVis.getWindow()) == 0))// || myGui.exitPressed() )
 	{
@@ -89,21 +116,15 @@ int main()
 				myGui.getLastStateFileName(),
 				myMaterial);
 
-			World myWorld(myParameters, myGui.getNumberOfThreads());
+			//Results myResults( myParameters.getSimulationTime(), myParameters.getTimeStep(), myParameters.getNumberOfAtoms() );
+			Simulation mySimulation(myParameters.getChosenMaterial());
+
+			cout << "Loop iteration " << hello << "!" << endl;
+			World myWorld(myParameters, mySimulation, myGui.getNumberOfThreads());
+			cout << "Iteration " << hello << " made it!" << endl;
+			hello++;
 
 			double deltaT = myParameters.getTimeStep();
-
-			double** cohesiveEnergyArray = myWorld.getResults().getCohesiveEnergy();
-			double** debyeTempArray = myWorld.getResults().getDebyeTemperature();
-			double** kinArray = myWorld.getResults().getKineticEnergy();
-			double** msdArray = myWorld.getResults().getMeanSquareDisplacement();
-			double**** posArray = myWorld.getResults().getPositions();
-			double** potArray = myWorld.getResults().getPotentialEnergy();
-			double** pressureArray = myWorld.getResults().getInternalPressure();
-			double** selfDiffArray = myWorld.getResults().getDiffusionConstant();
-			double** specificHeatArray = myWorld.getResults().getSpecificHeat();
-			double** tempArray = myWorld.getResults().getTemperature();
-			double** totArray = myWorld.getResults().getTotalEnergy();
 
 			int index{ 0 };
 
@@ -142,6 +163,7 @@ int main()
 				}
 
 			}
+
 			myGui.stopSimulate();
 			myGui.setMainVisible(true);
 
@@ -160,17 +182,17 @@ int main()
 
 			saveLastState.close();
 
-			myGui._cohesiveEnergy = *cohesiveEnergyArray;
-			myGui._debyeTemperature = *debyeTempArray;
-			myGui._kineticEnergy = *kinArray;
-			myGui._meanSquareDisplacement = *msdArray;
-			myGui._pos = *posArray;
-			myGui._potentialEnergy = *potArray;
-			myGui._pressure = *pressureArray;
-			myGui._selfDiffusionCoeff = *selfDiffArray;
-			myGui._specificHeat = *specificHeatArray;
-			myGui._temp = *tempArray;
-			myGui._totalEnergy = *totArray;
+			myGui._cohesiveEnergy = *(myWorld.getResults().getCohesiveEnergy());
+			myGui._debyeTemperature = *(myWorld.getResults().getDebyeTemperature());
+			myGui._kineticEnergy = *(myWorld.getResults().getKineticEnergy());
+			myGui._meanSquareDisplacement = *(myWorld.getResults().getMeanSquareDisplacement());
+			myGui._pos = *(myWorld.getResults().getPositions());
+			myGui._potentialEnergy = *(myWorld.getResults().getPotentialEnergy());
+			myGui._pressure = *(myWorld.getResults().getInternalPressure());
+			myGui._selfDiffusionCoeff = *(myWorld.getResults().getDiffusionConstant());
+			myGui._specificHeat = *(myWorld.getResults().getSpecificHeat());
+			myGui._temp = *(myWorld.getResults().getTemperature());
+			myGui._totalEnergy = *(myWorld.getResults().getTotalEnergy());
 			myGui.setNumberOfTimeStepsPlot((int)round(myParameters.getSimulationTime()/myParameters.getTimeStep()));
 
 			maxVisualTime = (int)round(myParameters.getSimulationTime() / myParameters.getTimeStep());
@@ -180,6 +202,7 @@ int main()
 			unitCellsZ = myParameters.getNumberOfUnitCellsZ();
 
 			myVis.setNumberOfParticles(myParameters.getNumberOfAtoms());
+			cout << "WE MADE IT!" << endl;
 		}
 
 		//myGui.handlePlots();// , kinenen, totenen, tempen);
@@ -208,6 +231,7 @@ int main()
 
 	glfwDestroyWindow(myVis.getWindow());
 	glfwTerminate();
+	*/
 
 	return 0;
 }
