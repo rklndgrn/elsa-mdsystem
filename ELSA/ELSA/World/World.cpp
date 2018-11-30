@@ -53,7 +53,7 @@ void World::calcPotentialAndForce(double elapsedTime)
 {
 	//Reset before the next iteration.
 	resetAllPotentialsAndForces();
-	_pressureRFSum = 0;
+	//_pressureRFSum = 0;
 
 	double potential{ 0 }, force{ 0 };// , totalPotential{ 0 };
 	Atom* a1;

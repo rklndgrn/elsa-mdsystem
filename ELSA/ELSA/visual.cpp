@@ -23,6 +23,11 @@ void visual::setNumberOfParticles(int number)
 	_numberOfParticles = number;
 }
 
+void visual::setIs2D(bool value)
+{
+	_is2D = value;
+}
+
 std::array<visual::_particle, _maxParticles> visual::getParticlesContainer()
 {
 	return _particlesContainer;
@@ -298,6 +303,15 @@ void visual::mainLoopVisual(double*** pos, int time, int maxTime, double lattice
 			_gParticulePositionSizeData[4 * ParticlesCount + 2] = _particlesContainer[i].pos.z;
 
 			_gParticulePositionSizeData[4 * ParticlesCount + 3] = _particlesContainer[i].size;
+
+			if (_is2D && (i < numberOfUnitCellsX*numberOfUnitCellsY * 4 || i > _numberOfParticles - numberOfUnitCellsX * numberOfUnitCellsY * 4))
+			{
+				setParticleColor(i, glm::vec4(255, 96, 4, 255));
+			}
+			else
+			{
+				setParticleColor(i, glm::vec4(4, 155, 255, 255));
+			}
 
 			_gParticuleColorData[4 * ParticlesCount + 0] = _particlesContainer[i].r;
 			_gParticuleColorData[4 * ParticlesCount + 1] = _particlesContainer[i].g;

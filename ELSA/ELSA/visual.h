@@ -41,6 +41,7 @@ private:
 
 	Gui _theGui;
 	bool _atomsVisible = false;
+	bool _is2D = false;
 	int _numberOfParticles;
 	GLFWwindow * window;
 	GLuint _texture;
@@ -94,6 +95,7 @@ public:
 	GLuint getParticlesColorBuffer();
 
 	void setAtomsVisible(bool visibility);
+	void setIs2D(bool);
 	void setNumberOfParticles(int);
 
 	GLFWwindow* getWindow();
