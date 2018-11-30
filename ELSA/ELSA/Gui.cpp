@@ -451,19 +451,19 @@ void Gui::handleMenu(double elapsedTime, double totalTime, int* visualisationTim
 
 void Gui::handlePlots()
 {
-	bool auto_resize = false;
-	int numberOfTimeSteps = _numberOfTimeStepsPlot;
-	//ImGuiWindowFlags window_flags = 0;
-	ImGuiWindowFlags flags = auto_resize ? ImGuiWindowFlags_AlwaysAutoResize : 0;
-	flags |= ImGuiWindowFlags_NoResize;
-
 	if (_plotVisible)
 	{
+		bool auto_resize = false;
+		int numberOfTimeSteps = _numberOfTimeStepsPlot;
+		//ImGuiWindowFlags window_flags = 0;
+		ImGuiWindowFlags flags = auto_resize ? ImGuiWindowFlags_AlwaysAutoResize : 0;
+		flags |= ImGuiWindowFlags_NoResize;
+
 		ImGui::Begin("Results", &_plotVisible, flags);
 		ImGui::SetWindowSize(ImVec2(glfwGetVideoMode(glfwGetPrimaryMonitor())->width, glfwGetVideoMode(glfwGetPrimaryMonitor())->height - 22));
 		ImGui::SetWindowPos(ImVec2(0, 22));
 
-
+		// Print the most important results at the head of the results window
 		ImGui::Text("Potential energy: \n %E", _potentialEnergy[numberOfTimeSteps - 1]);
 		ImGui::SameLine();
 		ImGui::Text("Kinetic energy: \n %E", _kineticEnergy[numberOfTimeSteps - 1]);
@@ -483,8 +483,14 @@ void Gui::handlePlots()
 			{
 				cohesiveVector->push_back(static_cast<float>(_cohesiveEnergy[i + 1]) / _elementaryCharge);
 
-				if (cohesiveVector->at(i) > max) { max = cohesiveVector->at(i); }
-				else if (cohesiveVector->at(i) < min) { min = cohesiveVector->at(i); }
+				if (cohesiveVector->at(i) > max) 
+				{
+					max = cohesiveVector->at(i); 
+				}
+				else if (cohesiveVector->at(i) < min)
+				{
+					min = cohesiveVector->at(i); 
+				}
 
 				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
 				{
@@ -506,8 +512,14 @@ void Gui::handlePlots()
 			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
 				debyeTempVector->push_back(static_cast<float>(_debyeTemperature[i + 1]));
-				if (debyeTempVector->at(i) > max) { max = debyeTempVector->at(i); }
-				else if (debyeTempVector->at(i) < min) { min = debyeTempVector->at(i); }
+				if (debyeTempVector->at(i) > max)
+				{
+					max = debyeTempVector->at(i);
+				}
+				else if (debyeTempVector->at(i) < min) 
+				{
+					min = debyeTempVector->at(i); 
+				}
 				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
 				{
 					sumLast10 += debyeTempVector->at(i);
@@ -529,8 +541,14 @@ void Gui::handlePlots()
 			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
 				pressureVector->push_back(static_cast<float>(_pressure[i + 1]));
-				if (pressureVector->at(i) > max) { max = pressureVector->at(i); }
-				else if (pressureVector->at(i) < min) { min = pressureVector->at(i); }
+				if (pressureVector->at(i) > max)
+				{
+					max = pressureVector->at(i); 
+				}
+				else if (pressureVector->at(i) < min)
+				{
+					min = pressureVector->at(i); 
+				}
 				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
 				{
 					sumLast10 += pressureVector->at(i);
@@ -551,8 +569,14 @@ void Gui::handlePlots()
 			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
 				kineticVector->push_back(static_cast<float>(_kineticEnergy[i + 1]) / _elementaryCharge);
-				if (kineticVector->at(i) > max) { max = kineticVector->at(i); }
-				else if (kineticVector->at(i) < min) { min = kineticVector->at(i); }
+				if (kineticVector->at(i) > max)
+				{
+					max = kineticVector->at(i);
+				}
+				else if (kineticVector->at(i) < min) 
+				{
+					min = kineticVector->at(i);
+				}
 				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
 				{
 					sumLast10 += kineticVector->at(i);
@@ -572,8 +596,14 @@ void Gui::handlePlots()
 			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
 				meanSquareVector->push_back(1e20*static_cast<float>(_meanSquareDisplacement[i + 1]));
-				if (meanSquareVector->at(i) > max) { max = meanSquareVector->at(i); }
-				else if (meanSquareVector->at(i) < min) { min = meanSquareVector->at(i); }
+				if (meanSquareVector->at(i) > max) 
+				{
+					max = meanSquareVector->at(i); 
+				}
+				else if (meanSquareVector->at(i) < min) 
+				{
+					min = meanSquareVector->at(i); 
+				}
 				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
 				{
 					sumLast10 += meanSquareVector->at(i);
@@ -595,8 +625,14 @@ void Gui::handlePlots()
 			{
 				potentialVector->push_back(static_cast<float>(_potentialEnergy[i + 1]) / _elementaryCharge);
 
-				if (potentialVector->at(i) > max) { max = potentialVector->at(i); }
-				else if (potentialVector->at(i) < min) { min = potentialVector->at(i); }
+				if (potentialVector->at(i) > max) 
+				{
+					max = potentialVector->at(i); 
+				}
+				else if (potentialVector->at(i) < min) 
+				{
+					min = potentialVector->at(i); 
+				}
 
 				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
 				{
@@ -618,7 +654,10 @@ void Gui::handlePlots()
 			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
 				selfDiffVector->push_back(static_cast<float>(_selfDiffusionCoefficient[i + 1]));
-				if (selfDiffVector->at(i) > max) { max = selfDiffVector->at(i); }
+				if (selfDiffVector->at(i) > max)
+				{
+					max = selfDiffVector->at(i); 
+				}
 				else if (selfDiffVector->at(i) < min) { min = selfDiffVector->at(i); }
 				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
 				{
@@ -641,8 +680,14 @@ void Gui::handlePlots()
 			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
 				specificHeatVector->push_back(static_cast<float>(_specificHeat[i + 1]));
-				if (specificHeatVector->at(i) > max) { max = specificHeatVector->at(i); }
-				else if (specificHeatVector->at(i) < min) { min = specificHeatVector->at(i); }
+				if (specificHeatVector->at(i) > max)
+				{
+					max = specificHeatVector->at(i); 
+				}
+				else if (specificHeatVector->at(i) < min)
+				{
+					min = specificHeatVector->at(i);
+				}
 				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
 				{
 					sumLast10 += specificHeatVector->at(i);
@@ -653,7 +698,6 @@ void Gui::handlePlots()
 			printStatistics(min, max, sumLast10);
 			delete specificHeatVector;
 		}
-
 		if (ImGui::CollapsingHeader("Temperature"))
 		{
 			std::vector<float>* temperatureVector = new std::vector<float>;
@@ -664,8 +708,14 @@ void Gui::handlePlots()
 			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
 				temperatureVector->push_back(static_cast<float>(_simulatedTemperature[i + 1]));
-				if (temperatureVector->at(i) > max) { max = temperatureVector->at(i); }
-				else if (temperatureVector->at(i) < min) { min = temperatureVector->at(i); }
+				if (temperatureVector->at(i) > max) 
+				{
+					max = temperatureVector->at(i); 
+				}
+				else if (temperatureVector->at(i) < min) 
+				{
+					min = temperatureVector->at(i); 
+				}
 				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
 				{
 					sumLast10 += temperatureVector->at(i);
@@ -685,8 +735,14 @@ void Gui::handlePlots()
 			for (int i = 0; i < numberOfTimeSteps - 1; i++)
 			{
 				totalEnergyVector->push_back(static_cast<float>(_totalEnergy[i + 1]) / _elementaryCharge);
-				if (totalEnergyVector->at(i) > max) { max = totalEnergyVector->at(i); }
-				else if (totalEnergyVector->at(i) < min) { min = totalEnergyVector->at(i); }
+				if (totalEnergyVector->at(i) > max) 
+				{
+					max = totalEnergyVector->at(i);
+				}
+				else if (totalEnergyVector->at(i) < min)
+				{
+					min = totalEnergyVector->at(i);
+				}
 				if (i >= numberOfTimeSteps - 11 && i < numberOfTimeSteps - 1)
 				{
 					sumLast10 += totalEnergyVector->at(i);
@@ -698,8 +754,6 @@ void Gui::handlePlots()
 			printStatistics(min, max, sumLast10);
 			delete totalEnergyVector;
 		}
-
-
 		ImGui::End();
 	}
 }
@@ -714,8 +768,14 @@ void Gui::handleProgressBar(double elapsedTime, double totalTime)
 	// Typically we would use ImVec2(-1.0f,0.0f) to use all available width, or ImVec2(width,0.0f) for a specified width. ImVec2(0.0f,0.0f) uses ItemWidth.
 	ImGui::ProgressBar(progress, ImVec2(0.0f, 0.0f));
 	ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
-	if (_simulate && !_initializing) { ImGui::Text("Simulating..."); }
-	else { ImGui::Text("Initializing..."); }
+	if (_simulate && !_initializing)
+	{
+		ImGui::Text("Simulating..."); 
+	}
+	else
+	{
+		ImGui::Text("Initializing..."); 
+	}
 
 }
 
@@ -772,12 +832,19 @@ void Gui::loadResultsWindow()
 			strcat(buf1, ".txt");
 			std::ifstream myFile;
 			myFile.open(buf1);
-			if (!myFile.is_open()) { _unableToOpenFile = true; }
+			if (!myFile.is_open())
+			{
+				_unableToOpenFile = true; 
+			}
 			else
 			{
 				std::string dummy;
 				int sizeOfFile{ 0 }, i{ 0 };
-				while (!myFile.eof()) { getline(myFile, dummy); sizeOfFile++; }
+				while (!myFile.eof()) 
+				{
+					getline(myFile, dummy);
+					sizeOfFile++;
+				}
 				myFile.close(); myFile.open(buf1);
 
 				_cohesiveEnergy = new double[sizeOfFile];
@@ -816,8 +883,14 @@ void Gui::loadResultsWindow()
 			}
 		}
 		ImGui::SameLine();
-		if (ImGui::Button("Cancel")) { _loadResultWindow = false; };
-		if (_unableToOpenFile) { ImGui::Text("Unable to open file..."); }
+		if (ImGui::Button("Cancel")) 
+		{
+			_loadResultWindow = false; 
+		};
+		if (_unableToOpenFile) 
+		{
+			ImGui::Text("Unable to open file...");
+		}
 		ImGui::End();
 	}
 }
@@ -833,8 +906,10 @@ void Gui::saveResultsWindow()
 		ImGui::Begin("Save results file...", &_saveResultWindow, flags);
 		ImGui::SetWindowSize(ImVec2(500, 110));
 		ImGui::Text("Enter the name of the file you want to save to:");
-		static char buf1[64] = "./SaveData/"; ImGui::InputText(".txt", buf1, 64);
-		if (ImGui::Button("Save")) {
+		static char buf1[64] = "./SaveData/";
+		ImGui::InputText(".txt", buf1, 64);
+		if (ImGui::Button("Save")) 
+		{
 			strcat(buf1, ".txt");
 			std::ofstream myFile;
 			myFile.open(buf1);
@@ -861,7 +936,10 @@ void Gui::saveResultsWindow()
 			_saveResultWindow = false;
 		}
 		ImGui::SameLine();
-		if (ImGui::Button("Cancel")) { _saveResultWindow = false; };
+		if (ImGui::Button("Cancel"))
+		{
+			_saveResultWindow = false; 
+		};
 		ImGui::End();
 	}
 }
@@ -996,7 +1074,10 @@ void Gui::stopButtonHandler()
 	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.0f, 1.f, 1.f));
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 1.0f, 0.9f));
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.0f, 1.0f, 0.8f));
-	if (ImGui::Button("Stop Simulation")) { _simulate = false; }
+	if (ImGui::Button("Stop Simulation"))
+	{
+		_simulate = false;
+	}
 	ImGui::PopStyleColor(3);
 	ImGui::PopID();
 }
