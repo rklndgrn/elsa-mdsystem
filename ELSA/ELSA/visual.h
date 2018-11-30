@@ -24,8 +24,6 @@ using namespace glm;
 
 class visual
 {
-
-
 private:
 	struct _particle {
 		glm::vec3 pos, speed;
@@ -40,74 +38,75 @@ private:
 	};
 
 	Gui _theGui;
+
+	std::array<_particle, _maxParticles> _particlesContainer;
+
 	bool _atomsVisible = false;
+
 	int _numberOfParticles;
-	GLFWwindow * window;
-	GLuint _texture;
+
 	const GLfloat _gVertexBufferData[12] = {
 		-0.5f, -0.5f, 0.0f,
 		0.5f, -0.5f, 0.0f,
 		-0.5f,  0.5f, 0.0f,
 		0.5f,  0.5f, 0.0f,
 	};
-	GLuint _billboardVertexBuffer;
-	GLuint _particlesPositionBuffer;
-	GLuint _particlesColorBuffer;
-	GLuint _vertexArrayID;
-	GLuint _programID;
-	// Vertex shader
-	GLuint _cameraRightWorldspaceID;
-	GLuint _cameraUpWorldspaceID;
-	GLuint _viewProjMatrixID;
-
-	// fragment shader
-	GLuint _textureID;
 
 	GLfloat* _gParticulePositionSizeData;
-	GLubyte* _gParticuleColorData;
 
-	std::array<_particle, _maxParticles> _particlesContainer;
+	GLFWwindow* window;
+
+	GLubyte* _gParticuleColorData;
+	
+	GLuint _billboardVertexBuffer;
+	GLuint _cameraRightWorldspaceID;
+	GLuint _cameraUpWorldspaceID;
+	GLuint _particlesColorBuffer;
+	GLuint _particlesPositionBuffer;
+	GLuint _programID;
+	GLuint _texture;
+	GLuint _textureID;
+	GLuint _vertexArrayID;
+	GLuint _viewProjMatrixID;
 
 public:
 	visual();
 	visual(const int maxPart);
-	~visual() = default;
 
+	~visual();
 
 	std::array<_particle, _maxParticles> getParticlesContainer();
+
+	GLfloat* getGParticulePositionSizeData();
+
+	GLFWwindow* getWindow();
+
+	GLubyte* getGParticuleColorData();
+
+	GLuint getBillboardVertexBuffer();
+	GLuint getCameraRightWorldspaceID();
+	GLuint getCameraUpWorldspaceID();
+	GLuint getParticlesColorBuffer();
+	GLuint getParticlesPositionBuffer();
+	GLuint getProgramID();
+	GLuint getTexture();
+	GLuint getTextureID();
+	GLuint getVertexArrayID();
+	GLuint getViewProjMatrix();
+
+	Gui getGui();
+
+	void initGLEW();
+	void initGLFW();
+	void initOpenGL();
+	void initVisual();
+	void mainLoopVisual(double***, int, int, double, int, int, int);
+	void openWindow();
+	void setAtomsVisible(bool visibility);
+	void setNumberOfParticles(int);
 	void setParticleCameraDist(int id, float dist);
 	void setParticlePosition(int id, glm::vec3 pos);
 	void setParticleColor(int id, glm::vec4 color);
 	void setParticleSize(int id, float size);
-	int initGLFW();
-	void openWindow();
 	void sortParticles();
-	void initVisual();
-	void initGLEW();
-	void initOpenGL();
-
-	void mainLoopVisual(double***, int, int, double, int, int, int);
-
-	GLuint getTexture();
-	GLuint getBillboardVertexBuffer();
-	GLuint getParticlesPositionBuffer();
-	GLuint getParticlesColorBuffer();
-
-	void setAtomsVisible(bool visibility);
-	void setNumberOfParticles(int);
-
-	GLFWwindow* getWindow();
-
-	GLuint getVertexArrayID();
-	GLuint getProgramID();
-	GLuint getCameraRightWorldspaceID();
-	GLuint getCameraUpWorldspaceID();
-	GLuint getViewProjMatrix();
-	GLuint getTextureID();
-
-	GLfloat* getGParticulePositionSizeData();
-	GLubyte* getGParticuleColorData();
-
-	Gui getGui();
-	void handleGui();
 };

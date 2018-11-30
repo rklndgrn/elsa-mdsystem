@@ -1,104 +1,118 @@
 #include "visual.h"
-//#define _maxParticles 27
 
-static void glfw_error_callback(int error, const char* description)
-{
-	fprintf(stderr, "Glfw Error %d: %s\n", error, description);
-}
+// Constructors
 
-visual::visual()//:_maxParticles(0)
+visual::visual()
 {
-	//_theGui.setupGui(getWindow());
 	initVisual();
 }
 
-visual::visual(const int maxPart)//:_maxParticles(maxPart)
+visual::visual(const int maxPart)
 {
-	//_theGui.setupGui(getWindow());
 	initVisual();
 }
 
-void visual::setNumberOfParticles(int number)
+visual::~visual()
 {
-	_numberOfParticles = number;
+	delete _gParticulePositionSizeData;
+	delete _gParticuleColorData;
 }
+
+// Public functions
 
 std::array<visual::_particle, _maxParticles> visual::getParticlesContainer()
 {
 	return _particlesContainer;
 }
 
-void visual::setParticleCameraDist(int id, float dist)
+GLfloat* visual::getGParticulePositionSizeData()
 {
-	_particlesContainer[id].cameradistance = dist;
+	return _gParticulePositionSizeData;
 }
 
-void visual::setParticlePosition(int id, glm::vec3 pos)
+GLFWwindow* visual::getWindow()
 {
-	_particlesContainer[id].pos = pos;
+	return window;
 }
 
-void visual::setParticleColor(int id, glm::vec4 color)
+GLubyte* visual::getGParticuleColorData()
 {
-	_particlesContainer[id].r = static_cast<unsigned char>(color.x);
-	_particlesContainer[id].g = static_cast<unsigned char>(color.y);
-	_particlesContainer[id].b = static_cast<unsigned char>(color.z);
-	_particlesContainer[id].a = static_cast<unsigned char>(color.w);
+	return _gParticuleColorData;
 }
 
-void visual::setParticleSize(int id, float size)
+GLuint visual::getBillboardVertexBuffer()
 {
-	_particlesContainer[id].size = size;
+	return _billboardVertexBuffer;
 }
 
-int visual::initGLFW()
+GLuint visual::getCameraRightWorldspaceID()
+{
+	return _cameraRightWorldspaceID;
+}
+
+GLuint visual::getCameraUpWorldspaceID()
+{
+	return _cameraUpWorldspaceID;
+}
+
+GLuint visual::getParticlesColorBuffer()
+{
+	return _particlesColorBuffer;
+}
+
+GLuint visual::getParticlesPositionBuffer()
+{
+	return _particlesPositionBuffer;
+}
+
+GLuint visual::getProgramID()
+{
+	return _programID;
+}
+
+GLuint visual::getTexture()
+{
+	return _texture;
+}
+
+GLuint visual::getTextureID()
+{
+	return _textureID;
+}
+
+GLuint visual::getVertexArrayID()
+{
+	return _vertexArrayID;
+}
+
+GLuint visual::getViewProjMatrix()
+{
+	return _viewProjMatrixID;
+}
+
+Gui visual::getGui()
+{
+	return _theGui;
+}
+
+// Initialize GLFW
+void visual::initGLFW()
 {
 	if (!glfwInit())
 	{
 		fprintf(stderr, "Failed to initialize GLFW\n");
 		getchar();
-		return -1;
 	}
 
 	glfwWindowHint(GLFW_SAMPLES, 4);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 }
 
-void visual::openWindow()
-{
-	window = glfwCreateWindow(glfwGetVideoMode(glfwGetPrimaryMonitor())->width, glfwGetVideoMode(glfwGetPrimaryMonitor())->height, "ELSA MD-Simulation", glfwGetPrimaryMonitor(), NULL);
-	if (window == NULL) {
-		fprintf(stderr, "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n");
-		getchar();
-		glfwTerminate();
-		//return -1;
-	}
-	glfwMakeContextCurrent(window);
-	glfwSwapInterval(1);
-	//return 0;
-}
-
-
-
-void visual::sortParticles()
-{
-	std::sort(&_particlesContainer[0], &_particlesContainer[_maxParticles]); 
-}
-
-void visual::initVisual()
-{
-	initGLFW();
-	openWindow();
-	initGLEW();
-	initOpenGL();
-
-
-}
-
+// Initialize GLEW
 void visual::initGLEW()
 {
 	glewExperimental = true; // Needed for core profile
@@ -106,11 +120,10 @@ void visual::initGLEW()
 		fprintf(stderr, "Failed to initialize GLEW\n");
 		getchar();
 		glfwTerminate();
-		//return -1;
 	}
-
 }
 
+// Initialize OpenGL
 void visual::initOpenGL()
 {
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
@@ -130,19 +143,17 @@ void visual::initOpenGL()
 	// Create and compile our GLSL program from the shaders
 	_programID = LoadShaders("Particle.vertexshader", "Particle.fragmentshader");
 
-	// Vertex shader
 	_cameraRightWorldspaceID = glGetUniformLocation(_programID, "CameraRight_worldspace");
 	_cameraUpWorldspaceID = glGetUniformLocation(_programID, "CameraUp_worldspace");
 	_viewProjMatrixID = glGetUniformLocation(_programID, "VP");
 
-	// fragment shader
 	_textureID = glGetUniformLocation(_programID, "myTextureSampler");
 
 	_gParticulePositionSizeData = new GLfloat[_maxParticles * 4];
 	_gParticuleColorData = new GLubyte[_maxParticles * 4];
 
-	for (int i = 0; i < _maxParticles; i++) {
-		//ParticlesContainer[i].life = -1.0f;
+	for (int i{ 0 }; i < _maxParticles; i++)
+	{
 		setParticleCameraDist(i, -1.0f);
 	}
 
@@ -166,92 +177,20 @@ void visual::initOpenGL()
 
 	glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
 
-	for (int i = 0; i < _maxParticles; i++) {
-		int particleIndex = i;
-
-
-		//setParticlePosition(particleIndex, glm::vec3(0, 0, -20.0f));
-		setParticleColor(particleIndex, glm::vec4(50, 30, 255, 255));
-		
-		setParticleSize(particleIndex, 0.1f);
-
-		visual::_particle& p = getParticlesContainer()[i]; // shortcut
+	for (int i{ 0 }; i < _maxParticles; i++)
+	{
+		setParticleColor(i, glm::vec4(50, 30, 255, 255));
+		setParticleSize(i, 0.1f);
 	}
 }
 
-GLuint visual::getTexture()
+// Initialization. It calls the different initialization functions
+void visual::initVisual()
 {
-	return _texture;
-}
-
-GLuint visual::getBillboardVertexBuffer()
-{
-	return _billboardVertexBuffer;
-}
-
-GLuint visual::getParticlesPositionBuffer()
-{
-	return _particlesPositionBuffer;
-}
-
-GLuint visual::getParticlesColorBuffer()
-{
-	return _particlesColorBuffer;
-}
-
-void visual::setAtomsVisible(bool visibility)
-{
-	_atomsVisible = visibility;
-}
-
-GLFWwindow * visual::getWindow()
-{
-	return window;
-}
-
-GLuint visual::getVertexArrayID()
-{
-	return _vertexArrayID;
-}
-
-GLuint visual::getProgramID()
-{
-	return _programID;
-}
-
-GLuint visual::getCameraRightWorldspaceID()
-{
-	return _cameraRightWorldspaceID;
-}
-
-GLuint visual::getCameraUpWorldspaceID()
-{
-	return _cameraUpWorldspaceID;
-}
-
-GLuint visual::getViewProjMatrix()
-{
-	return _viewProjMatrixID;
-}
-
-GLuint visual::getTextureID()
-{
-	return _textureID;
-}
-
-GLfloat* visual::getGParticulePositionSizeData()
-{
-	return _gParticulePositionSizeData;
-}
-
-GLubyte* visual::getGParticuleColorData()
-{
-	return _gParticuleColorData;
-}
-
-Gui visual::getGui()
-{
-	return _theGui;
+	initGLFW();
+	openWindow();
+	initGLEW();
+	initOpenGL();
 }
 
 void visual::mainLoopVisual(double*** pos, int time, int maxTime, double latticeConstant, int numberOfUnitCellsX, int numberOfUnitCellsY, int numberOfUnitCellsZ)
@@ -275,15 +214,15 @@ void visual::mainLoopVisual(double*** pos, int time, int maxTime, double lattice
 
 	// Simulate all particles
 	int ParticlesCount = 0;
-	
+
 	float positionsF[_maxParticles][3];
 	if (pos != NULL && time < maxTime)
 	{
 		for (int i = 0; i < _numberOfParticles; i++)
 		{
-				positionsF[i][0] = static_cast<float>(pos[time][i][0]) / latticeConstant - numberOfUnitCellsX / 2.0;
-				positionsF[i][1] = static_cast<float>(pos[time][i][1]) / latticeConstant - numberOfUnitCellsY / 2.0;
-				positionsF[i][2] = static_cast<float>(pos[time][i][2]) / latticeConstant - numberOfUnitCellsZ / 2.0;
+			positionsF[i][0] = static_cast<float>(pos[time][i][0]) / latticeConstant - numberOfUnitCellsX / 2.0;
+			positionsF[i][1] = static_cast<float>(pos[time][i][1]) / latticeConstant - numberOfUnitCellsY / 2.0;
+			positionsF[i][2] = static_cast<float>(pos[time][i][2]) / latticeConstant - numberOfUnitCellsZ / 2.0;
 		}
 
 		for (int i = 0; i < _numberOfParticles; i++) {
@@ -305,26 +244,17 @@ void visual::mainLoopVisual(double*** pos, int time, int maxTime, double lattice
 			_gParticuleColorData[4 * ParticlesCount + 3] = _particlesContainer[i].a;
 
 			ParticlesCount++;
-
-
 		}
-
 		sortParticles();
 	}
-	// Update the buffers that OpenGL uses for rendering.
-	// There are much more sophisticated means to stream data from the CPU to the GPU, 
-	// but this is outside the scope of this tutorial.
-	// http://www.opengl.org/wiki/Buffer_Object_Streaming
-
 
 	glBindBuffer(GL_ARRAY_BUFFER, getParticlesPositionBuffer());
-	glBufferData(GL_ARRAY_BUFFER, _maxParticles * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See above link for details.
+	glBufferData(GL_ARRAY_BUFFER, _maxParticles * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW); // Buffer orphaning.
 	glBufferSubData(GL_ARRAY_BUFFER, 0, ParticlesCount * sizeof(GLfloat) * 4, _gParticulePositionSizeData);
 
 	glBindBuffer(GL_ARRAY_BUFFER, getParticlesColorBuffer());
-	glBufferData(GL_ARRAY_BUFFER, _maxParticles * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See above link for details.
+	glBufferData(GL_ARRAY_BUFFER, _maxParticles * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW); 
 	glBufferSubData(GL_ARRAY_BUFFER, 0, ParticlesCount * sizeof(GLubyte) * 4, _gParticuleColorData);
-
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -338,10 +268,9 @@ void visual::mainLoopVisual(double*** pos, int time, int maxTime, double lattice
 	// Set our "myTextureSampler" sampler to use Texture Unit 0
 	glUniform1i(_textureID, 0);
 
-	// Same as the billboards tutorial
+	// Update the camera and projection matrices
 	glUniform3f(_cameraRightWorldspaceID, ViewMatrix[0][0], ViewMatrix[1][0], ViewMatrix[2][0]);
 	glUniform3f(_cameraUpWorldspaceID, ViewMatrix[0][1], ViewMatrix[1][1], ViewMatrix[2][1]);
-
 	glUniformMatrix4fv(_viewProjMatrixID, 1, GL_FALSE, &ViewProjectionMatrix[0][0]);
 
 	// 1rst attribute buffer : vertices
@@ -383,35 +312,66 @@ void visual::mainLoopVisual(double*** pos, int time, int maxTime, double lattice
 	// These functions are specific to glDrawArrays*Instanced*.
 	// The first parameter is the attribute buffer we're talking about.
 	// The second parameter is the "rate at which generic vertex attributes advance when rendering multiple instances"
-	// http://www.opengl.org/sdk/docs/man/xhtml/glVertexAttribDivisor.xml
 	glVertexAttribDivisor(0, 0); // particles vertices : always reuse the same 4 vertices -> 0
 	glVertexAttribDivisor(1, 1); // positions : one per quad (its center)                 -> 1
 	glVertexAttribDivisor(2, 1); // color : one per quad                                  -> 1
 
-								 // Draw the particules !
-								 // This draws many times a small triangle_strip (which looks like a quad).
-								 // This is equivalent to :
-								 // for(i in ParticlesCount) : glDrawArrays(GL_TRIANGLE_STRIP, 0, 4), 
-								 // but faster.
 	if (_atomsVisible)
 		glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, ParticlesCount);
 
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);
-
-	//handleGui();
-
 }
 
-//void visual::handleGui()
-//{
-//	_theGui.handleFrame();
-//
-//	if (_theGui.VisualVisible())
-//		setAtomsVisible(true);
-//	else
-//		setAtomsVisible(false);
-//
-//	_theGui.handleMenu();
-//}
+void visual::openWindow()
+{
+	window = glfwCreateWindow(glfwGetVideoMode(glfwGetPrimaryMonitor())->width, glfwGetVideoMode(glfwGetPrimaryMonitor())->height, "ELSA MD-Simulation", glfwGetPrimaryMonitor(), NULL);
+
+	if (window == NULL) {
+		fprintf(stderr, "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible.\n");
+		getchar();
+		glfwTerminate();
+	}
+	glfwMakeContextCurrent(window);
+	glfwSwapInterval(1);
+}
+
+void visual::setAtomsVisible(bool visibility)
+{
+	_atomsVisible = visibility;
+}
+
+void visual::setNumberOfParticles(int number)
+{
+	_numberOfParticles = number;
+}
+
+void visual::setParticleCameraDist(int id, float dist)
+{
+	_particlesContainer[id].cameradistance = dist;
+}
+
+void visual::setParticlePosition(int id, glm::vec3 pos)
+{
+	_particlesContainer[id].pos = pos;
+}
+
+void visual::setParticleColor(int id, glm::vec4 color)
+{
+	_particlesContainer[id].r = static_cast<unsigned char>(color.x);
+	_particlesContainer[id].g = static_cast<unsigned char>(color.y);
+	_particlesContainer[id].b = static_cast<unsigned char>(color.z);
+	_particlesContainer[id].a = static_cast<unsigned char>(color.w);
+}
+
+void visual::setParticleSize(int id, float size)
+{
+	_particlesContainer[id].size = size;
+}
+
+void visual::sortParticles()
+{
+	std::sort(&_particlesContainer[0], &_particlesContainer[_maxParticles]);
+}
+
