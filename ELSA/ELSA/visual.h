@@ -71,7 +71,7 @@ private:
 public:
 	visual();
 	visual(const int maxPart);
-	~visual() = default;
+	~visual();
 
 	std::array<_particle, _maxParticles> getParticlesContainer();
 	void setParticleCameraDist(int id, float dist);

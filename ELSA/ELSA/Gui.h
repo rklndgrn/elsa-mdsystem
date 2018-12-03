@@ -57,6 +57,7 @@ private:
 	char* _lastStateFileName;
 
 	int _arrayLength{ -1 };
+	int _numberOfAtoms{ 0 };
 	int _numberOfTimeStepsPlot;
 
 	bool _simulate;
@@ -68,7 +69,7 @@ private:
 	
 public:
 	Gui();
-	~Gui() = default;
+	~Gui();
 
 
 	void setupGui(GLFWwindow *window);
@@ -107,17 +108,17 @@ public:
 
 	int _counter;
 
-	double* _cohesiveEnergy;
-	double* _debyeTemperature;
-	double* _kineticEnergy;
-	double* _meanSquareDisplacement;
-	double*** _pos;
-	double* _potentialEnergy;
-	double* _pressure;
-	double* _selfDiffusionCoeff;
-	double* _specificHeat;
-	double* _temp;
-	double* _totalEnergy;
+	double* _cohesiveEnergy = nullptr;
+	double* _debyeTemperature = nullptr;
+	double* _kineticEnergy = nullptr;
+	double* _meanSquareDisplacement = nullptr;
+	double*** _pos = nullptr;
+	double* _potentialEnergy = nullptr;
+	double* _pressure = nullptr;
+	double* _selfDiffusionCoeff = nullptr;
+	double* _specificHeat = nullptr;
+	double* _temp = nullptr;
+	double* _totalEnergy = nullptr;
 
 	bool showCrystalSelector(const char* label);
 	bool showMaterialSelector(const char* label);

@@ -12,6 +12,12 @@ visual::visual()//:_maxParticles(0)
 	initVisual();
 }
 
+visual::~visual()
+{
+	delete[] _gParticulePositionSizeData;
+	delete[]  _gParticuleColorData;
+}
+
 visual::visual(const int maxPart)//:_maxParticles(maxPart)
 {
 	//_theGui.setupGui(getWindow());

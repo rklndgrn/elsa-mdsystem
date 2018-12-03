@@ -93,7 +93,7 @@ int main()
 				myMaterial);
 
 			myWorld = World(myParameters, myGui.getNumberOfThreads());
-			cout << "Here we go!" << endl;
+			//cout << "Here we go!" << endl;
 
 			double deltaT = myParameters.getTimeStep();
 
@@ -121,7 +121,7 @@ int main()
 
 					//Here's where the magic happens
 				myWorld.performSimulation(t, 10);
-				cout << "Z-position of some random particle is " << myWorld.getResults().getPositions()[15][676][2] << endl;
+				//cout << "Z-position of some random particle is " << myWorld.getResults().getPositions()[15][676][2] << endl;
 					//---//
 					//for each (Atom* a in myWorld.getAtomInAtomList(103)->getNeighbourList())
 					//{
@@ -131,7 +131,7 @@ int main()
 
 				myGui.handleFrame();
 				myGui.handleMenu(t, myParameters.getSimulationTime(), &visualTime, maxVisualTime, &speed);
-
+				/*
 				if (t >= myParameters.getSimulationTime() - deltaT && t < myParameters.getSimulationTime())
 				{
 					Results r = myWorld.getResults();
@@ -159,11 +159,37 @@ int main()
 					}
 					myGui.setNumberOfTimeStepsPlot((int)round(myParameters.getSimulationTime() / myParameters.getTimeStep()));
 				}
+				*/
 
 
 			}
 			myGui.stopSimulate();
 			myGui.setMainVisible(true);
+
+			Results r = myWorld.getResults();
+			int aL = r.getArrayLength();
+			int N = myParameters.getNumberOfAtoms();
+			myGui.updateArrays(aL, N);
+			for (int x = 0; x < aL; x++)
+			{
+				myGui._cohesiveEnergy[x] = r.getCohesiveEnergy()[x];
+				myGui._debyeTemperature[x] = r.getDebyeTemperature()[x];
+				myGui._kineticEnergy[x] = r.getKineticEnergy()[x];
+				myGui._meanSquareDisplacement[x] = r.getMeanSquareDisplacement()[x];
+				myGui._potentialEnergy[x] = r.getPotentialEnergy()[x];
+				myGui._pressure[x] = r.getInternalPressure()[x];
+				myGui._selfDiffusionCoeff[x] = r.getDiffusionConstant()[x];
+				myGui._specificHeat[x] = r.getSpecificHeat()[x];
+				myGui._temp[x] = r.getTemperature()[x];
+				myGui._totalEnergy[x] = r.getTotalEnergy()[x];
+				for (int n = 0; n < N; n++)
+				{
+					myGui._pos[x][n][0] = r.getPositions()[x][n][0];
+					myGui._pos[x][n][1] = r.getPositions()[x][n][1];
+					myGui._pos[x][n][2] = r.getPositions()[x][n][2];
+				}
+			}
+			myGui.setNumberOfTimeStepsPlot((int)round(myParameters.getSimulationTime() / myParameters.getTimeStep()));
 
 			Atom* a;
 			ofstream saveLastState;
@@ -204,7 +230,7 @@ int main()
 			unitCellsZ = myParameters.getNumberOfUnitCellsZ();
 
 			myVis.setNumberOfParticles(myParameters.getNumberOfAtoms());
-			cout << "WE MADE IT!" << endl;
+			//cout << "WE MADE IT!" << endl;
 		}
 
 		//myGui.handlePlots();// , kinenen, totenen, tempen);

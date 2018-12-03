@@ -27,6 +27,30 @@ Gui::Gui()
 	_2D = false;
 }
 
+Gui::~Gui()
+{
+	delete[] _cohesiveEnergy;
+	delete[] _debyeTemperature;
+	delete[] _kineticEnergy;
+	delete[] _meanSquareDisplacement;
+	delete[]_potentialEnergy;
+	delete[] _pressure;
+	delete[] _selfDiffusionCoeff;
+	delete[] _specificHeat;
+	delete[] _temp;
+	delete[] _totalEnergy;
+
+	for (int t = 0; t < _arrayLength; t++)
+	{
+		for (int n = 0; n < _numberOfAtoms; n++)
+		{
+			delete[] _pos[t][n];
+		}
+		delete[] _pos[t];
+	}
+	delete[] _pos;
+}
+
 void Gui::setupGui(GLFWwindow *window)
 {
 
@@ -1002,7 +1026,7 @@ void Gui::updateArrays(int newArrayLength, int N)
 			   
 		for (int t = 0; t < _arrayLength; t++)
 		{
-			for (int n = 0; n < N; n++)
+			for (int n = 0; n < _numberOfAtoms; n++)
 			{
 				delete[] _pos[t][n];
 				_pos[t][n] = nullptr;
@@ -1014,7 +1038,7 @@ void Gui::updateArrays(int newArrayLength, int N)
 		_pos = nullptr;
 	}
 
-	if (newArrayLength > 0)
+	if (newArrayLength > 0 && N > 0)
 	{
 		_totalEnergy = new double[newArrayLength];
 		_potentialEnergy = new double[newArrayLength];
@@ -1037,4 +1061,7 @@ void Gui::updateArrays(int newArrayLength, int N)
 			}
 		}
 	}
+
+	_arrayLength = newArrayLength;
+	_numberOfAtoms = N;
 }

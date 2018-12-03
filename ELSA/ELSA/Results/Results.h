@@ -14,17 +14,17 @@ private:
 	unsigned int _arrayLength;
 	unsigned int _numberOfAtoms;
 
-	double* _cohesiveEnergy;
-	double* _debyeTemperature;
-	double* _diffusionConstant;
-	double* _internalPressure;
-	double* _kineticEnergy;
-	double* _meanSquareDisplacement;
-	double*** _positions;
-	double* _potentialEnergy;
-	double* _specificHeat;
-	double* _temperature;
-	double* _totalEnergy;
+	double* _cohesiveEnergy = nullptr;
+	double* _debyeTemperature = nullptr;
+	double* _diffusionConstant = nullptr;
+	double* _internalPressure = nullptr;
+	double* _kineticEnergy = nullptr;
+	double* _meanSquareDisplacement = nullptr;
+	double*** _positions = nullptr;
+	double* _potentialEnergy = nullptr;
+	double* _specificHeat = nullptr;
+	double* _temperature = nullptr;
+	double* _totalEnergy = nullptr;
 
 	//void swap(Results &) noexcept;
 
