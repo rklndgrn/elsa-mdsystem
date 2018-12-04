@@ -369,7 +369,7 @@ void Gui::handleConfigurationHeader()
 		ImGui::InputInt("Number of unit cells y [1]", &_numberOfUnitCellsY);
 		ImGui::InputInt("Number of unit cells z [1]", &_numberOfUnitCellsZ);
 
-		ImGui::Checkbox("Anderson thermostat", &_thermostat);
+		ImGui::Checkbox("Andersen thermostat", &_thermostat);
 		ImGui::Checkbox("2D simulation", &_2D);
 		ImGui::Checkbox("Init from end of last simulation", &_useLastSimulationState);
 		ImGui::SameLine();
@@ -795,11 +795,11 @@ void Gui::handleSettingsHeader()
 		ImGui::SameLine();
 		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");
 
-		ImGui::InputDouble("Epsilon [m]", &_epsilon, 0.0f, 0.0f, "%e");
+		ImGui::InputDouble("Epsilon [J]", &_epsilon, 0.0f, 0.0f, "%e");
 		ImGui::SameLine();
 		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");
 
-		ImGui::InputDouble("Sigma [J]", &_sigma, 0.0f, 0.0f, "%e");
+		ImGui::InputDouble("Sigma [m]", &_sigma, 0.0f, 0.0f, "%e");
 		ImGui::SameLine();
 		showHelpMarker("You can input value using the scientific notation,\n  e.g. \"1e+8\" becomes \"100000000\".\n");
 
@@ -916,7 +916,7 @@ void Gui::saveResultsWindow()
 
 
 
-			myFile << "Temperature [K] " << "Total energy [J] " << "Potential energy [J] " << "Kinetic energy [J] " << std::endl;
+			myFile << "Cohesive energy [J] " << "Debye temperature [K]" << "Kinetic energy [J] " << "Mean square displacement [m^2]" << "Potential energy [J] "<< "Pressure [Pa]"<< "Self diffusion coefficient [m^2/s]" << "Specific heat [J/K]" << "Temperature [K]" << "Total energy [J] " << std::endl;
 
 			for (int i = 0; i < _numberOfTimeStepsPlot; i++)
 			{
