@@ -13,7 +13,7 @@ Gui::Gui()
 	_epsilon = 0.34*(1.6021766208E-19);
 	_sigma = 2.65e-10;
 	_cutOffDistance = 1.5*408.53e-12;
-	_mass = 39.948*(1.660539040e-27);
+	_mass = 107.8682*(1.660539040e-27);
 	_timeStep = 1e-15;
 	_simulationTime = 20e-15;
 	_numberOfUnitCellsX = 10;
@@ -104,31 +104,31 @@ bool Gui::showMaterialSelector(const char* label)
 			break;
 			// Data for Argon
 		case 1: _latticeConstant = 525.6e-12;
-			_epsilon = 0.0104*_elementaryCharge;
+			_epsilon = 167e-23;
 			_sigma = 3.40e-10;
 			_mass = 39.948*unitMass;
 			break;
-			// Data for Helium (source: https://www.slideshare.net/TzuPingChen1/helium-gas-with-lennardjones-potential-in-mcmd-70967262)
+			// Data for Helium 
 		case 2: _latticeConstant = 424.4e-12;
-			_epsilon = 10.22*_elementaryCharge;
-			_sigma = 2.556e-10;
+			_epsilon = 14e-23;
+			_sigma = 2.56e-10;
 			_mass = 4.0026002*unitMass;
 			break;
 			//Data for Krypton
 		case 3: _latticeConstant = 570.6e-12;
-			_epsilon = 0.0140*_elementaryCharge;
+			_epsilon = 225e-23;
 			_sigma = 3.65e-10;
 			_mass = 83.798*unitMass;
 			break;
 			//Data for Neon
 		case 4: _latticeConstant = 442.9e-12;
-			_epsilon = 0.0031*_elementaryCharge;
+			_epsilon = 50e-23;
 			_sigma = 2.74e-10;
 			_mass = 20.1797*unitMass;
 			break;
 			//Data for Xenon.
 		case 5: _latticeConstant = 620.23e-12;
-			_epsilon = 0.02*_elementaryCharge;
+			_epsilon = 320e-23;
 			_sigma = 3.98e-10;
 			_mass = 131.293*unitMass;
 			break;
