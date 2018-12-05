@@ -22,7 +22,7 @@ public:
 	double calcLJPotential(double dist) const;
 	double calcMeanSquareDisplacement(double**, double**, unsigned int, double, double, double, bool);
 	double calcSelfDiffusionCoefficient(double ***, double, double, double, unsigned int, double, double, double, bool);
-	double calcSpecificHeat(unsigned int, double, double, double*);
+	double calcSpecificHeat(unsigned int, double, double, double, double*);
 	double calcTemperature(double, double, double);
 	double calcTotalEnergy(double, double);
 

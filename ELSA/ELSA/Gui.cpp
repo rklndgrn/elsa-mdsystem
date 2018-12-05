@@ -694,7 +694,7 @@ void Gui::handlePlots()
 				}
 			}
 
-			ImGui::PlotLines("", specificHeatVector, numberOfTimeSteps - 1, 0, "Specific heat [J K^-1]", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", specificHeatVector, numberOfTimeSteps - 1, 0, "Specific heat [J Kg^-1 K^-1]", min, max, ImVec2(1700, 480));
 			printStatistics(min, max, sumLast10);
 			delete specificHeatVector;
 		}
