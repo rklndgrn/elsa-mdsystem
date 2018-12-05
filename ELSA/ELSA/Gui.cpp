@@ -916,7 +916,7 @@ void Gui::saveResultsWindow()
 
 
 
-			myFile << "Cohesive energy [J] " << "Debye temperature [K]" << "Kinetic energy [J] " << "Mean square displacement [m^2]" << "Potential energy [J] "<< "Pressure [Pa]"<< "Self diffusion coefficient [m^2/s]" << "Specific heat [J/K]" << "Temperature [K]" << "Total energy [J] " << std::endl;
+			myFile << "Cohesive energy [J] " << "Debye temperature [K]" << "Kinetic energy [J] " << "Mean square displacement [m^2]" << "Potential energy [J] "<< "Pressure [Pa]"<< "Self diffusion coefficient [m^2/s]" << "Specific heat [J/(KgK)]" << "Temperature [K]" << "Total energy [J] " << std::endl;
 
 			for (int i = 0; i < _numberOfTimeStepsPlot; i++)
 			{
