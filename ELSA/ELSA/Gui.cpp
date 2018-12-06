@@ -451,7 +451,7 @@ void Gui::handleMenu(double elapsedTime, double totalTime, int* visualisationTim
 
 void Gui::handlePlots()
 {
-	if (_plotVisible)
+	if (_plotVisible && !_simulate)
 	{
 		bool auto_resize = false;
 		int numberOfTimeSteps = _numberOfTimeStepsPlot;
