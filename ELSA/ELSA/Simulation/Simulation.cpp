@@ -83,7 +83,7 @@ double Simulation::calcSelfDiffusionCoefficient(double*** positionsArray, double
 }
 
 //Calculate the specific heat from the mean of the temperature and the square of the temperature.
-double Simulation::calcSpecificHeat(unsigned int numberOfAtoms, double kB, double numberOfTimeSteps, double* tempArray)
+double Simulation::calcSpecificHeat(unsigned int numberOfAtoms, double kB, double numberOfTimeSteps, double atomicMass, double* tempArray)
 {
 	double expT{ 0 }, expT2{ 0 }, tmp{ 0 };
 	for (int i{ (int)round(numberOfTimeSteps) }; i > (int)floor(numberOfTimeSteps * 0.7); --i)
@@ -93,6 +93,7 @@ double Simulation::calcSpecificHeat(unsigned int numberOfAtoms, double kB, doubl
 	}
 	expT /= ceil(numberOfTimeSteps * 0.3);
 	expT2 /= ceil(numberOfTimeSteps * 0.3);
+
 
 	//Check that the temperature is greter than 0. If not the specific heat is set to 0.
 	if (expT > 0)
@@ -104,10 +105,14 @@ double Simulation::calcSpecificHeat(unsigned int numberOfAtoms, double kB, doubl
 		tmp *= (3 * numberOfAtoms*kB)/2;*/
 		tmp = expT2 - pow(expT, 2);
 		tmp /= pow(expT, 2);
+
+		printf("%e \n", tmp);
+
 		/*tmp /= kB;
 		tmp = 2.0 / (3.0 * (int)(numberOfAtoms) * kB) - 4.0/9.0*tmp;
 		tmp = 1.0 / tmp;*/
 		tmp = 9.0 * numberOfAtoms * kB / (6.0 - 4.0 * numberOfAtoms * tmp);
+		tmp = tmp / (numberOfAtoms*atomicMass);
 	}
 	return tmp;
 }

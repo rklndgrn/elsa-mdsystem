@@ -694,7 +694,7 @@ void Gui::handlePlots()
 				}
 			}
 
-			ImGui::PlotLines("", specificHeatVector, numberOfTimeSteps - 1, 0, "Specific heat [J K^-1]", min, max, ImVec2(1700, 480));
+			ImGui::PlotLines("", specificHeatVector, numberOfTimeSteps - 1, 0, "Specific heat [J Kg^-1 K^-1]", min, max, ImVec2(1700, 480));
 			printStatistics(min, max, sumLast10);
 			delete specificHeatVector;
 		}
@@ -916,7 +916,7 @@ void Gui::saveResultsWindow()
 
 
 
-			myFile << "Cohesive energy [J] " << "Debye temperature [K]" << "Kinetic energy [J] " << "Mean square displacement [m^2]" << "Potential energy [J] "<< "Pressure [Pa]"<< "Self diffusion coefficient [m^2/s]" << "Specific heat [J/K]" << "Temperature [K]" << "Total energy [J] " << std::endl;
+			myFile << "Cohesive energy [J] " << "Debye temperature [K]" << "Kinetic energy [J] " << "Mean square displacement [m^2]" << "Potential energy [J] "<< "Pressure [Pa]"<< "Self diffusion coefficient [m^2/s]" << "Specific heat [J/(KgK)]" << "Temperature [K]" << "Total energy [J] " << std::endl;
 
 			for (int i = 0; i < _numberOfTimeStepsPlot; i++)
 			{

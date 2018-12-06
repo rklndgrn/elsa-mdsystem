@@ -669,7 +669,7 @@ void World::updateResults(double elapsedTime, double T)
 	_myResults.setDiffusionConstant(selfDiffusionCoefficient, index);
 
 	//Specific heat.
-	double specificHeat = _mySimulation.calcSpecificHeat(N, _myParameters.getBoltzmann(), index, *(_myResults.getTemperature()));
+	double specificHeat = _mySimulation.calcSpecificHeat(N, _myParameters.getBoltzmann(), index, _myParameters.getChosenMaterial().getMass(), *(_myResults.getTemperature()));
 	_myResults.setSpecificHeat(specificHeat, index);
 }
 
